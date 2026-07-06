@@ -8,11 +8,13 @@
 |---|---|
 | [plan-writer](plan-writer/SKILL.md) | 요구사항 인터뷰 → 코드베이스 분석 → `docs/plan/YYYY-MM-DD-<주제>.md` 작업 계획 작성. 사용자 승인 게이트 포함. |
 | [plan-executor](plan-executor/SKILL.md) | 승인된 계획을 읽어 작업별 tier(standard/light)에 따라 서브에이전트에 위임·검증하는 오케스트레이터. |
+| [adr-writer](adr-writer/SKILL.md) | 되돌리기 비싼 결정을 `docs/decisions/`에 ADR로 기록. 계획의 판단 근거 섹션을 초안 재료로 사용. |
 
 ## 워크플로우
 
 ```
 요구사항 → plan-writer(인터뷰·계획 작성) → 사용자 승인 → plan-executor(위임·검증) → 완료 보고
+                                                            └→ 되돌리기 비싼 결정 발견 시 adr-writer(ADR 기록)
 ```
 
 - 계획 문서 포맷: Markdown 본문 + YAML frontmatter (기계 파싱용 tasks/status/depends_on/tier)
