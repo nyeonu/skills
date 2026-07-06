@@ -30,7 +30,7 @@ agents/
 
 ### 실행 순서
 
-![워크플로우](docs/workflow.svg)
+<img src="docs/workflow.svg" width="545" alt="워크플로우">
 
 노란 마름모 2곳(스펙·계획 승인)만 사람이 개입하는 게이트이고, 나머지 전환은 에이전트 간 자동 연결이다. 보라색은 단계가 아니라 두 시점에 끼어드는 ADR 기록이다. 도식 소스: [docs/workflow.d2](docs/workflow.d2)
 
