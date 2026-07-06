@@ -1,0 +1,37 @@
+direction: down
+
+start: 요구사항 도착 {shape: oval}
+interview: "1. interview-me\n의도 확정"
+spec: "2. spec-writer\ndocs/spec/ 스펙 작성"
+gate1: 스펙 승인 {
+  shape: diamond
+  style.fill: "#f9e2af"
+}
+plan: "3. task-breakdown\ndocs/plan/ 계획 작성"
+gate2: 계획 승인 {
+  shape: diamond
+  style.fill: "#f9e2af"
+}
+exec: "4. plan-executor\n서브에이전트 위임 실행"
+verify: "5. spec-conformance-check\n스펙 적합성 독립 검증"
+review: "6. review 3종 병렬\n품질 · 보안 · 성능"
+done: 완료 {shape: oval}
+adr1: "adr-writer\nADR Proposed 작성" {style.fill: "#cba6f7"}
+adr2: "adr-writer\nADR Accepted 확정" {style.fill: "#cba6f7"}
+
+start -> interview: 모호함
+start -> spec: 명확함
+interview -> spec
+spec -> gate1
+gate1 -> spec: 반려
+gate1 -> plan: 승인
+plan -> gate2
+gate2 -> plan: 반려
+gate2 -> exec: 승인
+gate2 -> adr1: 되돌리기 비싼\n결정 포함 시 {style.stroke-dash: 3}
+exec -> verify
+verify -> plan: FAIL {style.stroke: "#C5221F"}
+verify -> review: PASS
+verify -> adr2: PASS {style.stroke-dash: 3}
+review -> plan: 수정 필요 {style.stroke: "#C5221F"}
+review -> done: 통과
