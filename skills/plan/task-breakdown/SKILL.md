@@ -56,6 +56,6 @@ description: 승인된 스펙 문서(docs/spec/)를 하위(저비용) 에이전�
 
 ## 산출물 위치와 파일명
 
-- 저장: `{프로젝트 루트}/docs/plan/YYYY-MM-DD-<계획-주제-kebab-case>.md`. 디렉터리가 없으면 생성한다.
+- 저장: `{프로젝트 루트}/docs/plan/YYYY-MM-DD-<브랜치명>-<계획-주제-kebab-case>.md`. 디렉터리가 없으면 생성한다. 브랜치명은 `git branch --show-current`로 확인하고, `/`가 포함되면 `-`로 치환한다 (예: `feature/login` → `feature-login`).
 - frontmatter의 `spec` 필드에 원본 스펙 문서 경로를 기록한다.
 - 사용자가 다른 경로를 지정하면 그것을 따른다.
