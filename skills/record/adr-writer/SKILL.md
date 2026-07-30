@@ -30,9 +30,9 @@ description: 되돌리기 비싼 기술 결정을 ADR(Architecture Decision Reco
 ## 작성 절차
 
 1. 결정의 맥락을 수집한다. task-breakdown이 작성한 계획 문서가 있다면 그 "판단 근거(Rationale)" 섹션이 초안 재료다 — 대안과 트레이드오프가 이미 정리되어 있다.
-2. `docs/decisions/`에서 기존 ADR을 확인해 다음 번호를 정한다. 파일명: `ADR-NNN-<주제-kebab-case>.md`.
+2. `docs/decisions/`에서 기존 ADR을 확인해 다음 번호를 정한다. 파일명: `ADR-NNN-<YYYY-MM-DD>-<브랜치명>-<주제-kebab-case>.md` (예: `ADR-003-2026-07-30-feature-login-session-storage.md`). 브랜치명은 `git branch --show-current`로 확인하고, `/`가 포함되면 `-`로 치환한다 (예: `feature/login` → `feature-login`).
 3. 아래 템플릿으로 작성한다. 특히 **기각한 대안과 그 이유**를 생략하지 마라 — ADR 가치의 절반이 여기 있다.
-4. 기존 결정을 뒤집는 경우, 옛 ADR을 삭제·수정하지 말고 새 ADR을 작성한 뒤 옛 것의 Status를 `Superseded by ADR-NNN`으로 갱신한다. 옛 ADR은 역사적 맥락이다.
+4. 기존 결정을 뒤집는 경우, 옛 ADR을 삭제·수정하지 말고 새 ADR을 작성한 뒤 옛 것의 Status를 `Superseded by ADR-NNN-<YYYY-MM-DD>-<브랜치명>` 형식(새 ADR의 번호·날짜·브랜치명)으로 갱신한다. 파일명 앞부분과 일치시켜 대체한 ADR 파일을 바로 찾을 수 있게 한다. 옛 ADR은 역사적 맥락이다.
 
 ## 템플릿
 
@@ -40,7 +40,7 @@ description: 되돌리기 비싼 기술 결정을 ADR(Architecture Decision Reco
 # ADR-NNN: <결정 한 줄 요약>
 
 ## Status
-Proposed | Accepted | Superseded by ADR-XXX | Deprecated
+Proposed | Accepted | Superseded by ADR-NNN-<YYYY-MM-DD>-<브랜치명> | Deprecated
 
 ## Date
 YYYY-MM-DD

@@ -54,7 +54,7 @@ addyosmani `spec-driven-development`의 Phase 1(Specify)을 이 워크플로우�
 
 ```markdown
 ---
-spec_id: <YYYY-MM-DD-주제-kebab-case>
+spec_id: <YYYY-MM-DD-브랜치명-주제-kebab-case>
 title: <스펙 제목>
 status: draft                # draft | approved | superseded
 created: <YYYY-MM-DD>
@@ -88,7 +88,7 @@ created: <YYYY-MM-DD>
 
 ### 4. 저장 및 승인 요청 — 여기서 종료
 
-- `docs/spec/YYYY-MM-DD-<주제>.md`로 저장한다 (`status: draft`). 디렉터리가 없으면 생성한다.
+- `docs/spec/YYYY-MM-DD-<브랜치명>-<주제>.md`로 저장한다 (`status: draft`). 디렉터리가 없으면 생성한다. 브랜치명은 `git branch --show-current`로 확인하고, `/`가 포함되면 `-`로 치환한다 (예: `feature/login` → `feature-login`).
 - 사용자에게 스펙 검토를 요청하고 **종료한다.** 승인 후의 작업 분해는 task-breakdown이 별도 세션에서 수행한다.
 - 사용자가 승인하면 `status: approved`로 갱신한다. 이 승인이 첫 번째 게이트다.
 
