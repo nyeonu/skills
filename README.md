@@ -2,28 +2,65 @@
 
 요구사항 수집 → 스펙 → 계획 → 실행 → 검증 → 품질 검토 → 결정 기록을 하나의 환경(Cowork 또는 Claude Code CLI)에서 완결하는 워크플로우와 스킬 모음. 각 단계의 상세 규칙은 해당 스킬의 SKILL.md가 원본이다.
 
+## 설치
+
+이 레포는 Claude Code **플러그인 마켓플레이스**다. 두 가지 설치 경로가 있다.
+
+### 방법 A — 대화형 설치 (처음이면 이걸 권장)
+
+레포를 클론하고 그 안에서 Claude Code를 연 뒤 이렇게 말한다:
+
+```
+스킬 설치해줘
+```
+
+설치 가이드 스킬([.claude/skills/install-guide](.claude/skills/install-guide/SKILL.md))이 발동해서 MCP 서버 3종 → 스킬 플러그인 2종 순서로 각각의 역할을 설명하고, 필요한 것만 골라 설치해준다.
+
+### 방법 B — 직접 설치
+
+```bash
+claude plugin marketplace add nyeonu/skills
+```
+
+이후 `/plugin` 메뉴에서 설명을 보고 고르거나, CLI로 직접 설치한다:
+
+```bash
+claude plugin install be-workflow@be-agentic-workflow --scope user
+```
+
+| 플러그인 | 내용 | 비고 |
+|---|---|---|
+| `be-workflow` | 워크플로우 코어 스킬 7종 (아래 도식의 파이프라인 전체) | 상호 의존이라 묶음 설치 |
+| `be-review` | 리뷰 스킬 3종 + 페르소나 에이전트 2종 | 단독 사용 가능 |
+| `mcp-context7` | 라이브러리 최신 문서 조회 MCP | 선택. API 키 불필요 |
+| `mcp-atlassian` | Jira·Confluence 원격 MCP | 선택. 첫 사용 시 `/mcp`에서 OAuth 로그인 |
+| `mcp-chrome-devtools` | 성능 트레이스 측정 MCP | 선택. 로컬 Chrome 필요 |
+
+MCP 3종은 전부 선택 사항이고, 없어도 스킬들은 동작한다.
+
 ## 구조
 
 ```
-skills/
-  define/
-    interview-me/            # 모호한 요구사항의 의도 추출
-    spec-writer/             # 코드 기반 스펙 문서화
-  plan/
-    task-breakdown/          # 승인된 스펙 → PLAN.md 분해 (추적성 매핑 포함)
-  execute/
-    plan-executor/           # 계획 실행 오케스트레이션 (tier 기반 고/저비용 분리)
-  verify/
-    spec-conformance-check/  # 구현물 ↔ 스펙 독립 검증 (fail-fast 게이트)
-  review/
-    code-review-and-quality/   # 정확성·가독성·유지보수 (한글 번역)
-    security-and-hardening/    # 보안 (한글 번역)
-    performance-optimization/  # 성능 (한글 번역)
-  record/
-    adr-writer/              # ADR 2시점 기록 (Proposed → Accepted)
-agents/
-  code-reviewer.md           # 리뷰 페르소나 (한글 번역)
-  security-auditor.md        # 보안 감사 페르소나 (한글 번역)
+.claude-plugin/marketplace.json    # 마켓플레이스 정의 (플러그인 5종 목록)
+.claude/skills/install-guide/      # 대화형 설치 가이드 (레포 안에서만 발동)
+plugins/
+  be-workflow/skills/
+    using-agent-skills/        # 메타 라우터: 진입점 판단 + 공통 운영 규칙
+    interview-me/              # [정의] 모호한 요구사항의 의도 추출
+    spec-writer/               # [정의] 코드 기반 스펙 문서화
+    task-breakdown/            # [계획] 승인된 스펙 → PLAN.md 분해 (추적성 매핑 포함)
+    plan-executor/             # [실행] 계획 실행 오케스트레이션 (tier 기반 고/저비용 분리)
+    spec-conformance-check/    # [검증] 구현물 ↔ 스펙 독립 검증 (fail-fast 게이트)
+    adr-writer/                # [기록] ADR 2시점 기록 (Proposed → Accepted)
+  be-review/
+    skills/
+      code-review-and-quality/   # 정확성·가독성·유지보수 (한글 번역)
+      security-and-hardening/    # 보안 (한글 번역)
+      performance-optimization/  # 성능 (한글 번역)
+    agents/
+      code-reviewer.md           # 리뷰 페르소나 (한글 번역)
+      security-auditor.md        # 보안 감사 페르소나 (한글 번역)
+  mcp-context7/ · mcp-atlassian/ · mcp-chrome-devtools/   # MCP 서버 동봉 플러그인
 ```
 
 ## 사용 방법
@@ -59,7 +96,3 @@ agents/
 - 기존 plan-writer/plan-executor/adr-writer: 포맷 계약과 오케스트레이션 구조
 
 원본에서 무엇을 왜 바꿨는지는 [CUSTOMIZATIONS.md](CUSTOMIZATIONS.md)에 기록되어 있다.
-
-## 미포함 (의도적)
-
-- `workflow-router` (meta 라우팅 스킬): 흐름 안정화 후 도입 예정. 그 전까지는 레포 CLAUDE.md에 "모든 작업은 이 워크플로우의 진입점 판단부터 시작"을 명시해 대체한다.

@@ -1,0 +1,9 @@
+{
+  "name": "mcp-atlassian",
+  "version": "0.1.0",
+  "description": "Atlassian 공식 원격 MCP 서버 (Jira·Confluence·Compass). 요구사항 소스가 Jira 티켓이나 Confluence 기획서일 때 interview-me·spec-writer 단계에서 원문을 직접 읽어온다. 설치 후 첫 사용 시 /mcp에서 OAuth 로그인이 필요하다.",
+  "author": {
+    "name": "nyeonu",
+    "url": "https://github.com/nyeonu"
+  }
+}

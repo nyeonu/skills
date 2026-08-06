@@ -1,0 +1,35 @@
+{
+  "name": "be-agentic-workflow",
+  "description": "BE 개발 에이전틱 워크플로우: 요구사항 인터뷰 → 스펙 → 계획 → 실행 → 검증 → 리뷰 → ADR 기록 스킬 세트와 선택형 MCP 서버(context7, Atlassian, Chrome DevTools)",
+  "owner": {
+    "name": "nyeonu",
+    "url": "https://github.com/nyeonu"
+  },
+  "plugins": [
+    {
+      "name": "be-workflow",
+      "source": "./plugins/be-workflow",
+      "description": "워크플로우 코어 7종: interview-me, spec-writer, task-breakdown, plan-executor, spec-conformance-check, adr-writer + 메타 라우터(using-agent-skills)"
+    },
+    {
+      "name": "be-review",
+      "source": "./plugins/be-review",
+      "description": "리뷰 스킬 3종(코드 품질·보안·성능) + 리뷰어/보안 감사 에이전트 페르소나 2종"
+    },
+    {
+      "name": "mcp-context7",
+      "source": "./plugins/mcp-context7",
+      "description": "context7 MCP — 라이브러리 최신 문서 조회 (API 키 불필요)"
+    },
+    {
+      "name": "mcp-atlassian",
+      "source": "./plugins/mcp-atlassian",
+      "description": "Atlassian 원격 MCP — Jira·Confluence 연동 (첫 사용 시 OAuth 로그인)"
+    },
+    {
+      "name": "mcp-chrome-devtools",
+      "source": "./plugins/mcp-chrome-devtools",
+      "description": "Chrome DevTools MCP — 성능 트레이스·Core Web Vitals 측정"
+    }
+  ]
+}
