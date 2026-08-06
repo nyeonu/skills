@@ -1,0 +1,9 @@
+{
+  "name": "mcp-context7",
+  "version": "0.1.0",
+  "description": "context7 MCP 서버 (라이브러리·프레임워크 최신 공식 문서 조회). 스펙 작성·계획 실행 단계에서 의존성 문서를 학습 데이터 대신 최신 버전으로 참조할 때 사용. API 키 없이 동작하며(요율 제한), 키가 있으면 CONTEXT7_API_KEY 환경변수로 지정.",
+  "author": {
+    "name": "nyeonu",
+    "url": "https://github.com/nyeonu"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "be-review",
+  "version": "0.1.0",
+  "description": "코드 품질 리뷰 세트: 코드 리뷰(정확성·가독성·유지보수), 보안 하드닝, 성능 최적화 스킬 3종 + 리뷰어/보안 감사 서브에이전트 페르소나 2종. be-workflow 없이 단독으로도 쓸 수 있다.",
+  "author": {
+    "name": "nyeonu",
+    "url": "https://github.com/nyeonu"
+  }
+}
