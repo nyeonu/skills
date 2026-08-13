@@ -75,8 +75,8 @@ fresh-context 교차 검증 아이디어는 addyosmani `doubt-driven-development
 
 방법론은 손대지 않았다. 문서 끝의 "다른 스킬과의 연계(Interaction with Other Skills)" 섹션이 addyosmani 스킬명(spec-driven-development 등)을 가리키고 있어서, 우리 스킬명(spec-writer 등)으로만 바꿨다. 안 바꾸면 에이전트가 존재하지 않는 스킬을 호출하려 든다.
 
-## 리뷰 3종 + 페르소나 2종 — 번역만
+## 리뷰 3종 + 페르소나 2종 — 번역 + 테스트 리뷰 렌즈 1건 추가
 
-내용 무변경 한글 번역 (code-review-and-quality, security-and-hardening, performance-optimization + code-reviewer, security-auditor).
+한글 번역 (code-review-and-quality, security-and-hardening, performance-optimization + code-reviewer, security-auditor). 이후 code-review-and-quality에 한 가지를 더했다: 2단계(테스트 먼저 리뷰)의 "엣지 케이스를 커버하는가"가 리뷰어의 감에 맡겨져 있어서, tdd 스킬의 **테스트 도출 5출처를 리뷰 질문 표로 인라인**했다. 인라인한 이유는 be-review가 be-workflow 없이 단독 설치되는 플러그인이라 tdd 스킬 참조(강결합)를 피하기 위함이다 — 5출처 내용이 바뀌면 tdd SKILL.md와 이 표를 함께 갱신해야 한다. 이 렌즈는 plan-executor의 테스트 리포트(계획 대비 기계적 대조 = 양)와 역할이 다르다: 리뷰는 테스트의 질(동작 검증인가, 구현의 거울인가)과 계획 단계 도출이 놓친 분기(리뷰 시점엔 실제 코드가 있다)를 잡는 독립 시선이다.
 
 단 원본 리뷰 세트에 있던 `code-simplification`은 **일부러 뺐다** — 이건 검토 스킬이 아니라 코드를 고치는 스킬이라, 병렬로 돌리면 다른 리뷰어가 보고 있는 코드가 중간에 바뀐다. 코드 수정은 어떤 경우든 task-breakdown 루프(계획→승인→실행)를 통해서만 한다.
