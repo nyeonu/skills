@@ -55,7 +55,7 @@ AskUserQuestion(multiSelect)으로 아래 2개를 제시한다:
 
 | 플러그인 | 내용 | 권장 대상 |
 |---|---|---|
-| `be-workflow` | 워크플로우 코어 7종: using-agent-skills(메타 라우터), interview-me, spec-writer, task-breakdown, plan-executor, spec-conformance-check, adr-writer. 승인 게이트·문서 상태로 서로 연결되어 있어 묶음 설치만 지원 | 스펙→계획→실행→검증 워크플로우를 쓸 사람 전부 |
+| `be-workflow` | 워크플로우 코어 8종: using-agent-skills(메타 라우터), interview-me, spec-writer, task-breakdown, plan-executor, tdd, spec-conformance-check, adr-writer. 승인 게이트·문서 상태로 서로 연결되어 있어 묶음 설치만 지원 | 스펙→계획→실행→검증 워크플로우를 쓸 사람 전부 |
 | `be-review` | 리뷰 스킬 3종(코드 품질·보안·성능) + 리뷰어/보안 감사 에이전트 2종 | 코드 리뷰만 필요해도 단독 설치 가능 |
 
 ```bash

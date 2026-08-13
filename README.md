@@ -30,7 +30,7 @@ claude plugin install be-workflow@be-agentic-workflow --scope user
 
 | 플러그인 | 내용 | 비고 |
 |---|---|---|
-| `be-workflow` | 워크플로우 코어 스킬 7종 (아래 도식의 파이프라인 전체) | 상호 의존이라 묶음 설치 |
+| `be-workflow` | 워크플로우 코어 스킬 8종 (아래 도식의 파이프라인 전체 + 코드 작성 규율 tdd) | 상호 의존이라 묶음 설치 |
 | `be-review` | 리뷰 스킬 3종 + 페르소나 에이전트 2종 | 단독 사용 가능 |
 | `mcp-context7` | 라이브러리 최신 문서 조회 MCP | 선택. API 키 불필요 |
 | `mcp-atlassian` | Jira·Confluence 원격 MCP | 선택. 첫 사용 시 `/mcp`에서 OAuth 로그인 |
@@ -48,8 +48,9 @@ plugins/
     using-agent-skills/        # 메타 라우터: 진입점 판단 + 공통 운영 규칙
     interview-me/              # [정의] 모호한 요구사항의 의도 추출
     spec-writer/               # [정의] 코드 기반 스펙 문서화
-    task-breakdown/            # [계획] 승인된 스펙 → PLAN.md 분해 (추적성 매핑 포함)
+    task-breakdown/            # [계획] 승인된 스펙 → PLAN.md 분해 (SC→테스트→작업 추적성 매핑)
     plan-executor/             # [실행] 계획 실행 오케스트레이션 (tier 기반 고/저비용 분리)
+    tdd/                       # [실행] 코드 작성 규율 단일 원본 (테스트 먼저, 도출 5출처)
     spec-conformance-check/    # [검증] 구현물 ↔ 스펙 독립 검증 (fail-fast 게이트)
     adr-writer/                # [기록] ADR 2시점 기록 (Proposed → Accepted)
   be-review/
@@ -67,9 +68,50 @@ plugins/
 
 ### 실행 순서
 
-<img src="docs/workflow.svg" width="545" alt="워크플로우">
+```mermaid
+flowchart TD
+    start([요구사항 도착])
+    interview["1. interview-me<br>의도 확정"]
+    spec["2. spec-writer<br>docs/spec/ 스펙 작성"]
+    gate1{스펙 승인}
+    plan["3. task-breakdown<br>docs/plan/ 계획 작성"]
+    gate2{계획 승인}
+    exec["4. plan-executor<br>서브에이전트 위임 실행"]
+    verify["5. spec-conformance-check<br>스펙 적합성 독립 검증"]
+    review["6. review 3종 병렬<br>품질 · 보안 · 성능"]
+    done([완료])
+    adr1["adr-writer<br>ADR Proposed 작성"]
+    adr2["adr-writer<br>ADR Accepted 확정"]
+    tdd["tdd<br>코드 작성 규율"]
 
-노란 마름모 2곳(스펙·계획 승인)만 사람이 개입하는 게이트이고, 나머지 전환은 에이전트 간 자동 연결이다. 보라색은 단계가 아니라 두 시점에 끼어드는 ADR 기록이다. 도식 소스: [docs/workflow.d2](docs/workflow.d2)
+    start -->|모호함| interview
+    start -->|명확함| spec
+    interview --> spec
+    spec --> gate1
+    gate1 -->|반려| spec
+    gate1 -->|승인| plan
+    plan --> gate2
+    gate2 -->|반려| plan
+    gate2 -->|승인| exec
+    gate2 -.->|되돌리기 비싼<br>결정 포함 시| adr1
+    tdd -.->|테스트 도출 5출처| plan
+    tdd -.->|"RED→GREEN→REFACTOR<br>지시문 주입"| exec
+    exec --> verify
+    verify -->|FAIL| plan
+    verify -->|PASS| review
+    verify -.->|PASS| adr2
+    review -->|수정 필요| plan
+    review -->|통과| done
+
+    linkStyle 13,16 stroke:#C5221F,color:#C5221F
+    style gate1 fill:#f9e2af,color:#000
+    style gate2 fill:#f9e2af,color:#000
+    style adr1 fill:#cba6f7,color:#000
+    style adr2 fill:#cba6f7,color:#000
+    style tdd fill:#a6e3a1,color:#000
+```
+
+노란 마름모 2곳(스펙·계획 승인)만 사람이 개입하는 게이트이고, 나머지 전환은 에이전트 간 자동 연결이다. 보라색은 단계가 아니라 두 시점에 끼어드는 ADR 기록이고, 초록색은 계획(테스트 도출)과 실행(하위 에이전트 지시문)에 주입되는 코드 작성 규율 tdd다.
 
 ### 진입점 — 모든 작업이 1번부터 시작하지 않는다
 
@@ -92,7 +134,7 @@ plugins/
 
 ## 출처
 
-- addyosmani/agent-skills (MIT): interview-me 원본, spec-writer·task-breakdown의 방법론, review 3종·페르소나 번역 원문
+- addyosmani/agent-skills (MIT): interview-me 원본, spec-writer·task-breakdown·tdd의 방법론, review 3종·페르소나 번역 원문
 - 기존 plan-writer/plan-executor/adr-writer: 포맷 계약과 오케스트레이션 구조
 
 원본에서 무엇을 왜 바꿨는지는 [CUSTOMIZATIONS.md](CUSTOMIZATIONS.md)에 기록되어 있다.
