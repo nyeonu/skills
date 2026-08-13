@@ -9,7 +9,7 @@
     {
       "name": "be-workflow",
       "source": "./plugins/be-workflow",
-      "description": "워크플로우 코어 7종: interview-me, spec-writer, task-breakdown, plan-executor, spec-conformance-check, adr-writer + 메타 라우터(using-agent-skills)"
+      "description": "워크플로우 코어 8종: interview-me, spec-writer, task-breakdown, plan-executor, tdd, spec-conformance-check, adr-writer + 메타 라우터(using-agent-skills)"
     },
     {
       "name": "be-review",

@@ -67,7 +67,9 @@ created: <YYYY-MM-DD>
 
 ## 성공 기준 (Success Criteria)
 <완료를 판별하는 구체적·검증 가능한 조건. 각 항목에 SC-1, SC-2… 형식의 ID를 붙인다.
-이 ID는 task-breakdown의 추적성 매핑과 spec-conformance-check의 검증 단위가 된다.>
+이 ID는 task-breakdown의 추적성 매핑과 spec-conformance-check의 검증 단위가 된다.
+가능하면 각 SC를 테스트로 옮길 수 있는 형태(주어진 상태/입력 → 기대 결과)로 쓴다 —
+task-breakdown이 이 SC에서 테스트 케이스를 도출한다(tdd 스킬 출처 ①).>
 - SC-1: <조건>
 - SC-2: <조건>
 
