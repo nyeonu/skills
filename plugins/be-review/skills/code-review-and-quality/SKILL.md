@@ -3,7 +3,7 @@ name: code-review-and-quality
 description: 다축(multi-axis) 코드 리뷰를 수행한다. 모든 변경 사항을 머지 전 검토할 때 사용한다. 본인, 다른 에이전트, 또는 사람이 작성한 코드를 코드 리뷰할 때 사용한다. PR이 메인 브랜치에 들어가기 전에 여러 차원에서 코드 품질을 평가해야 할 때 사용한다.
 ---
 
-# 코드 리뷰와 품질 (Code Review and Quality)
+# 코드 리뷰와 품질
 
 ## 개요
 
@@ -19,21 +19,21 @@ description: 다축(multi-axis) 코드 리뷰를 수행한다. 모든 변경 사
 - 기존 코드를 리팩터링할 때
 - 버그 수정 후 (수정 사항과 회귀 테스트를 모두 리뷰)
 
-## 5축 리뷰 (The Five-Axis Review)
+## 5축 리뷰
 
 모든 리뷰는 다음 차원에 걸쳐 코드를 평가한다:
 
-### 1. 정확성 (Correctness)
+### 1. 정확성
 
 코드가 주장하는 대로 동작하는가?
 
 - 스펙 또는 작업 요구사항과 일치하는가?
 - 엣지 케이스가 처리되는가(null, 빈 값, 경계값)?
-- 에러 경로가 처리되는가(해피 패스만이 아니라)?
+- 오류 경로가 처리되는가(정상 경로만이 아니라)?
 - 모든 테스트를 통과하는가? 테스트가 실제로 올바른 것을 검증하고 있는가?
 - 오프바이원(off-by-one) 오류, 레이스 컨디션, 상태 불일치가 있는가?
 
-### 2. 가독성과 단순성 (Readability & Simplicity)
+### 2. 가독성과 단순성
 
 작성자의 설명 없이 다른 엔지니어(또는 에이전트)가 이 코드를 이해할 수 있는가?
 
@@ -46,7 +46,7 @@ description: 다축(multi-axis) 코드 리뷰를 수행한다. 모든 변경 사
 - 명백하지 않은 의도를 명확히 하는 데 주석이 도움이 되는가? (단, 명백한 코드에는 주석을 달지 마라.)
 - 죽은 코드 잔재가 있는가: no-op 변수(`_unused`), 하위 호환 심(shim), `// removed` 주석 등?
 
-### 3. 아키텍처 (Architecture)
+### 3. 아키텍처
 
 변경이 시스템 설계에 부합하는가?
 
@@ -56,7 +56,7 @@ description: 다축(multi-axis) 코드 리뷰를 수행한다. 모든 변경 사
 - 의존성이 올바른 방향으로 흐르는가(순환 의존성 없음)?
 - 추상화 수준이 적절한가(과도한 설계도 아니고, 지나친 결합도 아닌가)?
 
-### 4. 보안 (Security)
+### 4. 보안
 
 상세한 보안 지침은 `security-and-hardening`을 참고하라. 변경이 취약점을 유발하는가?
 
@@ -69,7 +69,7 @@ description: 다축(multi-axis) 코드 리뷰를 수행한다. 모든 변경 사
 - 외부 소스(API, 로그, 사용자 콘텐츠, 설정 파일)의 데이터를 신뢰할 수 없는 것으로 취급하는가?
 - 외부 데이터 흐름이 로직이나 렌더링에 사용되기 전에 시스템 경계에서 검증되는가?
 
-### 5. 성능 (Performance)
+### 5. 성능
 
 상세한 프로파일링과 최적화는 `performance-optimization`을 참고하라. 변경이 성능 문제를 유발하는가?
 
@@ -80,15 +80,17 @@ description: 다축(multi-axis) 코드 리뷰를 수행한다. 모든 변경 사
 - 목록 엔드포인트에 페이지네이션이 누락되어 있는가?
 - 핫 패스(hot path)에서 생성되는 큰 객체가 있는가?
 
-## 변경 크기 (Change Sizing)
+## 변경 크기
 
 작고 집중된 변경은 리뷰하기 쉽고, 머지가 빠르며, 배포가 안전하다. 다음 크기를 목표로 하라:
 
 ```
-~100 lines changed   → Good. Reviewable in one sitting.
-~300 lines changed   → Acceptable if it's a single logical change.
-~1000 lines changed  → Too large. Split it.
+변경 ~100줄   → 좋다. 한 번에 리뷰할 수 있다.
+변경 ~300줄   → 하나의 논리적 변경이라면 수용 가능.
+변경 ~1000줄  → 너무 크다. 분할하라.
 ```
+
+(위 수치는 절대 기준이 아니라 리뷰 가능성 판단의 기준점이다.)
 
 **"하나의 변경"으로 간주되는 것:** 한 가지를 다루고, 관련 테스트를 포함하며, 제출 후에도 시스템이 정상 동작하도록 유지하는 자기완결적(self-contained)인 단일 수정. 기능의 한 부분이지 — 기능 전체가 아니다.
 
@@ -105,7 +107,7 @@ description: 다축(multi-axis) 코드 리뷰를 수행한다. 모든 변경 사
 
 **리팩터링과 기능 작업을 분리하라.** 기존 코드를 리팩터링하면서 새 동작을 추가하는 변경은 두 개의 변경이다 — 따로 제출하라. 소소한 정리(변수 이름 변경)는 리뷰어 재량으로 포함할 수 있다.
 
-## 변경 설명 (Change Descriptions)
+## 변경 설명
 
 모든 변경에는 버전 관리 히스토리에서 독립적으로 이해되는 설명이 필요하다.
 
@@ -115,16 +117,16 @@ description: 다축(multi-axis) 코드 리뷰를 수행한다. 모든 변경 사
 
 **안티패턴:** "Fix bug," "Fix build," "Add patch," "Moving code from A to B," "Phase 1," "Add convenience functions."
 
-## 리뷰 프로세스 (Review Process)
+## 리뷰 프로세스
 
 ### 1단계: 맥락 이해
 
 코드를 보기 전에 의도를 이해하라:
 
 ```
-- What is this change trying to accomplish?
-- What spec or task does it implement?
-- What is the expected behavior change?
+- 이 변경이 이루려는 것은 무엇인가?
+- 어떤 스펙 또는 작업을 구현하는가?
+- 기대되는 동작 변화는 무엇인가?
 ```
 
 ### 2단계: 테스트를 먼저 리뷰
@@ -132,11 +134,11 @@ description: 다축(multi-axis) 코드 리뷰를 수행한다. 모든 변경 사
 테스트는 의도와 커버리지를 드러낸다:
 
 ```
-- Do tests exist for the change?
-- Do they test behavior (not implementation details)?
-- Are edge cases covered?
-- Do tests have descriptive names?
-- Would the tests catch a regression if the code changed?
+- 이 변경에 대한 테스트가 존재하는가?
+- 테스트가 동작을 검증하는가 (구현 세부가 아니라)?
+- 엣지 케이스가 커버되는가?
+- 테스트 이름이 기대 동작을 서술하는가?
+- 코드가 잘못 바뀌면 이 테스트가 회귀를 잡아내는가?
 ```
 
 "엣지 케이스를 커버하는가"는 감으로 판정하지 말고 **테스트 도출 5출처**를 렌즈로 훑어라 — 각 출처에서 빠진 묶음이 곧 커버리지 구멍이다:
@@ -156,12 +158,12 @@ description: 다축(multi-axis) 코드 리뷰를 수행한다. 모든 변경 사
 다섯 가지 축을 염두에 두고 코드를 훑어라:
 
 ```
-For each file changed:
-1. Correctness: Does this code do what the test says it should?
-2. Readability: Can I understand this without help?
-3. Architecture: Does this fit the system?
-4. Security: Any vulnerabilities?
-5. Performance: Any bottlenecks?
+변경된 파일마다:
+1. 정확성: 테스트가 말하는 대로 코드가 동작하는가?
+2. 가독성: 도움 없이 이해할 수 있는가?
+3. 아키텍처: 시스템에 들어맞는가?
+4. 보안: 취약점이 있는가?
+5. 성능: 병목이 있는가?
 ```
 
 ### 4단계: 발견 사항 분류
@@ -178,19 +180,19 @@ For each file changed:
 
 이렇게 하면 작성자가 모든 피드백을 필수로 여겨 선택적 제안에 시간을 낭비하는 것을 방지할 수 있다.
 
-### 5단계: 검증의 검증 (Verify the Verification)
+### 5단계: 검증의 검증
 
 작성자의 검증 스토리를 확인하라:
 
 ```
-- What tests were run?
-- Did the build pass?
-- Was the change tested manually?
-- Are there screenshots for UI changes?
-- Is there a before/after comparison?
+- 어떤 테스트를 실행했는가?
+- 빌드가 통과했는가?
+- 수동으로도 확인했는가?
+- UI 변경이면 스크린샷이 있는가?
+- 변경 전/후 비교가 있는가?
 ```
 
-## 멀티 모델 리뷰 패턴 (Multi-Model Review Pattern)
+## 멀티 모델 리뷰 패턴
 
 리뷰 관점별로 서로 다른 모델을 사용하라:
 
@@ -216,7 +218,7 @@ our project conventions. The spec says [X]. The change should [Y].
 Flag any issues as Critical, Important, or Suggestion.
 ```
 
-## 죽은 코드 위생 (Dead Code Hygiene)
+## 죽은 코드 위생
 
 리팩터링이나 구현 변경 후에는 고아가 된(orphaned) 코드를 확인하라:
 
@@ -227,14 +229,14 @@ Flag any issues as Critical, Important, or Suggestion.
 죽은 코드를 방치하지 마라 — 미래의 독자와 에이전트를 혼란스럽게 한다. 하지만 확신이 없는 것을 말없이 삭제하지도 마라. 의심스러우면 물어라.
 
 ```
-DEAD CODE IDENTIFIED:
-- formatLegacyDate() in src/utils/date.ts — replaced by formatDate()
-- OldTaskCard component in src/components/ — replaced by TaskCard
-- LEGACY_API_URL constant in src/config.ts — no remaining references
-→ Safe to remove these?
+죽은 코드 발견:
+- src/utils/date.ts의 formatLegacyDate() — formatDate()로 대체됨
+- src/components/의 OldTaskCard 컴포넌트 — TaskCard로 대체됨
+- src/config.ts의 LEGACY_API_URL 상수 — 남은 참조 없음
+→ 이것들을 제거해도 되는가?
 ```
 
-## 리뷰 속도 (Review Speed)
+## 리뷰 속도
 
 느린 리뷰는 팀 전체를 막는다. 리뷰를 위한 컨텍스트 전환 비용은 다른 사람에게 부과되는 대기 비용보다 작다.
 
@@ -243,7 +245,7 @@ DEAD CODE IDENTIFIED:
 - **빠른 최종 승인보다 빠른 개별 응답을 우선하라.** 여러 라운드가 필요하더라도 빠른 피드백이 좌절감을 줄인다
 - **큰 변경:** 거대한 체인지셋을 하나로 리뷰하기보다 작성자에게 분할을 요청하라
 
-## 의견 충돌 처리 (Handling Disagreements)
+## 의견 충돌 처리
 
 리뷰 분쟁을 해결할 때는 다음 위계를 적용하라:
 
@@ -254,7 +256,7 @@ DEAD CODE IDENTIFIED:
 
 **"나중에 정리하겠다"를 받아들이지 마라.** 경험적으로 미뤄진 정리는 거의 이루어지지 않는다. 진짜 비상 상황이 아니라면 제출 전 정리를 요구하라. 이번 변경에서 주변 문제를 처리할 수 없다면 본인에게 할당한(self-assigned) 버그 등록을 요구하라.
 
-## 리뷰에서의 정직함 (Honesty in Review)
+## 리뷰에서의 정직함
 
 본인, 다른 에이전트, 또는 사람이 작성한 코드를 리뷰할 때:
 
@@ -264,7 +266,7 @@ DEAD CODE IDENTIFIED:
 - **명백한 문제가 있는 접근에는 이의를 제기하라.** 아첨(sycophancy)은 리뷰의 실패 유형이다. 구현에 문제가 있으면 직접적으로 말하고 대안을 제시하라.
 - **오버라이드는 품위 있게 수용하라.** 작성자가 전체 맥락을 알고 있으면서 동의하지 않는다면 그 판단을 존중하라. 사람이 아닌 코드에 대해 코멘트하라 — 개인에 대한 비판은 코드 자체에 초점을 맞추도록 재구성하라.
 
-## 의존성 규율 (Dependency Discipline)
+## 의존성 규율
 
 코드 리뷰의 일부는 의존성 리뷰다:
 
@@ -277,57 +279,57 @@ DEAD CODE IDENTIFIED:
 
 **원칙:** 새 의존성보다 표준 라이브러리와 기존 유틸리티를 선호하라. 모든 의존성은 부채(liability)다.
 
-## 리뷰 체크리스트 (The Review Checklist)
+## 리뷰 체크리스트
 
 ```markdown
-## Review: [PR/Change title]
+## 리뷰: [PR/변경 제목]
 
-### Context
-- [ ] I understand what this change does and why
+### 맥락
+- [ ] 이 변경이 무엇을 왜 하는지 이해했다
 
-### Correctness
-- [ ] Change matches spec/task requirements
-- [ ] Edge cases handled
-- [ ] Error paths handled
-- [ ] Tests cover the change adequately
+### 정확성
+- [ ] 변경이 스펙/작업 요구사항과 일치한다
+- [ ] 엣지 케이스가 처리된다
+- [ ] 오류 경로가 처리된다
+- [ ] 테스트가 변경을 충분히 커버한다
 
-### Readability
-- [ ] Names are clear and consistent
-- [ ] Logic is straightforward
-- [ ] No unnecessary complexity
+### 가독성
+- [ ] 이름이 명확하고 일관된다
+- [ ] 로직이 직관적이다
+- [ ] 불필요한 복잡성이 없다
 
-### Architecture
-- [ ] Follows existing patterns
-- [ ] No unnecessary coupling or dependencies
-- [ ] Appropriate abstraction level
+### 아키텍처
+- [ ] 기존 패턴을 따른다
+- [ ] 불필요한 결합이나 의존성이 없다
+- [ ] 추상화 수준이 적절하다
 
-### Security
-- [ ] No secrets in code
-- [ ] Input validated at boundaries
-- [ ] No injection vulnerabilities
-- [ ] Auth checks in place
-- [ ] External data sources treated as untrusted
+### 보안
+- [ ] 코드에 시크릿이 없다
+- [ ] 입력이 경계에서 검증된다
+- [ ] 인젝션 취약점이 없다
+- [ ] 인증/인가 검사가 있다
+- [ ] 외부 데이터 소스를 신뢰하지 않는 것으로 취급한다
 
-### Performance
-- [ ] No N+1 patterns
-- [ ] No unbounded operations
-- [ ] Pagination on list endpoints
+### 성능
+- [ ] N+1 패턴이 없다
+- [ ] 무제한 연산이 없다
+- [ ] 목록 엔드포인트에 페이지네이션이 있다
 
-### Verification
-- [ ] Tests pass
-- [ ] Build succeeds
-- [ ] Manual verification done (if applicable)
+### 검증
+- [ ] 테스트 통과
+- [ ] 빌드 성공
+- [ ] 수동 확인 완료 (해당하는 경우)
 
-### Verdict
-- [ ] **Approve** — Ready to merge
-- [ ] **Request changes** — Issues must be addressed
+### 판정
+- [ ] **승인(Approve)** — 머지 가능
+- [ ] **수정 요청(Request changes)** — 이슈 해결 필요
 ```
-## 참고 자료 (See Also)
+## 참고 자료
 
 - 상세한 보안 리뷰 지침은 `references/security-checklist.md` 참고
 - 성능 리뷰 점검 항목은 `references/performance-checklist.md` 참고
 
-## 흔한 합리화 (Common Rationalizations)
+## 흔한 합리화
 
 | 합리화 | 현실 |
 |---|---|
@@ -337,7 +339,7 @@ DEAD CODE IDENTIFIED:
 | "AI가 생성한 코드는 아마 괜찮을 것이다" | AI 코드는 더 적은 검증이 아니라 더 많은 검증이 필요하다. 틀렸을 때조차 자신만만하고 그럴듯하다. |
 | "테스트가 통과하니 좋은 코드다" | 테스트는 필요조건이지 충분조건이 아니다. 아키텍처 문제, 보안 이슈, 가독성 문제를 잡아내지 못한다. |
 
-## 위험 신호 (Red Flags)
+## 위험 신호
 
 - 아무 리뷰 없이 머지된 PR
 - 테스트 통과 여부만 확인하는 리뷰(다른 축 무시)
@@ -348,7 +350,7 @@ DEAD CODE IDENTIFIED:
 - 심각도 라벨 없는 리뷰 코멘트 — 무엇이 필수이고 선택인지 불분명해진다
 - "나중에 고치겠다"를 수용하는 것 — 절대 이루어지지 않는다
 
-## 검증 (Verification)
+## 검증
 
 리뷰 완료 후:
 

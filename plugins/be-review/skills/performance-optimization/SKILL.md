@@ -21,6 +21,8 @@ description: 애플리케이션 성능을 최적화한다. 성능 요구사항�
 
 ## Core Web Vitals 목표치
 
+아래 구간은 Google이 공식 문서(web.dev)에서 정의한 기준이다.
+
 | 지표 | 좋음 | 개선 필요 | 나쁨 |
 |--------|------|-------------------|------|
 | **LCP** (Largest Contentful Paint) | ≤ 2.5s | ≤ 4.0s | > 4.0s |
@@ -171,14 +173,6 @@ const tasks = await db.tasks.findMany({
     height="1000"
     type="image/avif"
   />
-  <source
-    media="(max-width: 767px)"
-    srcset="/hero-mobile-400.webp 400w, /hero-mobile-800.webp 800w"
-    sizes="100vw"
-    width="800"
-    height="1000"
-    type="image/webp"
-  />
   <!-- Desktop: landscape crop (2:1) -->
   <source
     srcset="/hero-800.avif 800w, /hero-1200.avif 1200w, /hero-1600.avif 1600w"
@@ -187,13 +181,7 @@ const tasks = await db.tasks.findMany({
     height="600"
     type="image/avif"
   />
-  <source
-    srcset="/hero-800.webp 800w, /hero-1200.webp 1200w, /hero-1600.webp 1600w"
-    sizes="(max-width: 1200px) 100vw, 1200px"
-    width="1200"
-    height="600"
-    type="image/webp"
-  />
+  <!-- WebP 폴백이 필요하면 같은 패턴으로 type="image/webp" source를 각 구간 뒤에 추가 -->
   <img
     src="/hero-desktop.jpg"
     width="1200"
@@ -291,7 +279,7 @@ res.set('Cache-Control', 'public, max-age=300'); // 5 minutes
 
 ## 성능 예산 (Performance Budget)
 
-예산을 설정하고 강제하라:
+예산을 설정하고 강제하라. 아래 수치는 공식 기준이 아니라 프로젝트 기본값 예시다 — 스펙에 성능 요구사항이 있으면 그 값을 쓰고, 없으면 이 예시를 시작점으로 사용자와 확정한다:
 
 ```
 JavaScript bundle: < 200KB gzipped (initial load)
@@ -324,7 +312,7 @@ npx lhci autorun
 | "나중에 최적화할게요" | 성능 부채는 복리로 불어난다. 명백한 안티패턴은 지금 고치고, 마이크로 최적화는 미뤄라. |
 | "제 컴퓨터에서는 빠른데요" | 당신의 컴퓨터는 사용자의 컴퓨터가 아니다. 대표성 있는 하드웨어와 네트워크에서 프로파일링하라. |
 | "이 최적화는 자명해요" | 측정하지 않았다면 모르는 것이다. 먼저 프로파일링하라. |
-| "사용자는 100ms를 못 느껴요" | 연구에 따르면 100ms의 지연은 전환율(conversion rate)에 영향을 미친다. 사용자는 생각보다 많이 알아챈다. |
+| "사용자는 100ms를 못 느껴요" | 체감 여부는 짐작이 아니라 측정 대상이다. 지연은 상호작용마다 쌓이고, 쌓인 지연은 사용자가 알아챈다. |
 | "프레임워크가 성능을 알아서 처리해요" | 프레임워크는 일부 문제를 예방하지만 N+1 쿼리나 과도한 번들 크기는 해결하지 못한다. |
 
 ## 위험 신호 (Red Flags)

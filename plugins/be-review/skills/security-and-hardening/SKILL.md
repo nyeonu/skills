@@ -3,7 +3,7 @@ name: security-and-hardening
 description: 코드를 보안 취약점으로부터 강화(hardening)한다. 사용자 입력 처리, 인증(authentication), 데이터 저장, 외부 연동을 다룰 때 사용한다. 신뢰할 수 없는 데이터를 받거나, 사용자 세션을 관리하거나, 서드파티 서비스와 상호작용하는 기능을 만들 때 입력 검증과 OWASP 기준의 보안 점검을 위해 사용한다.
 ---
 
-# 보안 및 하드닝 (Security and Hardening)
+# 보안과 하드닝
 
 ## 개요
 
@@ -18,7 +18,7 @@ description: 코드를 보안 취약점으로부터 강화(hardening)한다. 사
 - 파일 업로드, 웹훅(webhook), 콜백을 추가할 때
 - 결제 또는 개인식별정보(PII) 데이터를 처리할 때
 
-## 3단계 경계 시스템 (The Three-Tier Boundary System)
+## 3단계 경계 시스템
 
 ### 항상 할 것 (예외 없음)
 
@@ -53,7 +53,7 @@ description: 코드를 보안 취약점으로부터 강화(hardening)한다. 사
 
 ## OWASP Top 10 예방
 
-### 1. 인젝션 (SQL, NoSQL, OS 커맨드)
+### 1. 인젝션 — SQL, NoSQL, OS 명령
 
 ```typescript
 // BAD: SQL injection via string concatenation
@@ -213,7 +213,7 @@ function validateUpload(file: UploadedFile) {
 }
 ```
 
-## npm audit 결과 트리아지(triage)
+## npm audit 결과 트리아지
 
 모든 감사(audit) 결과가 즉각적인 조치를 요구하는 것은 아니다. 다음 의사결정 트리를 사용하라:
 
@@ -240,7 +240,9 @@ npm audit reports a vulnerability
 
 수정을 미룰 때는 그 이유를 문서화하고 재검토 날짜를 정하라.
 
-## 레이트 리미팅 (Rate Limiting)
+## 레이트 리미팅
+
+아래 수치(창 크기, 허용 횟수)는 공식 표준이 아니라 프로젝트 기본값 예시다. 트래픽 특성에 맞게 조정하고, 조정한 값은 근거와 함께 기록한다.
 
 ```typescript
 import rateLimit from 'express-rate-limit';
@@ -260,7 +262,7 @@ app.use('/api/auth/', rateLimit({
 }));
 ```
 
-## 시크릿 관리 (Secrets Management)
+## 시크릿 관리
 
 ```
 .env files:
@@ -283,6 +285,8 @@ git diff --cached | grep -i "password\|secret\|api_key\|token"
 ```
 
 ## 보안 리뷰 체크리스트
+
+괄호 안 수치(솔트 라운드, 시도 횟수 등)는 널리 쓰는 시작점이지 공식 기준이 아니다 — 프로젝트에서 다른 값을 쓰면 그 값을 기준으로 점검한다.
 
 ```markdown
 ### 인증 (Authentication)
@@ -312,11 +316,11 @@ git diff --cached | grep -i "password\|secret\|api_key\|token"
 - [ ] 의존성 취약점 감사 완료
 - [ ] 오류 메시지가 내부 정보를 노출하지 않음
 ```
-## 참고 (See Also)
+## 참고
 
 상세 보안 체크리스트와 커밋 전 검증 단계는 `references/security-checklist.md`를 참고하라.
 
-## 흔한 합리화 (Common Rationalizations)
+## 흔한 합리화
 
 | 합리화 | 현실 |
 |---|---|
@@ -326,7 +330,7 @@ git diff --cached | grep -i "password\|secret\|api_key\|token"
 | "프레임워크가 보안을 처리해줘" | 프레임워크는 도구를 제공할 뿐, 보장을 제공하지 않는다. 여전히 올바르게 사용해야 한다. |
 | "이건 그냥 프로토타입이야" | 프로토타입은 프로덕션이 된다. 보안 습관은 첫날부터. |
 
-## 위험 신호 (Red Flags)
+## 위험 신호
 
 - 사용자 입력이 데이터베이스 쿼리, 셸 커맨드, HTML 렌더링에 직접 전달됨
 - 소스 코드나 커밋 히스토리에 시크릿 존재
@@ -336,7 +340,7 @@ git diff --cached | grep -i "password\|secret\|api_key\|token"
 - 스택 트레이스나 내부 오류가 사용자에게 노출됨
 - 알려진 치명적(critical) 취약점을 가진 의존성
 
-## 검증 (Verification)
+## 검증
 
 보안 관련 코드를 구현한 후:
 
