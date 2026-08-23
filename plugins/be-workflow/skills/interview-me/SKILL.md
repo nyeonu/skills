@@ -1,225 +1,197 @@
 ---
 name: interview-me
-description: Extracts what the user actually wants instead of what they think they should want. Achieves this through one-question-at-a-time interview until ~95% confidence about the underlying intent. Use when an ask is underspecified ("build me X" without "for whom" or "why now"), when the user explicitly invokes ("interview me", "grill me", "are we sure?", "stress-test my thinking"), or when you catch yourself silently filling in ambiguous requirements before any plan, spec, or code exists.
+description: 모호한 요구사항에서 사용자의 실제 의도를 끌어내는 인터뷰 스킬. 요청에 대상 사용자·이유·성공 기준·핵심 제약 중 하나라도 빠져 있을 때, 사용자가 "인터뷰해줘", "질문해줘", "시작 전에 내 생각 점검해줘" 등을 언급할 때, 또는 계획·스펙·코드를 만들기 전에 모호한 요구사항을 조용히 메꾸고 있는 자신을 발견하면 반드시 이 스킬을 사용하라. 한 번에 질문 하나씩, 추정을 붙여 묻는다. 의도가 확인되면 spec-writer로 연결한다.
 ---
 
 # Interview Me
 
-## Overview
+사람이 요청하는 것과 실제로 원하는 것은 다르다. "대시보드 만들어줘"는 대시보드가 문제를 풀어서가 아니라, 그렇게 요청하는 것이 관례라서 나온 말일 수 있다. 이 간극을 찾는 가장 싼 시점은 계획·스펙·코드가 생기기 전이다. 일단 만들기 시작하면 되돌리는 비용이 생기고, 사용자는 잘못 만든 것을 "이 정도면 됐다"로 합리화하게 된다.
 
-What people ask for and what they actually want are different things. They ask for "a dashboard" because that's what one asks for, not because a dashboard solves their problem. They say "make it faster" without a number to hit.
+이 스킬은 그 간극을 비용이 생기기 전에 닫는다. 질문을 한 번에 하나씩, 내 추정을 붙여서 묻고, 사용자의 다음 반응을 예측할 수 있을 때까지 반복한다. 이 워크플로우에서 interview-me는 spec-writer의 앞 단계다 — 확인된 의도가 스펙의 입력이 된다.
 
-The cheapest moment to find this gap is before any plan, spec, or code exists. Once you've started building, switching costs are real, and the user will rationalize the wrong thing into a "good enough" thing. The misfit gets locked in.
+(원본은 addyosmani/agent-skills의 interview-me다. 방법론은 유지하고, 연계 대상을 이 워크플로우의 스킬로 바꿨다.)
 
-This skill closes the gap before it costs anything. The other Define-phase skills assume you already know roughly what you want: `idea-refine` generates variations from an idea, `spec-driven-development` writes the requirements down, `doubt-driven-development` stress-tests a plan after you've drafted one. Interview-me is the part before all of those, where you ask one question at a time, with your best guess attached, until you can predict what the user is going to say before they say it.
+## 사용 시점
 
-## When to Use
+- 요청에 다음 중 하나라도 빠져 있을 때: **누가** 쓰는가, **왜** 원하는가, **성공**은 어떤 모습인가, 무엇이 **핵심 제약**인가
+- 요청이 구체적이지 않고 관례적일 때 ("X 만들어줘", "더 빠르게 해줘") — 추측 없이는 풀 수 없는 요청
+- 확인하지 않은 가정을 깔고 시작하려는 자신을 발견했을 때
+- 두 가치가 충돌하는데(단순함 vs 유연함, 비용 vs 속도) 사용자가 어느 쪽을 우선하는지 말하지 않았을 때
+- 사용자가 명시적으로 요청할 때: "인터뷰해줘", "질문해줘", "시작 전에 점검해줘"
 
-Apply this skill when:
+**사용하지 않는 경우:**
 
-- The ask is missing at least one of: **who** the user is, **why** they want it, what **success** looks like, what the binding **constraint** is
-- The request is conventional rather than specific ("build me X", "make it faster") and you can't unpack the convention without guessing
-- You're tempted to start with assumptions you haven't surfaced
-- The user hasn't said which value they're optimizing for when two reasonable ones are in tension (simplicity vs. flexibility, cost vs. speed)
-- The user explicitly invokes: "interview me", "grill me", "before we start, are we sure?", "stress-test my thinking"
+- 요청이 자명하고 자기완결적일 때 ("이 변수 이름 바꿔줘", "오타 고쳐줘")
+- 사용자가 검증보다 속도를 원한다고 명시했을 때
+- 순수 정보 요청 ("X는 어떻게 동작하나?")
+- 기계적 작업 (이름 변경, 포맷팅, 파일 이동)
+- 이미 의도를 충분히 파악했을 때 — 단, 아래 종료 기준을 다시 읽고 판단하라
 
-**When NOT to use:**
+## 비대화형 환경 금지
 
-- The ask is unambiguous and self-contained ("rename this variable", "fix this typo")
-- The user has explicitly asked for speed over verification
-- Pure information requests ("how does X work?", "what does this code do?")
-- Mechanical operations (renames, formats, file moves)
-- You already have ≥95% confidence; re-read the stop condition below before assuming you don't
+이 스킬은 응답하는 사용자가 있어야 동작한다. CI 파이프라인, 예약 실행, 자율 루프 같은 **비대화형 환경에서는 발동하지 않는다.** 그런 환경에서 요구사항이 모호하면, 임의로 추정해 진행하지 말고 무엇이 모호해서 막혔는지를 보고하고 멈춘다.
 
-## Loading Constraints
+## 진행 절차
 
-This skill needs a live, responsive user. **Do not invoke in non-interactive contexts** like CI pipelines, scheduled runs, `/loop`, or autonomous-loop. If you're in one of those and the ask is underspecified, flag that as a blocker for the user instead of guessing.
+### 1. 가설을 세우고 확신 정도를 밝힌다
 
-## The Process
-
-### Step 1: Hypothesize, with a confidence number
-
-Before asking anything, write down your current best read of what the user wants in **one sentence**, plus an honest confidence number (0–100%):
+질문하기 전에, 사용자가 원하는 것에 대한 현재 판단을 한 문장으로 쓰고 솔직한 확신 정도를 붙인다:
 
 ```
-HYPOTHESIS: You want a way to answer "how are we doing?" in standup, and "dashboard" was the convention that came to mind.
-CONFIDENCE: ~30% — missing: who it's for, what "metrics" means in context, and what success looks like
+현재 이해: 스탠드업에서 "우리 잘 되고 있나?"에 답할 수단을 원하고, "대시보드"는 관례적으로 떠오른 표현이다.
+확신 정도: ~30%
+아직 모르는 점: 누구를 위한 것인지, "지표"가 무엇을 가리키는지, 성공이 어떤 모습인지
 ```
 
-The number forces honesty. If you wrote down a high number but can't actually predict the user's reactions to the next three questions you'd ask, the number is wrong. Start at the confidence level you can defend.
+수치는 절대적인 정확도 측정값이 아니다 — 인터뷰를 계속할지 끝낼지 판단하는 보조 신호로만 쓴다. 높은 수치를 쓰고 싶다면 스스로 검증하라: 다음에 할 질문 세 개의 답을 예측할 수 없다면 그 수치는 틀렸다. 확신이 낮을 때는 "아직 모르는 점"을 반드시 함께 적는다 — 무엇이 비어 있는지 알아야 사용자가 그 간극을 채워 줄 수 있다.
 
-When confidence is below ~70%, append a brief reason on the same line — what's still unresolved or missing. This tells the user exactly what the interview needs to surface, and prevents the number from being a vague signal.
-
-### Step 2: Ask one question at a time, each with a guess attached
-
-Format:
+### 2. 질문은 한 번에 하나, 추정을 붙여서
 
 ```
-Q: <one focused question>
-GUESS: <your hypothesis for the answer, with the reasoning that produced it>
+질문: <초점이 하나인 질문>
+내 추정: <예상하는 답과 그렇게 추정한 근거>
 ```
 
-Wait for the user to react before asking the next question.
+사용자의 반응을 받은 뒤에 다음 질문으로 넘어간다.
 
-**Why one at a time, not a batch:**
+**왜 하나씩인가:** 질문을 묶어 보내면 사용자는 훑어 읽고 표면적인 답을 한다. 세 번째 질문은 첫 답에 따라 달라지는 경우가 많아서, 한꺼번에 물으면 잘못된 프레임이 고정된다. 사용자가 깊이 생각할 에너지는 유한하다.
 
-- The user can't react to your hypotheses if you bury them in a list
-- Batches encourage skim-reading and surface answers
-- The third question often depends on the answer to the first; asking them all at once locks in the wrong framing
-- The user's energy for thinking carefully is finite; spend it one question at a time
+**왜 추정을 붙이는가:** 사람은 빈 질문에 답을 만들어내는 것보다 틀린 추정에 반박하는 것이 빠르다. 추정을 내보이면 내 가정이 드러나고, 틀릴 수 있는 위치에 스스로를 세우게 된다 — 그것이 인터뷰의 목적이다. 위험은 예의 바른 사용자가 추정에 그냥 동의해 버리는 것이다. 틀려도 된다는 태도를 보이고, 가끔은 사용자가 반박할 만한 방향으로 추정해서 완화한다.
 
-**Why attach a guess:**
-
-- The user reacts faster to a wrong guess than they generate an answer from scratch
-- It commits you to a hypothesis you can be visibly wrong about, which keeps you honest
-- It surfaces *your* assumptions, which is what the interview is meant to expose
-
-The risk here is a polite user agreeing with your guess to be agreeable. Mitigate by being visibly willing to be wrong, and occasionally guess in a direction you expect the user to push back on.
-
-### Step 3: Listen for "want vs. should want"
-
-The most dangerous answers are the ones where the user says what a thoughtful answer *sounds like* rather than what they actually want. Watch for:
-
-- Answers that pattern-match best-practice talk ("I want it to be scalable", "clean architecture") without specifics
-- Answers that defer to convention ("the way most apps do it", "the standard approach")
-- Phrases like "I should probably…", "I think I'm supposed to…", "good engineering practice says…"
-- Buzzwords as goals — when "modern", "scalable", "robust" are the answer instead of a specific outcome
-
-When you hear these, the question to ask is:
-
-> *"If you didn't have to justify this to anyone, what would you actually want?"*
-
-That single question often does more work than the previous five.
-
-### Step 4: Restate intent in the user's own words
-
-When your confidence is high, write back what you now think the user wants. Keep it tight (5–8 lines), use their language where possible, and structure it so the user can confirm or correct line by line:
+답을 받으면 추정을 갱신해서 다음 질문 앞에 짧게 보여준다:
 
 ```
-Here's what I now think you want:
-
-- Outcome:      <one line>
-- User:         <one line — who benefits>
-- Why now:      <one line — what changed>
-- Success:      <one line — how we know it worked>
-- Constraint:   <one line — the binding limit>
-- Out of scope: <one line — what we're explicitly not doing>
-
-Yes / no / refine?
+갱신된 이해: 팀 대시보드가 아니라 개인용 실험 추적이다.
+확신 정도: ~60%
+아직 모르는 점: "초기 신호"가 무엇인지, 완료가 어떤 모습인지
 ```
 
-Including "Out of scope" is non-negotiable. Half of misalignment is silent disagreement about what is *not* being built.
+### 3. "원하는 것"과 "원해야 할 것 같은 것"을 구분한다
 
-### Step 5: Confirm — explicit yes, not "whatever you think"
+가장 위험한 답은 사용자가 실제로 원하는 것이 아니라, 사려 깊은 답처럼 *들리는* 것을 말할 때다. 다음 신호를 주의하라:
 
-The gate is an explicit "yes." The following are **not** yes:
+- 구체성 없는 모범 답안 ("확장 가능해야 해요", "클린 아키텍처로")
+- 관례에 기대는 답 ("보통 앱들이 하는 방식으로", "표준적인 접근으로")
+- "아마 ~해야 할 것 같아요", "좋은 엔지니어링 관행상…" 같은 표현
+- 목표 자리에 들어온 유행어 — 구체적 결과 대신 "모던하게", "견고하게"
 
-- "Whatever you think is best." → The user is delegating, which means they don't have 95% confidence either. Re-ask with two concrete options framed as a choice.
-- "Sounds good." → Ambiguous. Ask: "Anything you'd refine?" Silence isn't confirmation.
-- "Sure, let's go." → Often a polite exit, not an endorsement. Same follow-up.
-- Silence followed by "okay let's start." → The user has given up on the interview, not converged. Stop and ask whether you've missed something.
+이런 답이 나오면 이렇게 묻는다:
 
-If they correct you, fold the correction in and restate. Loop until you get an explicit yes.
+> "누구에게도 정당화할 필요가 없다면, 실제로는 뭘 원하시나요?"
 
-### The 95% Confidence Stop
+이 질문 하나가 앞선 질문 다섯 개보다 많은 것을 끌어내는 경우가 많다.
 
-You're done when you can answer yes to this:
+### 4. 사용자의 언어로 의도를 재진술한다
 
-> *Can I predict the user's reaction to the next three questions I would ask?*
-
-If yes, you have shared understanding. Stop interviewing and produce the restate. If no, you're not done; ask the next question.
-
-This is a checkable test, not a vibe. It also has a floor: if you've gone several rounds and still can't predict, that's information about the ask, not a reason to keep grinding. Stop and tell the user: "I've asked X questions and I still can't predict your reactions. Something foundational is missing. Want to step back?"
-
-## Output
-
-The output of this skill is a **confirmed statement of intent**: the restate from Step 4, with an explicit yes from Step 5. That's the deliverable. Specs, plans, and task lists are downstream; they consume the intent this skill produces.
-
-If the user wants the intent to persist (a multi-session project, a handoff to another collaborator), offer to save it to `docs/intent/[topic].md`. Only save if they confirm.
-
-## Example
-
-A short before-and-after.
-
-**Without `interview-me`:**
+확신이 충분해지면, 지금 이해한 것을 사용자의 표현을 살려 되돌려 쓴다. 사용자가 줄 단위로 확인하거나 고칠 수 있게 구조화한다:
 
 ```
-User:  build me a dashboard for our metrics
-Agent: <starts proposing chart libraries and layouts>
+지금까지 이해한 내용:
+
+- 목표:        <한 줄>
+- 사용자:      <한 줄 — 누가 혜택을 보는가>
+- 지금인 이유: <한 줄 — 무엇이 달라졌는가>
+- 성공 기준:   <한 줄 — 됐는지 어떻게 아는가>
+- 핵심 제약:   <한 줄 — 움직일 수 없는 한계>
+- 제외 범위:   <한 줄 — 명시적으로 하지 않는 것>
+
+맞으면 확인해달라. 틀린 줄이 있으면 짚어달라.
 ```
 
-The agent has assumed: who it's for, what metrics, what "for our team" means, what success looks like. None of these are stated. Every assumption is a place the user can later say "that's not what I meant."
+"제외 범위"는 생략할 수 없다. 어긋남의 절반은 무엇을 만들지 *않는지*에 대한 말 없는 불일치에서 온다.
 
-**With `interview-me`:**
+### 5. 명시적 확인을 받는다
+
+게이트는 명시적인 "맞다"이다. 다음은 확인이 아니다:
+
+- **"알아서 해주세요"** — 위임이지 결정이 아니다. 사용자도 확신이 없다는 뜻이므로, 구체적인 선택지 두 개를 제시해 고르게 한다.
+- **"좋네요" / "그렇게 하죠"** — 모호하거나 예의상 하는 말일 수 있다. "고치고 싶은 부분은 없나요?"라고 되묻는다. 침묵은 확인이 아니다.
+- **침묵 후 "그냥 시작하죠"** — 수렴이 아니라 인터뷰 포기다. 멈추고 무엇을 놓쳤는지 묻는다.
+
+사용자가 고쳐주면 반영해서 다시 재진술한다. 명시적 확인이 나올 때까지 반복한다.
+
+## 종료 판단
+
+다음 질문에 "예"라고 답할 수 있으면 끝났다:
+
+> *다음에 할 질문 세 개에 대한 사용자의 반응을 예측할 수 있는가?*
+
+예측할 수 있으면 이해가 공유된 것이다. 인터뷰를 멈추고 재진술을 만든다. 예측할 수 없으면 다음 질문을 한다.
+
+바닥도 있다: 여러 라운드를 돌았는데도 예측이 안 되면, 그것은 계속 물을 이유가 아니라 요청 자체에 대한 정보다. 멈추고 알린다: "질문을 여러 번 했는데 아직 반응을 예측할 수 없다. 근본적인 무언가가 빠져 있다. 한 발 물러나서 다시 볼까?"
+
+## 산출물과 연결
+
+이 스킬의 산출물은 **확인된 의도 진술**이다 — 4단계의 재진술에 5단계의 명시적 확인이 붙은 것. 스펙, 계획, 작업 목록은 이 의도를 입력으로 삼는 하류 산출물이다.
+
+- 확인된 의도가 구체적이면("Y 사용자를 위해 Z 성공 기준으로 X를 원한다") **spec-writer로 연결**해 `docs/spec/`에 스펙으로 문서화한다.
+- task-breakdown은 두 단계 하류다 (스펙 승인 후).
+- spec-conformance-check는 반대쪽 끝이다 — 이 스킬은 결정 전 의도 추출, 그쪽은 구현 후 스펙 대조.
+- 의도를 세션 너머로 남겨야 하면(여러 세션에 걸친 프로젝트, 다른 담당자에게 인계) `docs/intent/<주제>.md` 저장을 제안한다. 사용자가 확인한 경우에만 저장한다.
+
+## 예시
 
 ```
-User: build me a dashboard for our metrics
+사용자: 우리 지표 보는 대시보드 만들어줘
 
-Agent:
-HYPOTHESIS: You want a way to answer "how are we doing?" in standup, and "dashboard" came to mind because that's the conventional answer.
-CONFIDENCE: ~30% — missing: who it's for, what "metrics" are, and what success looks like
+에이전트:
+현재 이해: 스탠드업에서 "우리 잘 되고 있나?"에 답할 수단을 원하고, "대시보드"는 관례적으로 떠오른 표현이다.
+확신 정도: ~30%
+아직 모르는 점: 누구를 위한 것인지, "지표"가 무엇인지, 성공이 어떤 모습인지
 
-Q:     When you say "how are we doing?", who's asking — you alone, the engineering team in standup, or up the chain (e.g., your manager, an exec, a board)?
-GUESS: engineering team in standup, because "we" usually scopes that way and standups are where this question gets asked. If it's for execs the metrics and the framing change a lot.
+질문: "잘 되고 있나?"를 묻는 사람이 누구인가요 — 본인 혼자인가요, 스탠드업의 개발팀인가요, 아니면 윗선(매니저, 임원)인가요?
+내 추정: 스탠드업의 개발팀. "우리"가 보통 그 범위이고, 이 질문이 나오는 자리가 스탠드업이라서다. 임원용이면 지표와 구성이 크게 달라진다.
 
-User: It's actually for me. I keep losing track of which experiments are running and what their early signal looks like.
+사용자: 사실 나 혼자 보려고. 어떤 실험이 돌고 있는지, 초기 신호가 어떤지 자꾸 놓쳐서.
 
-Agent:
-Updated read: not a team dashboard at all. It's a personal experiment tracker. Confidence: ~60% — still missing: what "early signal" means and what done looks like.
+에이전트:
+갱신된 이해: 팀 대시보드가 아니라 개인용 실험 추적이다.
+확신 정도: ~60%
+아직 모르는 점: "초기 신호"가 무엇인지, 완료가 어떤 모습인지
 
-Q:     Is the gap that you don't know which experiments exist, or that you can't see their results in one place?
-GUESS: the second one. You have a list of experiments somewhere, but their results live in five different tools, and reconciling them by hand is what you're tired of.
+질문: 지금 문제는 어떤 실험이 있는지 자체를 모르는 건가요, 아니면 결과를 한 곳에서 못 보는 건가요?
+내 추정: 후자. 실험 목록은 어딘가 있는데 결과가 여러 도구에 흩어져 있어서 손으로 취합하는 게 지겨워진 상황.
 
-User: First one actually. I literally don't have a list. They're spread across different docs.
-
-Agent: <continues>
+사용자: 전자야. 목록 자체가 없어. 문서 여기저기 흩어져 있거든.
 ```
 
-Two questions in, the agent has discovered the actual ask isn't "a dashboard." It's "a list." Different artifact, different scope, different work. The dashboard would have been wrong.
+질문 두 개 만에 실제 요청이 "대시보드"가 아니라 "목록"임이 드러났다. 다른 산출물, 다른 범위, 다른 작업이다. 대시보드를 만들었다면 틀린 것을 만든 것이다.
 
-## Interaction with Other Skills
+## 타협 금지 (Anti-Rationalization)
 
-(Adapted for this workflow — original references to addyosmani skill names are mapped to local skills.)
-
-- **`spec-writer`**: downstream. If the confirmed intent is concrete ("I want X for Y users with Z success criteria"), hand off to `spec-writer` to write it down as a spec in `docs/spec/`.
-- **`task-breakdown`**: two hops downstream of this skill (after the spec is approved).
-- **`spec-conformance-check`**: opposite end of the timeline. Interview-me is pre-decision intent extraction; conformance check is post-implementation verification against the spec.
-
-## Common Rationalizations
-
-| Rationalization | Reality |
+| 떠오르는 변명 | 실제 |
 |---|---|
-| "The ask is clear enough" | If you can't write the user's desired outcome in one sentence right now, the ask isn't clear. Run Step 1 before deciding. |
-| "Asking too many questions wastes their time" | Time wasted by 4–6 targeted questions is small. Time wasted by building the wrong thing is enormous, and the user is the one bearing that cost. |
-| "I'll figure it out as I build" | Switching costs after code exists are 10x what they are now. Discovery during implementation is rework. |
-| "They said 'whatever you think,' so I should just decide" | "Whatever you think" is delegation, not decision. Re-ask with two concrete options as a choice. |
-| "I should give them several options to pick from" | Options work when the user knows what they want and is choosing between trade-offs. They don't know what they want yet. Listing options widens the search; asking narrows it. |
-| "If I attach my guess, I'm leading them" | Leading is the point. Reacting is faster than generating from scratch. The risk is sycophancy, not leading; mitigate by being visibly willing to be wrong. |
-| "We've talked enough, I get it" | Test it: can you predict their reaction to the next three questions? If not, you don't get it yet. |
-| "The user said yes, we're done" | If the yes followed a vague restate or an open-ended "sounds good," the yes is hollow. Restate concretely and re-confirm. |
+| "요청이 이 정도면 명확하다" | 사용자가 원하는 결과를 지금 한 문장으로 못 쓰면 명확하지 않은 것이다. 판단 전에 1단계를 돌려라. |
+| "질문을 많이 하면 사용자 시간을 뺏는다" | 겨냥된 질문 4~6개의 비용은 작다. 틀린 것을 만드는 비용은 크고, 그 비용은 사용자가 진다. |
+| "만들면서 알아가면 된다" | 코드가 생긴 뒤의 방향 전환 비용은 지금의 몇 배다. 구현 중의 발견은 재작업이다. |
+| "'알아서 해달라'고 했으니 내가 정하면 된다" | 위임은 결정이 아니다. 구체적 선택지 두 개로 다시 물어라. |
+| "선택지를 여러 개 주고 고르게 하자" | 선택지는 사용자가 원하는 것을 알고 트레이드오프를 고를 때 유효하다. 아직 원하는 것을 모르는 단계에서는 질문이 좁히고, 선택지 나열은 오히려 넓힌다. |
+| "추정을 붙이면 유도 질문이 된다" | 유도가 목적이다. 반박이 생성보다 빠르다. 위험은 유도가 아니라 사용자의 예의상 동의이고, 틀려도 된다는 태도로 완화한다. |
+| "충분히 얘기했다, 알겠다" | 검증하라: 다음 질문 세 개의 반응을 예측할 수 있는가? 못 하면 아직 모르는 것이다. |
+| "사용자가 '좋다'고 했으니 끝" | 모호한 재진술에 붙은 "좋다"는 빈 확인이다. 구체적으로 재진술하고 다시 확인받아라. |
 
-## Red Flags
+## 레드 플래그
 
-- Three or more questions in a single message: that's batching, not interviewing
-- A question without your hypothesis attached: that's surveying, not committing
-- Accepting "whatever you think is best" as a terminal answer
-- Producing a spec, plan, or task list before the user has explicitly confirmed your restate
-- Questions framed as "what would be best practice?" instead of "what do you actually want?"
-- The user gives a sophistication-signaling answer ("scalable", "clean", "modern") and you accept it without probing whether it's what they actually want
-- Three or more rounds without your confidence visibly rising: you're asking the wrong questions, step back and reframe
-- A confidence number below ~70% with no reason attached: the user can't help close the gap if they don't know what's missing
-- Saving the intent doc before the user has confirmed (the doc itself implies a yes the user didn't give)
-- Skipping the "Out of scope" line in the restate (silent disagreement about non-goals is half of misalignment)
+- 한 메시지에 질문 3개 이상 — 인터뷰가 아니라 설문이다
+- 추정 없는 질문 — 가설에 스스로를 걸지 않은 조사다
+- "알아서 해주세요"를 최종 답으로 수용
+- 명시적 확인 전에 스펙·계획·작업 목록 생산
+- "모범 사례가 뭘까요?" 식 질문 — "실제로 뭘 원하나요?"가 맞다
+- 사용자의 모범 답안("확장 가능", "클린", "모던")을 되묻지 않고 수용
+- 3라운드 이상 확신이 오르지 않음 — 질문이 잘못됐다. 물러나서 재구성하라
+- 확신이 낮은데 "아직 모르는 점"이 비어 있음 — 사용자가 간극을 채울 수 없다
+- 확인 전에 의도 문서 저장 (문서 존재 자체가 받지 않은 확인을 암시한다)
+- 재진술에서 "제외 범위" 줄 생략
 
-## Verification
+## 검증
 
-After applying interview-me:
+인터뷰 종료 전 확인:
 
-- [ ] An explicit hypothesis with a confidence number was stated in the first turn
-- [ ] Every confidence number below ~70% was accompanied by a one-line reason (what's still unresolved or missing)
-- [ ] Questions were asked one at a time, each with the agent's guess attached
-- [ ] At least one "what would you actually want if you didn't have to justify it?" probe ran when the user gave a sophistication-signaling or convention-signaling answer
-- [ ] A concrete restate (Outcome / User / Why now / Success / Constraint / Out of scope) was written back to the user
-- [ ] The user confirmed the restate with an explicit yes (not "whatever you think," not "sounds good," not silence)
-- [ ] At the stop point, the agent could predict reactions to the next three questions it would ask
-- [ ] Any handoff to a downstream skill (`idea-refine`, `spec-driven-development`) was framed in terms of the confirmed intent, not the original underspecified ask
+- [ ] 첫 턴에 가설과 확신 정도를 명시했는가
+- [ ] 확신이 낮은 턴마다 "아직 모르는 점"을 함께 적었는가
+- [ ] 질문을 한 번에 하나씩, 추정을 붙여서 했는가
+- [ ] 사용자가 모범 답안형 응답을 했을 때 "실제로 뭘 원하는가" 프로브를 했는가
+- [ ] 재진술(목표/사용자/지금인 이유/성공 기준/핵심 제약/제외 범위)을 사용자에게 되돌려 줬는가
+- [ ] 명시적 확인을 받았는가 ("알아서", "좋네요", 침묵은 확인이 아니다)
+- [ ] 종료 시점에 다음 질문 세 개의 반응을 예측할 수 있었는가
+- [ ] 하류 연결(spec-writer)을 원래의 모호한 요청이 아니라 확인된 의도 기준으로 했는가

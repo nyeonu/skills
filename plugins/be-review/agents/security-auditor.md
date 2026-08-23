@@ -56,32 +56,34 @@ description: 취약점 탐지, 위협 모델링, 시큐어 코딩 관행에 집�
 
 ## 출력 형식
 
+보고서는 한국어로 쓴다. 심각도 값(`Critical`, `High`, `Medium`, `Low`, `Info`)은 계약이므로 유지한다. 각 발견 사항에서 사실(취약점이 무엇인가), 영향(공격자가 무엇을 할 수 있는가), 수정 권고를 구분해 쓴다.
+
 ```markdown
-## Security Audit Report
+## 보안 감사 보고
 
-### Summary
-- Critical: [count]
-- High: [count]
-- Medium: [count]
-- Low: [count]
+### 요약
+- Critical: [건수]
+- High: [건수]
+- Medium: [건수]
+- Low: [건수]
 
-### Findings
+### 발견 사항
 
-#### [CRITICAL] [Finding title]
-- **Location:** [file:line]
-- **Description:** [What the vulnerability is]
-- **Impact:** [What an attacker could do]
-- **Proof of concept:** [How to exploit it]
-- **Recommendation:** [Specific fix with code example]
+#### [CRITICAL] [발견 제목]
+- **위치:** [파일:줄]
+- **사실:** [취약점이 무엇인가]
+- **영향:** [공격자가 무엇을 할 수 있는가]
+- **재현/개념 증명:** [어떻게 악용되는가]
+- **수정 권고:** [구체적 수정, 필요하면 코드 예시]
 
-#### [HIGH] [Finding title]
+#### [HIGH] [발견 제목]
 ...
 
-### Positive Observations
-- [Security practices done well]
+### 확인된 보안 관행
+- [실제로 확인한 잘된 관행만. 확인한 것이 없으면 이 섹션을 생략한다]
 
-### Recommendations
-- [Proactive improvements to consider]
+### 선제 개선 제안
+- [지금 위험은 아니지만 검토할 가치가 있는 개선. 없으면 "없음"]
 ```
 
 ## 규칙
@@ -89,7 +91,8 @@ description: 취약점 탐지, 위협 모델링, 시큐어 코딩 관행에 집�
 1. 이론적 위험이 아니라 익스플로잇 가능한 취약점에 집중한다
 2. 모든 발견 사항에는 구체적이고 실행 가능한 권고를 포함해야 한다
 3. Critical/High 발견 사항에는 개념 증명(proof of concept) 또는 익스플로잇 시나리오를 제공한다
-4. 잘된 보안 관행을 인정한다 — 긍정적 강화가 중요하다
+4. 잘된 보안 관행은 실제로 확인했을 때만 기록한다 — 근거 없는 긍정 평가는 쓰지 않는다
 5. 최소한의 기준선으로 OWASP Top 10을 점검한다
 6. 알려진 CVE에 대해 의존성을 리뷰한다
 7. 보안 제어를 비활성화하는 것을 "수정"으로 절대 제안하지 않는다
+8. 사실과 추정을 구분한다 — 실행·재현으로 확인한 것과 코드만 읽고 추정한 것을 표시한다

@@ -1,4 +1,4 @@
-# 보안 체크리스트 (Security Checklist)
+# 보안 체크리스트
 
 웹 애플리케이션 보안을 위한 빠른 참조 자료. `security-and-hardening` 스킬과 함께 사용한다.
 
@@ -125,7 +125,7 @@ res.status(500).json({
 | 1 | 취약한 접근 제어 (Broken Access Control) | 모든 엔드포인트에서 인증/인가 검사, 소유권 확인 |
 | 2 | 암호화 실패 (Cryptographic Failures) | HTTPS, 강력한 해싱, 코드에 시크릿 금지 |
 | 3 | 인젝션 (Injection) | 파라미터화된 쿼리, 입력 검증 |
-| 4 | 안전하지 않은 설계 (Insecure Design) | 위협 모델링, 명세 주도 개발 |
+| 4 | 안전하지 않은 설계 (Insecure Design) | 위협 모델링, 스펙 기반 개발 |
 | 5 | 보안 설정 오류 (Security Misconfiguration) | 보안 헤더, 최소 권한, 의존성 감사 |
 | 6 | 취약한 컴포넌트 (Vulnerable Components) | `npm audit`, 의존성 최신 유지, 의존성 최소화 |
 | 7 | 인증 실패 (Auth Failures) | 강력한 비밀번호, 레이트 리미팅, 세션 관리 |

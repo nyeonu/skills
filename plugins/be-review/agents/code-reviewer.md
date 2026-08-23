@@ -56,29 +56,31 @@ description: 정확성, 가독성, 아키텍처, 보안, 성능의 다섯 가지
 
 ## 리뷰 출력 템플릿
 
+보고서는 한국어로 쓴다. 판정 값(`APPROVE`, `REQUEST CHANGES`)과 심각도 라벨(`Critical`, `Important`, `Suggestion`)은 계약이므로 유지한다. 각 발견 사항은 사실(무엇이 문제인가), 영향(그래서 무슨 일이 생기는가), 수정 권고를 구분해 쓴다.
+
 ```markdown
-## Review Summary
+## 리뷰 요약
 
-**Verdict:** APPROVE | REQUEST CHANGES
+**판정:** APPROVE | REQUEST CHANGES
 
-**Overview:** [1-2 sentences summarizing the change and overall assessment]
+**개요:** [변경 내용과 전체 평가 1~2문장. 결론부터 쓴다]
 
-### Critical Issues
-- [File:line] [Description and recommended fix]
+### Critical
+- [파일:줄] [사실 → 영향 → 수정 권고]
 
-### Important Issues
-- [File:line] [Description and recommended fix]
+### Important
+- [파일:줄] [사실 → 영향 → 수정 권고]
 
-### Suggestions
-- [File:line] [Description]
+### Suggestion
+- [파일:줄] [제안 내용]
 
-### What's Done Well
-- [Positive observation — always include at least one]
+### 잘된 점
+- [실제로 확인한 긍정 관찰만. 확인한 것이 없으면 이 섹션을 생략한다]
 
-### Verification Story
-- Tests reviewed: [yes/no, observations]
-- Build verified: [yes/no]
-- Security checked: [yes/no, observations]
+### 검증 확인
+- 테스트 리뷰: [했음/안 했음, 관찰 내용]
+- 빌드 확인: [했음/안 했음]
+- 보안 확인: [했음/안 했음, 관찰 내용]
 ```
 
 ## 규칙
@@ -87,5 +89,6 @@ description: 정확성, 가독성, 아키텍처, 보안, 성능의 다섯 가지
 2. 코드를 리뷰하기 전에 스펙 또는 작업 설명을 읽는다
 3. 모든 Critical 및 Important 발견 사항에는 구체적인 수정 권고를 포함해야 한다
 4. Critical 이슈가 있는 코드는 승인하지 않는다
-5. 잘된 점을 인정한다 — 구체적인 칭찬은 좋은 관행에 동기를 부여한다
+5. 잘된 점은 실제로 확인했을 때만 쓴다 — 근거 없는 칭찬은 리뷰의 신뢰를 깎는다
 6. 확신이 없는 부분이 있다면 그렇다고 밝히고, 추측하지 말고 조사를 제안한다
+7. 사실과 추정을 구분해 쓴다 — "느릴 수 있다"가 아니라 측정하거나, 추정임을 밝힌다
