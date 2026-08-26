@@ -5,29 +5,27 @@ description: 애플리케이션 성능을 최적화한다. 성능 요구사항�
 
 # 성능 최적화
 
-## 개요
+최적화하기 전에 먼저 측정하라. 측정 없는 성능 작업은 추측이고, 추측은 중요한 것은 개선하지 못한 채 복잡성만 더하는 성급한 최적화(premature optimization)로 이어진다. 기본 대상은 백엔드(API·DB·인프라)다.
 
-최적화하기 전에 먼저 측정하라. 측정 없는 성능 작업은 추측일 뿐이다 — 그리고 추측은 정작 중요한 것은 개선하지 못한 채 복잡성만 더하는 성급한 최적화(premature optimization)로 이어진다. 먼저 프로파일링하고, 실제 병목을 찾아내고, 수정한 뒤, 다시 측정하라. 측정으로 중요하다고 입증된 것만 최적화하라.
+## 필수 참고자료 로드
+
+성능 진단이나 최적화를 시작하기 **전에** 대상 영역의 참고자료를 반드시 읽는다. 선택 사항이 아니다:
+
+| 대상 | 필수 참고자료 |
+|---|---|
+| 백엔드 작업 (API·DB·인프라) | `references/performance-checklist-backend.md` |
+| UI·브라우저 작업 | `references/performance-checklist-frontend.md` |
+| 풀스택 작업 | 두 파일 모두 |
+| 대상 영역이 불분명 | 두 파일 모두 |
 
 ## 사용 시점
 
-- 스펙에 성능 요구사항이 존재할 때 (로드 시간 예산, 응답 시간 SLA)
+- 스펙에 성능 요구사항이 있을 때 (응답 시간 SLA, 로드 시간 예산)
 - 사용자 또는 모니터링에서 느린 동작이 보고될 때
-- Core Web Vitals 점수가 기준치 미만일 때
 - 어떤 변경이 회귀를 유발했다고 의심될 때
 - 대용량 데이터셋이나 높은 트래픽을 처리하는 기능을 구현할 때
 
-**사용하지 말아야 할 때:** 문제의 증거가 확보되기 전에는 최적화하지 마라. 성급한 최적화는 얻는 성능보다 더 큰 비용의 복잡성을 더한다.
-
-## Core Web Vitals 목표치
-
-아래 구간은 Google이 공식 문서(web.dev)에서 정의한 기준이다.
-
-| 지표 | 좋음 | 개선 필요 | 나쁨 |
-|--------|------|-------------------|------|
-| **LCP** (Largest Contentful Paint) | ≤ 2.5s | ≤ 4.0s | > 4.0s |
-| **INP** (Interaction to Next Paint) | ≤ 200ms | ≤ 500ms | > 500ms |
-| **CLS** (Cumulative Layout Shift) | ≤ 0.1 | ≤ 0.25 | > 0.25 |
+**사용하지 말아야 할 때:** 문제의 증거가 확보되기 전에는 최적화하지 마라.
 
 ## 최적화 워크플로
 
@@ -35,304 +33,85 @@ description: 애플리케이션 성능을 최적화한다. 성능 요구사항�
 1. MEASURE  → 실제 데이터로 기준선(baseline) 수립
 2. IDENTIFY → (가정이 아닌) 실제 병목 식별
 3. FIX      → 특정된 병목을 해결
-4. VERIFY   → 다시 측정하여 개선 확인
+4. VERIFY   → 같은 조건으로 다시 측정하여 개선 확인
 5. GUARD    → 회귀 방지를 위한 모니터링 또는 테스트 추가
 ```
 
-### 1단계: 측정
+### 측정 경로
 
-상호 보완적인 두 가지 접근 방식 — 둘 다 사용하라:
+- **실사용자 필드 데이터가 있으면 그것을 우선한다** — 실제 문제 식별의 기준. 백엔드는 APM·응답 시간 로그·느린 쿼리 로그, 웹 프런트엔드는 RUM(Real User Monitoring — 실사용자 브라우저에서 수집한 측정)·CrUX.
+- **재현과 회귀 확인에는 합성(synthetic) 측정을 쓴다** — 통제된 조건에서 반복 가능한 측정 (부하 테스트, 프로파일러, Lighthouse).
+- 필드 데이터가 없으면 합성 기준선으로 작업할 수 있다. 단, 그 결과로 "실제 사용자 경험이 개선됐다"고 과장하지 않는다 — 합성 개선은 합성 조건에서의 개선이다.
+- **변경 전후 측정 조건을 동일하게 유지한다** (같은 데이터 규모, 같은 부하, 같은 환경). 조건이 다른 전후 비교는 비교가 아니다.
 
-- **합성 측정(Synthetic) (Lighthouse, DevTools Performance 탭):** 통제된 조건, 재현 가능. CI에서의 회귀 감지와 특정 이슈 격리에 최적.
-- **RUM (web-vitals 라이브러리, CrUX):** 실제 환경에서의 실사용자 데이터. 수정이 실제로 사용자 경험을 개선했는지 검증하려면 필수.
+## BE 병목 진단 순서
 
-**프론트엔드:**
-```bash
-# Synthetic: Lighthouse in Chrome DevTools (or CI)
-# Chrome DevTools → Performance tab → Record
-# Chrome DevTools MCP → Performance trace
-
-# RUM: Web Vitals library in code
-import { onLCP, onINP, onCLS } from 'web-vitals';
-
-onLCP(console.log);
-onINP(console.log);
-onCLS(console.log);
-```
-
-**백엔드:**
-```bash
-# Response time logging
-# Application Performance Monitoring (APM)
-# Database query logging with timing
-
-# Simple timing
-console.time('db-query');
-const result = await db.query(...);
-console.timeEnd('db-query');
-```
-
-### 어디서부터 측정을 시작할까
-
-증상을 기준으로 무엇을 먼저 측정할지 결정하라:
-
-```
-무엇이 느린가?
-├── 첫 페이지 로드
-│   ├── 큰 번들? --> 번들 크기 측정, 코드 분할(code splitting) 확인
-│   ├── 느린 서버 응답? --> DevTools Network 워터폴에서 TTFB 측정
-│   │   ├── DNS가 오래 걸림? --> 알려진 오리진에 dns-prefetch / preconnect 추가
-│   │   ├── TCP/TLS가 오래 걸림? --> HTTP/2 활성화, 엣지 배포 확인, keep-alive
-│   │   └── 대기(서버)가 오래 걸림? --> 백엔드 프로파일링, 쿼리와 캐싱 확인
-│   └── 렌더링 차단 리소스? --> Network 워터폴에서 CSS/JS 차단 여부 확인
-├── 인터랙션이 굼뜨게 느껴짐
-│   ├── 클릭 시 UI가 멈춤? --> 메인 스레드 프로파일링, 긴 작업(>50ms) 탐색
-│   ├── 폼 입력 지연? --> 리렌더링, 제어 컴포넌트(controlled component) 오버헤드 확인
-│   └── 애니메이션 버벅임(jank)? --> 레이아웃 스래싱, 강제 리플로우 확인
-├── 내비게이션 후 페이지
-│   ├── 데이터 로딩? --> API 응답 시간 측정, 워터폴 여부 확인
-│   └── 클라이언트 렌더링? --> 컴포넌트 렌더링 시간 프로파일링, N+1 페치 확인
-└── 백엔드 / API
-    ├── 단일 엔드포인트만 느림? --> 데이터베이스 쿼리 프로파일링, 인덱스 확인
-    ├── 모든 엔드포인트가 느림? --> 커넥션 풀, 메모리, CPU 확인
-    └── 간헐적으로 느림? --> 락 경합, GC 일시 정지, 외부 의존성 확인
-```
-
-### 2단계: 병목 식별
-
-카테고리별 흔한 병목:
-
-**프론트엔드:**
+증상에서 출발해 다음 순서로 조사한다:
 
 | 증상 | 유력한 원인 | 조사 방법 |
-|---------|-------------|---------------|
-| 느린 LCP | 큰 이미지, 렌더링 차단 리소스, 느린 서버 | Network 워터폴, 이미지 크기 확인 |
-| 높은 CLS | 크기(dimension) 미지정 이미지, 늦게 로드되는 콘텐츠, 폰트 전환에 따른 밀림 | 레이아웃 이동(layout shift) 어트리뷰션 확인 |
-| 나쁜 INP | 메인 스레드의 무거운 JavaScript, 대규모 DOM 업데이트 | Performance 트레이스에서 긴 작업(long task) 확인 |
-| 느린 초기 로드 | 큰 번들, 과다한 네트워크 요청 | 번들 크기, 코드 분할 확인 |
-
-**백엔드:**
-
-| 증상 | 유력한 원인 | 조사 방법 |
-|---------|-------------|---------------|
-| 느린 API 응답 | N+1 쿼리, 누락된 인덱스, 최적화되지 않은 쿼리 | 데이터베이스 쿼리 로그 확인 |
+|---|---|---|
+| 특정 API만 느림 | N+1 쿼리, 누락된 인덱스, 느린 외부 호출 | 쿼리 로그·실행 계획, 외부 호출 트레이싱 |
+| 모든 API가 느림 | 커넥션 풀 고갈, CPU·메모리 포화 | 풀 지표, 시스템 지표 |
+| 간헐적으로 느림 | 락 경합, GC 일시 정지, 외부 의존성 흔들림 | p95/p99 분해, GC 로그, 의존성별 지연 분포 |
 | 메모리 증가 | 누수된 참조, 무제한 캐시, 큰 페이로드 | 힙 스냅샷 분석 |
 | CPU 스파이크 | 동기식 무거운 연산, 정규식 백트래킹 | CPU 프로파일링 |
-| 높은 지연 시간(latency) | 캐싱 누락, 중복 연산, 네트워크 홉 | 스택 전반에 걸친 요청 트레이싱 |
 
-### 3단계: 흔한 안티패턴 수정
+- **지연은 평균이 아니라 백분위로 본다.** p95/p99가 사용자가 겪는 최악 경험이다. 평균이 좋아도 p99가 나쁘면 문제는 남아 있다.
+- **처리량과 지연을 함께 본다.** 지연만 줄이고 처리량이 무너지는 최적화(또는 그 반대)는 개선이 아니다.
+- **캐시는 일관성 비용과 함께 판단한다.** 무엇을 캐시하는지, 무효화가 언제 일어나는지, 스테일(stale) 허용 범위가 무엇인지 없이 추가한 캐시는 새 버그 원천이다.
 
-#### N+1 쿼리 (백엔드)
+### 흔한 BE 안티패턴
 
 ```typescript
-// BAD: N+1 — one query per task for the owner
+// BAD: N+1 — 항목마다 쿼리 하나
 const tasks = await db.tasks.findMany();
 for (const task of tasks) {
   task.owner = await db.users.findUnique({ where: { id: task.ownerId } });
 }
+// GOOD: 조인/include로 단일 쿼리
+const tasks = await db.tasks.findMany({ include: { owner: true } });
 
-// GOOD: Single query with join/include
-const tasks = await db.tasks.findMany({
-  include: { owner: true },
-});
-```
-
-#### 무제한 데이터 페칭
-
-```typescript
-// BAD: Fetching all records
+// BAD: 무제한 조회
 const allTasks = await db.tasks.findMany();
-
-// GOOD: Paginated with limits
-const tasks = await db.tasks.findMany({
-  take: 20,
-  skip: (page - 1) * 20,
-  orderBy: { createdAt: 'desc' },
-});
+// GOOD: 페이지네이션
+const page = await db.tasks.findMany({ take: 20, skip: (n - 1) * 20 });
 ```
 
-#### 이미지 최적화 누락 (프론트엔드)
+그 외: 요청 핸들러 안의 동기식 무거운 연산, 개별 호출 반복 대신 벌크(bulk) 연산 미사용, 자주 읽고 드물게 바뀌는 데이터의 캐싱 누락. 상세 점검 항목은 필수 로드한 `references/performance-checklist-backend.md`를 따른다.
 
-```html
-<!-- BAD: No dimensions, no format optimization -->
-<img src="/hero.jpg" />
+## 수치와 목표
 
-<!-- GOOD: Hero / LCP image — art direction + resolution switching, high priority -->
-<!--
-  Two techniques combined:
-  - Art direction (media): different crop/composition per breakpoint
-  - Resolution switching (srcset + sizes): right file size per screen density
--->
-<picture>
-  <!-- Mobile: portrait crop (8:10) -->
-  <source
-    media="(max-width: 767px)"
-    srcset="/hero-mobile-400.avif 400w, /hero-mobile-800.avif 800w"
-    sizes="100vw"
-    width="800"
-    height="1000"
-    type="image/avif"
-  />
-  <!-- Desktop: landscape crop (2:1) -->
-  <source
-    srcset="/hero-800.avif 800w, /hero-1200.avif 1200w, /hero-1600.avif 1600w"
-    sizes="(max-width: 1200px) 100vw, 1200px"
-    width="1200"
-    height="600"
-    type="image/avif"
-  />
-  <!-- WebP 폴백이 필요하면 같은 패턴으로 type="image/webp" source를 각 구간 뒤에 추가 -->
-  <img
-    src="/hero-desktop.jpg"
-    width="1200"
-    height="600"
-    fetchpriority="high"
-    alt="Hero image description"
-  />
-</picture>
+다음은 공식 표준이 없다: API 응답 시간, 캐시 TTL, 번들·이미지 크기, Lighthouse 점수, 기본 레이트·요청 수. 목표치를 정할 때:
 
-<!-- GOOD: Below-the-fold image — lazy loaded + async decoding -->
-<img
-  src="/content.webp"
-  width="800"
-  height="400"
-  loading="lazy"
-  decoding="async"
-  alt="Content image description"
-/>
-```
+1. 스펙, SLA, 기존 측정값이 있으면 그것을 쓴다.
+2. 없으면 제안값임을 명시하고 사용자 확인을 받는다.
 
-#### 불필요한 리렌더링 (React)
+웹 프런트엔드의 Core Web Vitals(LCP·INP·CLS)는 예외적으로 Google 공식 기준이 있다 — 기준값·조건(75번째 백분위 필드 데이터)·출처 버전은 `references/performance-checklist-frontend.md`의 출처 메타데이터에 기록되어 있다. 공식 기준과 프로젝트 자체 성능 예산은 구분해서 표기한다.
 
-```tsx
-// BAD: Creates new object on every render, causing children to re-render
-function TaskList() {
-  return <TaskFilters options={{ sortBy: 'date', order: 'desc' }} />;
-}
+**공식 출처 재확인 조건**: 평소에는 참고자료의 기록값을 쓰고 매번 web.dev를 조회하지 않는다. 단 다음의 경우에는 공식 출처를 다시 확인한다 — Core Web Vitals 지표나 임계값을 스펙·SLA·성능 예산·CI 통과 기준으로 **새로 확정**할 때, 참고자료의 `상태`가 `needs_review`일 때, 또는 참고자료의 `확인일`이 작업일 기준 30일을 넘었을 때. 마지막 조건은 이 스킬을 실행하는 주체가 참고자료의 신선도 확인 규칙에 따라 수행한다.
 
-// GOOD: Stable reference
-const DEFAULT_OPTIONS = { sortBy: 'date', order: 'desc' } as const;
-function TaskList() {
-  return <TaskFilters options={DEFAULT_OPTIONS} />;
-}
+## 프런트엔드 라우팅
 
-// Use React.memo for expensive components
-const TaskItem = React.memo(function TaskItem({ task }: Props) {
-  return <div>{/* expensive render */}</div>;
-});
-
-// Use useMemo for expensive computations
-function TaskStats({ tasks }: Props) {
-  const stats = useMemo(() => calculateStats(tasks), [tasks]);
-  return <div>{stats.completed} / {stats.total}</div>;
-}
-```
-
-#### 큰 번들 크기
-
-```typescript
-// Modern bundlers (Vite, webpack 5+) handle named imports with tree-shaking automatically,
-// provided the dependency ships ESM and is marked `sideEffects: false` in package.json.
-// Profile before changing import styles — the real gains come from splitting and lazy loading.
-
-// GOOD: Dynamic import for heavy, rarely-used features
-const ChartLibrary = lazy(() => import('./ChartLibrary'));
-
-// GOOD: Route-level code splitting wrapped in Suspense
-const SettingsPage = lazy(() => import('./pages/Settings'));
-
-function App() {
-  return (
-    <Suspense fallback={<Spinner />}>
-      <SettingsPage />
-    </Suspense>
-  );
-}
-```
-
-#### 캐싱 누락 (백엔드)
-
-```typescript
-// Cache frequently-read, rarely-changed data
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-let cachedConfig: AppConfig | null = null;
-let cacheExpiry = 0;
-
-async function getAppConfig(): Promise<AppConfig> {
-  if (cachedConfig && Date.now() < cacheExpiry) {
-    return cachedConfig;
-  }
-  cachedConfig = await db.config.findFirst();
-  cacheExpiry = Date.now() + CACHE_TTL;
-  return cachedConfig;
-}
-
-// HTTP caching headers for static assets
-app.use('/static', express.static('public', {
-  maxAge: '1y',           // Cache for 1 year
-  immutable: true,        // Never revalidate (use content hashing in filenames)
-}));
-
-// Cache-Control for API responses
-res.set('Cache-Control', 'public, max-age=300'); // 5 minutes
-```
-
-## 성능 예산 (Performance Budget)
-
-예산을 설정하고 강제하라. 아래 수치는 공식 기준이 아니라 프로젝트 기본값 예시다 — 스펙에 성능 요구사항이 있으면 그 값을 쓰고, 없으면 이 예시를 시작점으로 사용자와 확정한다:
-
-```
-JavaScript bundle: < 200KB gzipped (initial load)
-CSS: < 50KB gzipped
-Images: < 200KB per image (above the fold)
-Fonts: < 100KB total
-API response time: < 200ms (p95)
-Time to Interactive: < 3.5s on 4G
-Lighthouse Performance score: ≥ 90
-```
-
-**CI에서 강제:**
-```bash
-# Bundle size check
-npx bundlesize --config bundlesize.config.json
-
-# Lighthouse CI
-npx lhci autorun
-```
-
-## 참고
-
-상세한 성능 체크리스트, 최적화 명령어, 안티패턴 레퍼런스는 `references/performance-checklist.md`를 참고하라.
-
+이미지·React 렌더링·번들·폰트·Core Web Vitals 등 UI·웹 렌더링 성능은 이 본문에서 다루지 않는다. UI·브라우저 작업이면 위 필수 로드 규칙에 따라 `references/performance-checklist-frontend.md`를 읽고 그 체크리스트를 따른다. 브라우저 전용 API(`scheduler.yield()` 등)는 기능 탐지와 대체 경로 규칙을 그 파일에서 따른다.
 
 ## 흔한 합리화
 
 | 합리화 | 현실 |
 |---|---|
-| "나중에 최적화할게요" | 성능 부채는 복리로 불어난다. 명백한 안티패턴은 지금 고치고, 마이크로 최적화는 미뤄라. |
-| "제 컴퓨터에서는 빠른데요" | 당신의 컴퓨터는 사용자의 컴퓨터가 아니다. 대표성 있는 하드웨어와 네트워크에서 프로파일링하라. |
 | "이 최적화는 자명해요" | 측정하지 않았다면 모르는 것이다. 먼저 프로파일링하라. |
-| "사용자는 100ms를 못 느껴요" | 체감 여부는 짐작이 아니라 측정 대상이다. 지연은 상호작용마다 쌓이고, 쌓인 지연은 사용자가 알아챈다. |
-| "프레임워크가 성능을 알아서 처리해요" | 프레임워크는 일부 문제를 예방하지만 N+1 쿼리나 과도한 번들 크기는 해결하지 못한다. |
-
-## 위험 신호 (Red Flags)
-
-- 프로파일링 데이터로 정당화되지 않은 최적화
-- 데이터 페칭에서의 N+1 쿼리 패턴
-- 페이지네이션 없는 목록(list) 엔드포인트
-- 크기(dimension), 지연 로딩(lazy loading), 반응형 크기가 없는 이미지
-- 리뷰 없이 커지는 번들 크기
-- 프로덕션 성능 모니터링 부재
-- 모든 곳에 `React.memo`와 `useMemo` 사용 (과용은 미사용만큼 나쁘다)
+| "제 컴퓨터에서는 빠른데요" | 개발 장비와 개발 데이터는 프로덕션이 아니다. 대표성 있는 조건에서 측정하라. |
+| "나중에 최적화할게요" | 명백한 안티패턴(N+1, 무제한 조회)은 지금 고치고, 마이크로 최적화는 미뤄라. |
+| "프레임워크가 알아서 해줘요" | 프레임워크는 N+1 쿼리와 무제한 조회를 막아주지 않는다. |
 
 ## 검증
 
-성능 관련 변경 후에는 다음을 확인하라:
+성능 관련 변경 후:
 
-- [ ] 변경 전후의 측정값이 존재한다 (구체적인 수치)
-- [ ] 특정 병목이 식별되고 해결되었다
-- [ ] Core Web Vitals가 "좋음(Good)" 기준치 이내이다
-- [ ] 번들 크기가 유의미하게 증가하지 않았다
-- [ ] 새 데이터 페칭 코드에 N+1 쿼리가 없다
-- [ ] CI에서 성능 예산 검사를 통과한다 (구성된 경우)
+- [ ] 대상 영역의 필수 참고자료를 진단 시작 전에 읽었는가 (불분명하면 두 파일 모두)
+- [ ] 변경 전후의 측정값이 같은 조건에서 수집됐고 구체적 수치로 존재한다
+- [ ] 특정 병목이 식별되고 해결되었다 (짐작으로 여러 곳을 고치지 않았다)
+- [ ] 백분위(p95/p99) 기준으로 악화가 없다
+- [ ] 새 데이터 페칭 코드에 N+1·무제한 조회가 없다
+- [ ] 회귀 방지 장치(모니터링, 성능 테스트, CI 검사)를 남겼다
 - [ ] 기존 테스트가 여전히 통과한다 (최적화가 동작을 깨뜨리지 않았다)
+- [ ] 필드 데이터 없이 작업했다면 보고에서 실사용자 개선을 단정하지 않았다
