@@ -55,12 +55,12 @@ plugins/
     adr-writer/                # [기록] ADR 2시점 기록 (Proposed → Accepted)
   be-review/
     skills/
-      code-review-and-quality/   # 정확성·가독성·유지보수 (한글 번역)
-      security-and-hardening/    # 보안 (한글 번역)
-      performance-optimization/  # 성능 (한글 번역)
+      code-review-and-quality/   # 다축 리뷰: 정확성·가독성·아키텍처 + 보안·성능 1차 확인
+      security-and-hardening/    # 보안 (OWASP 기준, 체크리스트 필수 로드)
+      performance-optimization/  # 성능 (BE 우선, 백엔드/프런트엔드 체크리스트 분리)
     agents/
-      code-reviewer.md           # 리뷰 페르소나 (한글 번역)
-      security-auditor.md        # 보안 감사 페르소나 (한글 번역)
+      code-reviewer.md           # 리뷰 페르소나 (스킬과 동일한 심각도·판정 계약)
+      security-auditor.md        # 보안 감사 페르소나
   mcp-context7/ · mcp-atlassian/ · mcp-chrome-devtools/   # MCP 서버 동봉 플러그인
 ```
 
@@ -131,6 +131,16 @@ flowchart TD
 3. fail-fast: 앞 게이트가 실패하면 뒤 단계 비용이 발생하지 않는다.
 4. 계획 밖 병렬 실행은 읽기 전용 작업(검토)에만. 코드 수정은 반드시 계획 루프를 통한다. 승인된 계획 안에서 `depends_on` 없는 작업을 plan-executor가 병렬 실행하는 것은 계획 승인에 포함된 병렬성이다.
 5. 단일 환경 진행: 작업 시작 시 Cowork/CLI 중 하나를 정하고 끝까지 그 환경에서. 산출물이 전부 레포 안(`docs/`)이라 다음 작업은 다른 환경에서 시작해도 된다. 요구사항 소스가 외부 채널(기획서·메신저) 중심이면 Cowork, 코드 중심이면 CLI가 유리하다.
+
+### 리뷰 스킬의 참고자료 계약
+
+리뷰 3종의 상세 체크리스트는 각 스킬의 `references/`에 있고, 본문은 판단 규칙만 담는다. 로드는 권고가 아니라 계약이다:
+
+- `security-and-hardening`: 발동 시 `security-checklist.md`를 **항상** 읽고 시작
+- `performance-optimization`: 대상 영역별 필수 — 백엔드 작업 → `performance-checklist-backend.md`, UI·브라우저 작업 → `performance-checklist-frontend.md`, 풀스택·불분명 → 둘 다
+- `code-review-and-quality`: diff와 작업 목적으로 조건을 판정해 발견 사항 분류 **전에** 해당 체크리스트를 읽고, 출력의 "읽은 참고자료" 슬롯으로 무엇을 읽었는지 드러낸다
+
+외부 공식 기준(OWASP 비밀번호 저장, Core Web Vitals)은 매 작업마다 조회하지 않는다. 각 참고자료의 출처 메타데이터(공식 출처·확인일·출처 버전·상태)에 기록된 값을 쓰고, 월 1회 원본 변경(commit SHA·Last updated)만 감지한다 — 변경이 있으면 자동 수정 없이 `needs_review`로 표시하고 사람이 검토해 갱신한다. 신규 비밀번호 저장 설계, 알고리즘·파라미터 확정, CWV를 스펙·SLA·CI 기준으로 확정하는 작업은 시점과 무관하게 공식 출처를 재확인한다.
 
 ## 출처
 
