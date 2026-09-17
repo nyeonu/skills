@@ -153,7 +153,7 @@ fresh-context 교차 검증 아이디어는 addyosmani `doubt-driven-development
 
 **Core Web Vitals 구간 경계**: `개선 필요` 열이 `좋음` 구간을 포함하던 표기를 열린 하한·닫힌 상한으로 바꿨다. LCP는 `> 2.5s, ≤ 4.0s`, INP는 `> 200ms, ≤ 500ms`, CLS는 `> 0.1, ≤ 0.25`다. 공식 임계값 자체는 바꾸지 않았다.
 
-## 성공 기준 식별자를 §글자-번호로 전환 + 테스트 이름 서술형 (be-workflow · be-review)
+## 성공 기준 식별자를 §글자-번호로 전환 + 테스트 이름 서술형 (be-workflow 0.1.3 / be-review 0.1.4)
 
 **계기**: 성공 기준을 전역 순번 SC-1, SC-2…로 매기던 방식은 스펙을 합본할 때 번호가 밀린다. fanclub-service-api의 additional-info 통합 스펙에서 실제로 발생했다 — 합본 전 로컬 SC 번호를 든 검증 리포트·ADR이 현행 전역 번호와 불일치했고, `@DisplayName("SC-N: …")` 태그도 함께 어긋났다. 번호를 리매핑하는 규칙(0.1.x의 "스펙 통합·재번호 시 태그도 리매핑")은 사고를 막지 못했다.
 
