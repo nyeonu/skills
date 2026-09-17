@@ -14,6 +14,7 @@ task-breakdown이 작성하고 사용자가 승인한 계획 문서를 실행하
 - 대상 계획 문서를 읽는다. 경로를 지정받지 않았으면 `docs/plan/`에서 최신 파일을 찾아 사용자에게 확인받는다.
 - frontmatter의 `status`가 `approved`가 아니면 실행하지 말고 사용자에게 승인 여부를 물어라. 사용자가 확인해주면 `status: approved`로 갱신 후 진행한다. 승인 게이트는 이 워크플로우에서 사람이 통제권을 유지하는 장치이므로 생략하지 않는다.
 - 계획의 "선택한 방식과 이유"에 되돌리기 비싼 결정이 표시되어 있는데 대응하는 ADR(`docs/decisions/`, `Proposed`)이 없으면, 실행 전에 adr-writer로 작성할 것을 사용자에게 안내한다.
+- **스펙 변경 감지**: frontmatter의 `spec_rev`와 현재 값(`git log -1 --format=%H -- <spec>`)을 비교한다. 다르면 실행하지 않고 사용자에게 알린다 — 계획이 참조한 스펙 이후에 스펙이 바뀌었으므로, 변경 내용(`git diff <spec_rev>..HEAD -- <spec>`)을 보여주고 task-breakdown으로 계획을 재검토할지 확인받는다. `parent_spec_rev`가 있으면 같은 확인을 공통 스펙에도 한다(다른 저장소라 접근할 수 없으면 사용자에게 확인을 요청한다). `spec_rev`가 없는 옛 계획은 경고만 하고 진행한다.
 - 실행 시작 시 `status: in_progress`로 갱신한다.
 
 ### 2. 작업 디스패치
