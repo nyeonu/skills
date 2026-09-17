@@ -43,6 +43,10 @@ Rules:
   Do not add tests beyond those specified.
 - If you find error branches or edge cases the plan does not cover, do NOT
   add tests for them — list them under `uncovered` in your report.
+- Test names (`@DisplayName` or the test function name) state what is
+  verified: the behavior, the condition and the expected result, exactly as
+  written in the task. Never prefix them with a spec criterion id (`§A-1`,
+  `SC-N`); the plan's traceability table links criteria to tests.
 - Weakening tests (skip, disable, relaxed assertions) to make them pass is
   failure. If you cannot make them pass, report that fact.
 - Deliverables (code comments, docs, any text that lands in the repo)
@@ -90,7 +94,7 @@ notes: <only what the orchestrator must know to proceed | ->
 
 **사용자 보고는 한국어 산출물이다** (채널 언어 정책의 예외 아님 — 원칙 그대로다). 결과부터 쓴다 — 과정 서술은 판정에 필요한 만큼만 남긴다. 필수 항목에 쓸 내용이 없으면 일반론으로 채우지 말고 `없음`이라고 쓴다.
 
-테스트 대조는 새 판단을 만드는 단계가 아니다 — **계획의 추적성 표(SC → 테스트 케이스 → 작업)를 기준선으로, 실제 테스트 코드·실행 결과를 기계적으로 대조**한다. 기준선 없는 커버리지 판정(라인 % 등)으로 대체하지 않는다. 재료는 서브에이전트 보고의 `tests`·`uncovered` 슬롯 취합 + 오케스트레이터가 직접 실행한 verify 결과다.
+테스트 대조는 새 판단을 만드는 단계가 아니다 — **계획의 추적성 표(기준 `§글자-번호` → 테스트 → 작업)를 기준선으로, 실제 테스트 코드·실행 결과를 기계적으로 대조**한다. 기준선 없는 커버리지 판정(라인 % 등)으로 대체하지 않는다. 재료는 서브에이전트 보고의 `tests`·`uncovered` 슬롯 취합 + 오케스트레이터가 직접 실행한 verify 결과다. 대조 후 실제 테스트 이름이 계획 표와 다르면 **계획 표를 실제 이름으로 갱신한다** — 이 표는 기준 ↔ 테스트의 단일 색인이라 낡으면 spec-conformance-check의 추적성 판정이 무너진다. 테스트 이름은 기준 식별자 없이 무엇을 검증하는지 서술해야 하므로(tdd 스킬), 서브에이전트가 `§A-1: …`·`SC-N: …` 같은 접두어를 붙였거나 이름이 무엇을 검증하는지 불명확하면 대조 표의 결과 열에 결함으로 적는다.
 
 ```markdown
 ## 실행 결과
@@ -109,11 +113,12 @@ notes: <only what the orchestrator must know to proceed | ->
 
 ## 테스트 대조
 
-| 계획한 테스트 (출처/층) | 연결된 SC | 실제 테스트 (파일 · 테스트 이름) | 결과 |
+| 계획한 테스트 (출처/층) | 스펙 기준 | 실제 테스트 (파일 · 테스트 이름) | 결과 |
 |---|---|---|---|
-| birthYear 1900 미만이면 400 (②/유닛) | SC-13 | AdditionalInfoServiceTest · "SC-13: …" | PASS |
-| PUT 실패 시 upsert 롤백 (③/통합) | SC-17 | 미작성 | — |
+| birthYear가 1900 미만이면 400으로 거절한다 (②/유닛) | §D-2 | AdditionalInfoServiceTest · "birthYear가 1900 미만이면 400으로 거절한다" | PASS |
+| PUT 실패 시 upsert가 롤백된다 (③/통합) | §D-6 | 미작성 | — |
 
+- 추적성 표 갱신: <계획 표와 실제 이름이 달라 갱신한 행. 없으면 "없음">
 - skip·비활성화된 테스트: <0건이어야 정상. 있으면 목록과 사유>
 - 신규·변경된 테스트 파일: <목록>
 - 커버리지 증감: <레포가 추적하는 경우만. 감소했으면 원인>
