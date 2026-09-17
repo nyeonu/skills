@@ -66,6 +66,8 @@ plugins/
 
 ## 사용 방법
 
+팀 단위로 쓸 때의 운영 규칙(스펙의 공통/애플리케이션 구분, 티켓 모양, 브랜치, 승인 후 변경 처리)은 [docs/team-workflow.md](docs/team-workflow.md)에 있다. 아래는 스킬 파이프라인 자체의 사용법이다.
+
 ### 실행 순서
 
 ```mermaid
@@ -117,7 +119,7 @@ flowchart TD
 
 - 요구사항이 모호하다 → 1 (interview-me)
 - 요구사항은 명확, 스펙 없음 → 2 (spec-writer)
-- 승인된 스펙 존재 → 3 (task-breakdown)
+- 승인된 스펙(`status: approved`) 존재 → 3 (task-breakdown). `implemented`·`superseded` 스펙은 완료된 변경의 기록이라 분해 대상이 아니다
 - 승인된 계획 존재 / 실행 중 계획 존재 → 4 (plan-executor, frontmatter `status`로 재개)
 - 버그·장애 → 디버깅 후 수정 범위가 크면 3으로 합류
 - 사소한 변경(단일 파일, 명확한 범위) → 워크플로우 생략, 직접 처리

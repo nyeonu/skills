@@ -13,6 +13,9 @@ author: <작성 에이전트/사람>
 created: <YYYY-MM-DD>
 target: <대상 저장소 또는 디렉터리>
 spec: <원본 스펙 문서 경로>            # 예: docs/spec/2026-07-06-session-token-refresh.md
+spec_rev: <스펙 파일의 최신 커밋 해시>   # git log -1 --format=%H -- <spec>. 실행 전 스펙 변경 감지용
+parent_spec: <공통 스펙 위치>           # 스펙에 parent가 있을 때만. 예: fanclub-auth@feature/ASD-2141:docs/spec/...
+parent_spec_rev: <공통 스펙 커밋 해시>   # 위와 같을 때만. 없으면 두 줄 모두 지운다
 tasks:                               # 본문 작업 섹션과 1:1 대응
   - id: T1
     title: <작업 제목>
@@ -104,7 +107,7 @@ ADR Proposed 작성 대상이다.>
 ## 작성 시 체크리스트
 
 - [ ] frontmatter `tasks`와 본문 `### T*` 섹션이 1:1 대응하는가
-- [ ] frontmatter `spec`이 승인된 스펙 문서를 가리키는가
+- [ ] frontmatter `spec`이 승인된 스펙 문서를 가리키고 `spec_rev`가 그 파일의 현재 커밋 해시인가 (parent가 있으면 `parent_spec`·`parent_spec_rev`도)
 - [ ] 추적성 표가 스펙의 모든 SC-N을 커버하는가 (SC → 테스트 케이스 → 작업)
 - [ ] 테스트 케이스마다 출처와 층(유닛/통합/E2E)이 표시됐는가
       - 기본 출처는 ①~⑤를 사용한다.
