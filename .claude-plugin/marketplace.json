@@ -1,6 +1,6 @@
 {
   "name": "be-agentic-workflow",
-  "description": "BE 개발 에이전틱 워크플로우: 요구사항 인터뷰 → 스펙 → 계획 → 실행 → 검증 → 리뷰 → ADR 기록 스킬 세트와 선택형 MCP 서버(context7, Atlassian, Chrome DevTools)",
+  "description": "에이전틱 개발 워크플로우: 요구사항 인터뷰 → 스펙 → 계획 → 실행 → 검증 → 리뷰 → ADR 기록 스킬 세트와 선택형 MCP 서버(context7, Atlassian, Chrome DevTools)",
   "owner": {
     "name": "nyeonu",
     "url": "https://github.com/nyeonu"
