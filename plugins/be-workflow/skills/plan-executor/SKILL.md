@@ -50,6 +50,11 @@ Rules:
   traceability table links criteria to tests.
 - Weakening tests (skip, disable, relaxed assertions) to make them pass is
   failure. If you cannot make them pass, report that fact.
+- Do not add annotations, AOP, reflection, or config-driven behavior the task
+  does not name. If the task requires placing decision logic (access checks,
+  state transitions, rules) inside a repository/HTTP/reactive call chain, or
+  assigns a unit test to such logic without saying where it goes, stop and
+  report under `blocked`.
 - Deliverables (code comments, docs, any text that lands in the repo)
   follow the repository's language conventions — for this repo, Korean.
   English is for this communication channel only.

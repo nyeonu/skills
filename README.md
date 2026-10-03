@@ -140,7 +140,7 @@ flowchart TD
 
 - `security-and-hardening`: 발동 시 `security-checklist.md`를 **항상** 읽고 시작
 - `performance-optimization`: 대상 영역별 필수 — 백엔드 작업 → `performance-checklist-backend.md`, UI·브라우저 작업 → `performance-checklist-frontend.md`, 풀스택·불분명 → 둘 다
-- `code-review-and-quality`: diff와 작업 목적으로 조건을 판정해 발견 사항 분류 **전에** 해당 체크리스트를 읽고, 출력의 "읽은 참고자료" 슬롯으로 무엇을 읽었는지 드러낸다
+- `code-review-and-quality`: diff와 작업 목적으로 조건을 판정해 발견 사항 분류 **전에** 해당 체크리스트를 읽고, 출력의 "읽은 참고자료" 슬롯으로 무엇을 읽었는지 드러낸다. 결정 로직·매직·도메인 경계 변경이면 `local-reasoning-checklist.md`(에이전트가 파일 몇 개만 보고 안전하게 고칠 수 있는 구조인지의 판정 기준)도 읽는다
 
 외부 공식 기준(OWASP 비밀번호 저장, Core Web Vitals)은 매 작업마다 조회하지 않는다. 각 참고자료의 출처 메타데이터(공식 출처·확인일·출처 버전·상태)에 기록된 값을 쓰고, 월 1회 원본 변경(commit SHA·Last updated)만 감지한다 — 변경이 있으면 자동 수정 없이 `needs_review`로 표시하고 사람이 검토해 갱신한다. 신규 비밀번호 저장 설계, 알고리즘·파라미터 확정, CWV를 스펙·SLA·CI 기준으로 확정하는 작업은 시점과 무관하게 공식 출처를 재확인한다.
 
