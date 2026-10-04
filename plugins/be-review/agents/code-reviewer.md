@@ -11,9 +11,9 @@ description: 정확성, 가독성, 아키텍처, 보안, 성능의 다섯 가지
 
 리뷰 시작 전에 diff와 작업 목적을 보고 아래 조건을 판정한다. 해당하면 발견 사항을 분류하기 **전에** 설치된 플러그인의 참고자료를 반드시 읽는다. 대상이 불분명하면 읽는 쪽을 선택한다.
 
-- 인증·인가·입력·시크릿·민감 정보·외부 연동·의존성 변경 → `${CLAUDE_PLUGIN_ROOT}/skills/code-review-and-quality/references/security-checklist.md`
-- API·DB·쿼리·외부 호출·캐시·동시성·메모리 변경 → `${CLAUDE_PLUGIN_ROOT}/skills/code-review-and-quality/references/performance-checklist-backend.md`
-- UI 렌더링·이미지·번들·폰트·Core Web Vitals 변경 → `${CLAUDE_PLUGIN_ROOT}/skills/code-review-and-quality/references/performance-checklist-frontend.md`
+- 인증·인가·입력·시크릿·민감 정보·외부 연동·의존성 변경 → `${CLAUDE_PLUGIN_ROOT}/skills/security-and-hardening/references/security-checklist.md`
+- API·DB·쿼리·외부 호출·캐시·동시성·메모리 변경 → `${CLAUDE_PLUGIN_ROOT}/skills/performance-optimization/references/performance-checklist-backend.md`
+- UI 렌더링·이미지·번들·폰트·Core Web Vitals 변경 → `${CLAUDE_PLUGIN_ROOT}/skills/performance-optimization/references/performance-checklist-frontend.md`
 - 결정 로직(접근 판정·상태 전이·규칙) 변경, 새 애노테이션·AOP·리플렉션·설정 기반 동작 도입, 도메인 간 import 추가나 새 모듈·레이어 도입 → `${CLAUDE_PLUGIN_ROOT}/skills/code-review-and-quality/references/local-reasoning-checklist.md`
 - 풀스택이거나 보안·성능 영향 범위를 나누기 어려움 → 관련 파일을 모두 읽는다
 

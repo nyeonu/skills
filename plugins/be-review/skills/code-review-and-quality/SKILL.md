@@ -25,8 +25,8 @@ description: 다축(multi-axis) 코드 리뷰를 수행한다. 모든 변경 사
 
 이어서 diff와 작업 목적을 보고 **참고자료 로드 여부를 판정한다.** 해당 조건이면 4단계(발견 사항 분류) 전에 반드시 읽는다 — 권고가 아니라 계약이다:
 
-- 인증·인가·세션·토큰·쿠키·외부 입력·파일 업로드·시크릿·PII·외부 연동·의존성 변경이 있으면 → `references/security-checklist.md`
-- DB 조회·목록 API·외부 호출·캐시·락·풀·동시성·CPU·메모리·대용량 처리 변경이 있으면 → `references/performance-checklist-backend.md`, UI 렌더링 변경이 있으면 → `references/performance-checklist-frontend.md`
+- 인증·인가·세션·토큰·쿠키·외부 입력·파일 업로드·시크릿·PII·외부 연동·의존성 변경이 있으면 → `${CLAUDE_PLUGIN_ROOT}/skills/security-and-hardening/references/security-checklist.md`
+- DB 조회·목록 API·외부 호출·캐시·락·풀·동시성·CPU·메모리·대용량 처리 변경이 있으면 → `${CLAUDE_PLUGIN_ROOT}/skills/performance-optimization/references/performance-checklist-backend.md`, UI 렌더링 변경이 있으면 → `${CLAUDE_PLUGIN_ROOT}/skills/performance-optimization/references/performance-checklist-frontend.md`
 - 결정 로직(접근 판정·상태 전이·정렬/필터 규칙) 변경, 새 애노테이션·AOP·리플렉션·설정 기반 동작 도입, 도메인 간 import 추가나 새 모듈·레이어 도입이 있으면 → `references/local-reasoning-checklist.md`
 - 여러 조건에 해당하면 해당하는 참고자료를 모두 읽는다
 - 해당 여부가 불분명하면 누락 방지를 위해 읽는 쪽을 선택한다
