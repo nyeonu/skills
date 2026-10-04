@@ -78,7 +78,7 @@ flowchart TD
     gate1{스펙 승인}
     plan["3. task-breakdown<br>docs/plan/ 계획 작성"]
     gate2{계획 승인}
-    exec["4. plan-executor<br>서브에이전트 위임 실행"]
+    exec["4. plan-executor<br>실행자(저비용 모델) 위임 실행"]
     verify["5. spec-conformance-check<br>스펙 적합성 독립 검증"]
     review["6. review 3종 병렬<br>품질 · 보안 · 성능"]
     done([완료])
@@ -136,7 +136,7 @@ flowchart TD
 
 ### 리뷰 스킬의 참고자료 계약
 
-리뷰 3종의 상세 체크리스트는 각 스킬의 `references/`에 있고, 본문은 판단 규칙만 담는다. 로드는 권고가 아니라 계약이다:
+상세 체크리스트의 원본은 전문 스킬(`security-and-hardening`, `performance-optimization`)의 `references/`에 하나씩 있고, `code-review-and-quality`는 자기 `references/`에 국소 추론 체크리스트만 두고 보안·성능 체크리스트는 `${CLAUDE_PLUGIN_ROOT}` 경로로 그 원본을 읽는다(사본 없음). 본문은 판단 규칙만 담는다. 로드는 권고가 아니라 계약이다:
 
 - `security-and-hardening`: 발동 시 `security-checklist.md`를 **항상** 읽고 시작
 - `performance-optimization`: 대상 영역별 필수 — 백엔드 작업 → `performance-checklist-backend.md`, UI·브라우저 작업 → `performance-checklist-frontend.md`, 풀스택·불분명 → 둘 다

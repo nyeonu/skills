@@ -1,6 +1,6 @@
 # 성능 체크리스트 — 프런트엔드
 
-`performance-optimization` 스킬의 프런트엔드 필수 참고자료다. UI·웹 렌더링 성능 작업을 시작하기 전에 반드시 읽는다. 백엔드가 대상이면 `performance-checklist-backend.md`를 읽는다.
+`performance-optimization` 스킬의 프런트엔드 필수 참고자료다. UI·웹 렌더링 성능 작업을 시작하기 전에 반드시 읽는다. `code-review-and-quality` 스킬과 `code-reviewer` 에이전트도 UI 렌더링 변경을 리뷰할 때 읽는다. 백엔드가 대상이면 `performance-checklist-backend.md`를 읽는다.
 
 ## 출처 메타데이터
 
@@ -10,7 +10,14 @@
 - 추적하는 기준: Core Web Vitals 지표 구성(LCP·INP·CLS)과 good/needs improvement/poor 임계값
 - 상태: current    <!-- current | needs_review -->
 
-**신선도 확인 규칙**: 이 파일을 읽는 실행 주체는 `확인일`이 작업일 기준 30일 이내면 아래 기록값을 쓴다. 30일을 넘었으면 web.dev 문서의 `Last updated`와 Core Web Vitals 기준값 영역이 기록과 같은지만 확인한다. 같으면 현재 작업에 기록값을 쓰고 확인 결과를 보고한다. 다르면 수치를 자동 수정하지 말고 `needs_review`와 변경 검토 필요를 보고한다. 현재 작업이 이 스킬 저장소의 유지보수라면 같은 결과를 두 참고자료 사본의 `확인일`·`출처 버전`·`상태`와 `CUSTOMIZATIONS.md`에 함께 반영한다. 공식 출처를 확인할 수 없으면 검증 공백을 보고하고, 새 스펙·SLA·성능 예산·CI 기준을 현행 공식 기준으로 단정하지 않는다.
+**신선도 확인 규칙**: 이 파일을 읽는 실행 주체는 `확인일`이 작업일 기준 30일 이내면 아래 기록값을 쓴다. 30일을 넘었으면 web.dev 문서의 `Last updated`와 Core Web Vitals 기준값 영역이 기록과 같은지만 확인한다. 같으면 현재 작업에 기록값을 쓰고 확인 결과를 보고한다. 다르면 수치를 자동 수정하지 말고 `needs_review`와 변경 검토 필요를 보고한다. 현재 작업이 이 스킬 저장소의 유지보수라면 같은 결과를 이 파일의 `확인일`·`출처 버전`·`상태`와 `CUSTOMIZATIONS.md`에 함께 반영한다. 공식 출처를 확인할 수 없으면 검증 공백을 보고하고, 새 스펙·SLA·성능 예산·CI 기준을 현행 공식 기준으로 단정하지 않는다.
+
+## 목차
+
+- Core Web Vitals — 지표와 구간 경계
+- 측정 — 필드/합성 측정 도구, TTFB 진단
+- 체크리스트 — 이미지 · JavaScript · CSS·폰트 · 네트워크·렌더링
+- 코드 예시 — scheduler.yield() 기능 탐지 · LCP 이미지 · React 리렌더링 · 코드 분할
 
 ## Core Web Vitals
 

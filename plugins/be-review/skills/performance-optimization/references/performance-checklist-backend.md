@@ -1,6 +1,6 @@
 # 성능 체크리스트 — 백엔드
 
-`performance-optimization` 스킬의 백엔드 필수 참고자료다. 백엔드 성능 작업을 시작하기 전에 반드시 읽는다. UI·웹 렌더링이 대상이면 `performance-checklist-frontend.md`를 읽는다.
+`performance-optimization` 스킬의 백엔드 필수 참고자료다. 백엔드 성능 작업을 시작하기 전에 반드시 읽는다. `code-review-and-quality` 스킬과 `code-reviewer` 에이전트도 DB·외부 호출·캐시·동시성 변경을 리뷰할 때 읽는다. UI·웹 렌더링이 대상이면 `performance-checklist-frontend.md`를 읽는다.
 
 이 문서의 수치(응답 시간, TTL 등)는 전부 프로젝트 기본값 예시다 — 추적하는 외부 공식 기준이 없다. 스펙·SLA·기존 측정값이 있으면 그 값이 기준이다.
 
