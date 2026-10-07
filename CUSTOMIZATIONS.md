@@ -251,3 +251,33 @@ fresh-context 교차 검증 아이디어는 addyosmani `doubt-driven-development
 **역할 용어 통일 (be-workflow)**: plan-executor가 띄우는 작업 에이전트를 서브에이전트·실행자·실행 에이전트·저비용 에이전트·하위 에이전트 다섯 가지로 불렀다. **오케스트레이터**(계획을 실행하는 세션) / **실행자**(작업 하나를 받아 수행하는 에이전트) / **검증자**(스펙만 보고 구현을 대조하는 에이전트)로 통일하고 using-agent-skills 개요에 정의를 한 줄 넣었다. "서브에이전트"는 Claude Code의 기능(Agent 도구로 띄운 세션)을 가리킬 때만 남겼다 — spec-conformance-check의 "fresh-context 서브에이전트로 스폰", plan-executor의 실행자 정의 문장. "저비용 모델"은 tier를 설명하는 자리에서만 쓴다.
 
 **보류한 것 (대조 보고서 5~8)**: ① `claude plugin eval`로 평가 묶음(라우팅, 참고자료 로드 계약, 국소 추론 적용 강도 세 케이스)을 레포 `evals/`에 두는 것 — 이후 변경의 기준선이 된다. ② 1,000자 넘는 한 줄 문단 분할(code-review-and-quality 아키텍처 축, task-breakdown 추적성·구조 배치, tdd 이름 규칙·목 문단) — 의미를 건드리므로 평가 묶음으로 전후 비교하며 한다. ③ description 축약(최장 adr-writer 341자) — 스킬 목록 예산(모델 컨텍스트의 1%)을 넘기면 오래 안 쓴 스킬의 설명부터 지워지므로 핵심 용례를 앞에 두고 줄인다. ④ 시작 시 복사해 체크하는 진행 목록, 도구 정식 이름 표기(spec-conformance-check의 "browser-testing-with-devtools"), `disable-model-invocation`·`context: fork` 검토. 스킬 이름 패턴 혼재는 설치 ID·문서·기억에 박혀 있어 바꾸지 않기로 했다.
+
+## 평가 묶음 신설 — `claude plugin eval` 케이스 4개 (be-workflow 0.1.7 / be-review 0.1.7)
+
+**계기**: 스킬 작성 가이드 대조(0.1.6)에서 보류한 첫 항목. 이후 변경(긴 문단 분할, description 축약)의 효과를 잴 기준선이 없었다. Claude Code 2.1.278의 `claude plugin eval`은 케이스마다 플러그인 있음/없음 두 arm을 3회씩 돌려 점수 차이(Δ)를 보고하므로, 가이드가 말하는 "기준선 설정 → 최소 지침 → 비교"가 명령 하나로 된다.
+
+**구성**: 각 플러그인 `evals/` 아래 케이스 디렉터리(`prompt.md` + `case.yaml` + `fixture.sh` + `graders/`). `fixture.sh`가 빈 작업 공간에 git 저장소와 리뷰 대상 변경(`CHANGES.diff`)을 만든다 — 실행 세션에는 셸이 없어 코드만 보고 판정한다. 채점기는 세 층이다: 스킬이 발동했는가(`tool_used: Skill`, 플러그인 효과 지표), 계약을 지켰는가(`tool_used: Read`로 참고자료 경로, `regex`로 "읽은 참고자료" 슬롯), 결과가 맞는가(`llm` 루브릭).
+
+| 케이스 | 재는 것 | 플러그인 |
+|---|---|---|
+| `routes-spec-conformance-check` | "스펙대로 됐는지 확인해줘"가 spec-conformance-check로 가고 계획·구현·TDD로 새지 않는가. 셸 없이도 기준별 판정과 검증 공백을 정직하게 쓰는가 | be-workflow |
+| `loads-security-checklist` | 인증 변경에서 security-checklist.md를 `${CLAUDE_PLUGIN_ROOT}` 경로로 읽고 "읽은 참고자료"에 적는가. 심어 둔 결함 다섯 개(SQL 결합·토큰 로깅·만료 없는 토큰·평문 저장·오류에 토큰)를 등급과 함께 잡는가 | be-review |
+| `local-reasoning-without-declaration` | CLAUDE.md 선언이 없을 때 렌즈 ② 분리 제안이 Suggestion에만 있고 Important에는 없는가 | be-review |
+| `local-reasoning-with-declaration` | 같은 변경에 CLAUDE.md "국소 추론 판정 기준 합의"가 있으면 분리 지적이 Important이고 같은 파일 static 메서드를 먼저 제안하는가 | be-review |
+
+**실행 방법**: 플러그인 루트에서 `claude plugin eval . --scaffold --trust-plugin --no-publish`, be-review는 `--judge-model sonnet`을 붙인다. 이 저장소의 세션 안에서 중첩 실행할 때는 `.zshrc`의 Ollama 변수(`ANTHROPIC_BASE_URL`, `ANTHROPIC_API_KEY`)와 `CLAUDECODE`를 빼고 OAuth 자격(키체인)이 닿아야 한다. 모델은 `prompt.md`가 sonnet으로 고정한다. `results/`는 `.gitignore`.
+
+**결과 (2026-10-06, 각 arm 3회, 현재 루브릭 기준)**:
+
+| 케이스 | 스킬 발동 | WITH | W/OUT | Δ |
+|---|---|---|---|---|
+| routes-spec-conformance-check | 3/3 | 1.00 | 0.83 | +0.17 |
+| loads-security-checklist | 2/3 | 1.00 | 1.00 | 0 |
+| local-reasoning-without-declaration | 2/3 | 0.67 | 0.33 | +0.33 |
+| local-reasoning-with-declaration | 0/3 (이전 두 회차 1/3, 2/3) | 0.00 | 0.00 | 0 |
+
+**핵심 발견 — 발동률**: be-review 스킬은 "머지 전 리뷰해줘. 변경은 CHANGES.diff…"라는 자연스러운 요청에 21회 중 9회(43%)만 발동했다. 발동한 실행은 예외 없이 계약을 지켰다(참고자료 경로 치환·로드, 보고 슬롯, 선언 유무에 따른 등급과 질문형). 미발동 실행은 리뷰 자체는 그럴듯하지만 참고자료를 읽지 않고 적용 강도 규칙도 모른다. 반면 be-workflow의 spec-conformance-check는 3/3 발동했다 — 그쪽 description에는 트리거 문구 예시와 "반드시 이 스킬을 사용하라"가 있고, be-review 셋에는 없다. 가이드가 "가장 흔한 첫 발견"으로 예고한 바로 그 경우다. 다음 작업은 be-review description에 트리거 문구를 넣고 이 묶음으로 전후를 비교하는 것이다(대조 보고서 3번 항목이 여기서 합류한다).
+
+**채점기에서 배운 것**: ① haiku 심판은 "항목의 권장 조치가 무엇인가"와 "설명에 '목'·'분리'라는 낱말이 나오는가"를 구분하지 못해, 설계대로 Suggestion에 둔 분리 제안을 FAIL로 읽었다. 루브릭을 "권장 조치만 본다, 무엇은 구조 권고가 아니다"로 다시 쓰고 심판을 sonnet으로 올리자 사라졌다. ② "Important에 구조 지적이 없으면 통과"만으로는 구조 지적을 아예 안 하는 기준선이 통과해 Δ가 0이 됐다 — "Suggestion 등급의 분리 제안이 있어야 한다"를 더해 플러그인이 더하는 것을 재게 했다. ③ 보안 케이스는 기준선도 심은 결함을 다 잡아 결과 채점기의 Δ가 0이다. 이 케이스의 값은 Δ가 아니라 계약 지표 세 개다. ④ 픽스처의 기존 테스트가 옛 생성자를 쓰면 리뷰어가 "컴파일 깨짐"에 집중해 판정이 흐려졌다 — 테스트를 새 생성자에 맞추되 판정 분기는 덮지 않게 바꿨다.
+
+**보류**: with-declaration은 발동률이 낮아 아직 판정 품질을 말할 표본이 없다(발동한 3회 중 2회 PASS). description을 고친 뒤 다시 본다. 한 실행에서 performance-checklist-backend.md Read가 "도구 권한"으로 실패했다는 보고가 있었는데 추적 로그가 없어 원인은 미확인이다. Haiku로 실행 모델을 바꾼 비교는 아직 안 했다.
