@@ -281,3 +281,34 @@ fresh-context 교차 검증 아이디어는 addyosmani `doubt-driven-development
 **채점기에서 배운 것**: ① haiku 심판은 "항목의 권장 조치가 무엇인가"와 "설명에 '목'·'분리'라는 낱말이 나오는가"를 구분하지 못해, 설계대로 Suggestion에 둔 분리 제안을 FAIL로 읽었다. 루브릭을 "권장 조치만 본다, 무엇은 구조 권고가 아니다"로 다시 쓰고 심판을 sonnet으로 올리자 사라졌다. ② "Important에 구조 지적이 없으면 통과"만으로는 구조 지적을 아예 안 하는 기준선이 통과해 Δ가 0이 됐다 — "Suggestion 등급의 분리 제안이 있어야 한다"를 더해 플러그인이 더하는 것을 재게 했다. ③ 보안 케이스는 기준선도 심은 결함을 다 잡아 결과 채점기의 Δ가 0이다. 이 케이스의 값은 Δ가 아니라 계약 지표 세 개다. ④ 픽스처의 기존 테스트가 옛 생성자를 쓰면 리뷰어가 "컴파일 깨짐"에 집중해 판정이 흐려졌다 — 테스트를 새 생성자에 맞추되 판정 분기는 덮지 않게 바꿨다.
 
 **보류**: with-declaration은 발동률이 낮아 아직 판정 품질을 말할 표본이 없다(발동한 3회 중 2회 PASS). description을 고친 뒤 다시 본다. 한 실행에서 performance-checklist-backend.md Read가 "도구 권한"으로 실패했다는 보고가 있었는데 추적 로그가 없어 원인은 미확인이다. Haiku로 실행 모델을 바꾼 비교는 아직 안 했다.
+
+## be-review description 트리거 보강 — 발동률 43% → 89% (be-review 0.1.8)
+
+**계기**: 0.1.7 평가 묶음에서 be-review 스킬이 "머지 전 리뷰해줘. 변경은 CHANGES.diff…"라는 자연스러운 요청에 21회 중 9회(43%)만 발동했다. 발동하면 계약은 전부 지켰으므로 문제는 본문이 아니라 선택이었다. 같은 묶음에서 be-workflow의 spec-conformance-check는 3/3 발동했는데, 그쪽 description에는 사용자 문구 예시와 "반드시 이 스킬을 사용하라"가 있고 be-review 셋에는 없었다. 스킬 작성 가이드 대조 보고서의 3번 항목(description 축약)도 여기서 함께 처리했다.
+
+**바꾼 것**: 세 description을 "핵심 용례 한 문장 → 사용자 문구 예시와 상황 → 반드시 사용하라 → 인접 스킬 경계" 순서로 다시 썼다. 본문에 있는 절차 설명("정확성·가독성·아키텍처를 보고 보안·성능은 1차 확인", "먼저 측정하고 백엔드를 기본 대상으로")은 description에서 뺐다 — 선택에 쓰이지 않고 매 세션 목록 토큰만 쓴다. 키워드가 될 만한 용어(OWASP, Core Web Vitals, N+1)는 문구 예시 쪽으로 옮겼다.
+
+| 스킬 | 이전 | 트리거 추가(긴 판) | 축약판(채택) |
+|---|---|---|---|
+| code-review-and-quality | 147자 | 263자 | 217자 |
+| security-and-hardening | 181자 | 250자 | 222자 |
+| performance-optimization | 135자 | 238자 | 206자 |
+
+이전보다 길어진 것은 사용자 문구 예시와 인접 스킬 경계가 들어갔기 때문이고, 세 개 합계 645자는 Claude Code 목록 캡(1,536자/스킬)과 거리가 멀다.
+
+**실측 (플러그인 있음 arm 3회, sonnet 실행·sonnet 심판)**:
+
+| 케이스 | 이전 발동 | 긴 판 | 축약판 |
+|---|---|---|---|
+| loads-security-checklist | 2/3 | 2/3 | 2/3 |
+| local-reasoning-with-declaration | 0/3 (이전 회차 1/3, 2/3) | 3/3 | 3/3 |
+| local-reasoning-without-declaration | 2/3 | 3/3 | 3/3 |
+| 합계 | 9/21 (43%) | 8/9 (89%) | 8/9 (89%) |
+
+발동한 실행의 계약 지표(참고자료 Read, 보고 슬롯)는 전부 통과했고, 선언 있음 케이스는 3/3 발동에 판정 루브릭 3/3 통과로 "선언이 있으면 Important + 같은 파일 static 메서드 우선"이 표본으로 확인됐다. 보안 케이스에서 두 판 모두 1회는 code-review-and-quality 발동 지표가 실패했는데 security-checklist.md Read 지표는 통과했다 — 스킬을 안 썼다면 그 경로를 알 수 없으므로 security-and-hardening을 골랐을 가능성이 크다(그 스킬은 고정 출력 템플릿이 없어 "읽은 참고자료" 슬롯이 없다). 보안이 주제인 변경에서 두 스킬이 모두 해당될 때의 우선순위가 description에 없다는 뜻이다. 어느 스킬이 선택됐는지 결과에 남도록 `security-skill-fired-instead` 지표 채점기(점수 미반영)를 케이스에 추가했다. 선언 없음 축약판 run3는 설계대로 분리 제안을 Suggestion에 두고 선언 부재까지 적었는데 심판 표가 1대 2로 갈렸다 — 심판 편차이지 스킬 실패가 아니다.
+
+**보류 후보 — 보안 체크리스트 출처 추적 확대**: 지금은 Password Storage Cheat Sheet만 출처 메타데이터(커밋 SHA·추적하는 기준)로 묶여 있고 나머지 절은 원칙 수준의 일반 관행이다. Session Management·Authentication·Authorization·Input Validation·REST Security·Secrets Management·Logging처럼 구체적인 값이나 금지 규칙이 있는 치트시트는 같은 방식으로 절마다 출처를 묶고 신선도 규칙을 절 단위로 바꾸는 것이 후보다. 전문을 옮기지 않고 숫자와 금지 규칙만 체크 항목으로 두는 원칙은 유지한다. 아직 착수하지 않았다.
+
+**보류 후보 — 스킬별 라우팅 케이스**: 지금 묶음은 code-review-and-quality의 발동만 잰다. security-and-hardening·performance-optimization과 be-workflow의 나머지 일곱 스킬에는 "그 스킬이 받아야 할 요청"으로 시작하는 케이스가 없다. 스킬마다 발동 지표와 가벼운 결과 루브릭을 둔 케이스 하나씩이 후보다.
+
+**배운 것**: description에 들어가야 하는 것은 "사용자가 실제로 치는 말"과 "이 스킬이 아닌 경우"다. 스킬이 무엇을 어떻게 하는지는 본문의 몫이며, description에 있어도 선택률을 올리지 않는다. 축약판이 긴 판과 같은 발동률을 냈다는 것이 그 근거다.
