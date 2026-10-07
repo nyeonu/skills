@@ -144,6 +144,14 @@ flowchart TD
 
 외부 공식 기준(OWASP 비밀번호 저장, Core Web Vitals)은 매 작업마다 조회하지 않는다. 각 참고자료의 출처 메타데이터(공식 출처·확인일·출처 버전·상태)에 기록된 값을 쓰고, 월 1회 원본 변경(commit SHA·Last updated)만 감지한다 — 변경이 있으면 자동 수정 없이 `needs_review`로 표시하고 사람이 검토해 갱신한다. 신규 비밀번호 저장 설계, 알고리즘·파라미터 확정, CWV를 스펙·SLA·CI 기준으로 확정하는 작업은 시점과 무관하게 공식 출처를 재확인한다.
 
+## 평가
+
+플러그인마다 `evals/`에 `claude plugin eval` 케이스가 있다 (be-review 3개, be-workflow 1개). 플러그인 루트에서 아래를 돌리면 플러그인 있음/없음 두 arm을 3회씩 실행해 점수 차이(Δ)를 보고한다. 케이스 목록과 각 케이스가 재는 것은 각 플러그인의 `evals/README.md`에 있다. 결과(`evals/results/`)는 커밋하지 않는다.
+
+```bash
+claude plugin eval . --scaffold --trust-plugin --no-publish
+```
+
 ## 출처
 
 - addyosmani/agent-skills (MIT): interview-me 원본, spec-writer·task-breakdown·tdd의 방법론, review 3종·페르소나 번역 원문
