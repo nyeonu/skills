@@ -88,7 +88,7 @@ env -u CLAUDECODE -u CLAUDE_CODE_ENTRYPOINT -u ANTHROPIC_BASE_URL -u ANTHROPIC_A
 이 문서는 저장소 루트 `rewrite-description-brief.md`로 커밋돼 있어 어느 브랜치에서든 같은 내용을 읽는다. 비교가 끝나 채택본을 정식 커밋할 때 이 파일은 제외한다.
 
 
-- 공통 기준 커밋: `feature/rewrite-description`의 "평가 케이스 7개 추가" 커밋 (해시는 커밋 후 기입).
+- 공통 기준 커밋: `feature/rewrite-description`의 30e00cc "be-workflow 라우팅 평가 케이스 7개 추가"와 그 위의 이 문서 갱신 커밋. 세션 B는 `feature/rewrite-description`의 현재 끝(tip)에서 분기하면 된다.
 - 세션 A: `feature/rewrite-description` (워크트리 `.claude/worktrees/local-reasoning-lens-review-39a61b`).
 - 세션 B: 기준 커밋에서 `feature/rewrite-description-b`를 만들어 별도 워크트리에서 작업한다.
 
