@@ -146,7 +146,7 @@ flowchart TD
 
 ## 평가
 
-플러그인마다 `evals/`에 `claude plugin eval` 케이스가 있다 (be-review 3개, be-workflow 1개). 플러그인 루트에서 아래를 돌리면 플러그인 있음/없음 두 arm을 3회씩 실행해 점수 차이(Δ)를 보고한다. 케이스 목록과 각 케이스가 재는 것은 각 플러그인의 `evals/README.md`에 있다. 결과(`evals/results/`)는 커밋하지 않는다.
+플러그인마다 `evals/`에 `claude plugin eval` 케이스가 있다 (be-review 3개, be-workflow 8개: 스킬마다 라우팅 케이스 하나씩). 플러그인 루트에서 아래를 돌리면 플러그인 있음/없음 두 arm을 3회씩 실행해 점수 차이(Δ)를 보고한다. 케이스 목록과 각 케이스가 재는 것은 각 플러그인의 `evals/README.md`에 있다. 결과(`evals/results/`)는 커밋하지 않는다.
 
 ```bash
 claude plugin eval . --scaffold --trust-plugin --no-publish
