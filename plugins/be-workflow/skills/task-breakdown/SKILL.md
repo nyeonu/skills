@@ -1,6 +1,6 @@
 ---
 name: task-breakdown
-description: 승인된 스펙 문서(docs/spec/)를 실행자(저비용 모델)가 그대로 실행할 수 있는 PLAN.md로 분해하는 스킬. 사용자가 "작업 계획 세워줘", "plan 작성", "구현 계획", "이 기능 어떻게 나눠서 작업하지" 등을 언급하거나, 승인된 스펙을 실행 가능한 작업 단위로 나눠야 하는 상황이면 반드시 이 스킬을 사용하라. 스펙이 없으면 먼저 spec-writer를 사용한다. 계획 실행은 plan-executor를 사용한다.
+description: 승인된 스펙을 실행 가능한 PLAN.md로 분해하는 스킬. 사용자가 "작업 계획 세워줘", "plan 작성", "구현 계획"이라고 하거나, 승인된 스펙을 작업 단위로 나누려 하면 반드시 이 스킬을 사용하라. 스펙 작성은 spec-writer, 계획 실행은 plan-executor를 사용한다.
 ---
 
 # Task Breakdown

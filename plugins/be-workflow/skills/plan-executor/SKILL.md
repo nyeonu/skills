@@ -1,6 +1,6 @@
 ---
 name: plan-executor
-description: 승인된 PLAN.md 작업 계획을 읽어 저비용 모델의 실행자들에게 작업을 위임하고 검증하는 오케스트레이션 스킬. 사용자가 "계획 실행해줘", "PLAN.md 진행해", "승인했으니 시작해", "작업 실행" 등을 언급하거나, docs/plan/ 아래의 계획 문서를 실행에 옮기려는 상황이면 반드시 이 스킬을 사용하라. 계획을 새로 작성하는 요청에는 task-breakdown 스킬을 사용한다.
+description: 승인된 PLAN.md를 실행자에게 위임하고 검증하는 스킬. 사용자가 "계획 실행해줘", "PLAN.md 진행해", "승인했으니 시작해"라고 하거나, docs/plan/의 계획을 실행하려 하면 반드시 이 스킬을 사용하라. 계획 작성은 task-breakdown을 사용한다.
 ---
 
 # Plan Executor
