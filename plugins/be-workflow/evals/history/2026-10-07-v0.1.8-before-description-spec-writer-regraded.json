@@ -1,0 +1,196 @@
+{
+  "schemaVersion": 1,
+  "claudeVersion": "2.1.278",
+  "startedAt": "2026-10-07T06:44:08.869Z",
+  "durationSeconds": 55,
+  "costUsd": 0.46200440000000004,
+  "partial": false,
+  "suite": {
+    "root": "/Users/yeonu/develop/personal/skills/.claude/worktrees/local-reasoning-lens-review-39a61b/plugins/be-workflow",
+    "ablation": "none",
+    "caseFilter": "routes-spec-writer",
+    "threshold": 1,
+    "concurrency": 3,
+    "plugins": [
+      {
+        "name": "be-workflow",
+        "version": "0.1.7",
+        "path": "/Users/yeonu/develop/personal/skills/.claude/worktrees/local-reasoning-lens-review-39a61b/plugins/be-workflow"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "name": "routes-spec-writer",
+      "dir": "evals/routes-spec-writer",
+      "source": "mixed",
+      "promptMarkdown": "프로필에 자기소개(bio) 필드를 추가하는 기능을 시작하려고 해. 저장할 때 선택으로 받고 최대 200자, 조회할 때 같이 내려줘야 해. 금칙어 필터링은 이번에 안 해. 구현 들어가기 전에 요구사항부터 문서로 정리해줘.",
+      "model": "sonnet",
+      "runsPerCase": 3,
+      "timeoutSeconds": 600,
+      "maxTurns": 15,
+      "graders": [
+        {
+          "name": "no-other-workflow-skill",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?(task-breakdown|plan-executor|tdd|spec-conformance-check|adr-writer|using-agent-skills)\"",
+            "min": 0,
+            "max": 0,
+            "arm": "both"
+          }
+        },
+        {
+          "name": "skill-fired",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?spec-writer\""
+          }
+        },
+        {
+          "name": "surfaces-assumptions",
+          "type": "regex",
+          "weight": 1,
+          "config": {
+            "target": "last_message",
+            "pattern": "가정",
+            "flags": "",
+            "match": "contains"
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 1,
+            "costUsd": 0.1782646,
+            "judgeCostUsd": 0,
+            "durationSeconds": 55,
+            "startedAt": "2026-10-07T06:44:08.895Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-442PVV/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "surfaces-assumptions",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 가정",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 11,
+            "costUsd": 0.14947180000000002,
+            "judgeCostUsd": 0,
+            "durationSeconds": 33,
+            "startedAt": "2026-10-07T06:44:08.895Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-rpKutc/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "surfaces-assumptions",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 가정",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 11,
+            "costUsd": 0.134268,
+            "judgeCostUsd": 0,
+            "durationSeconds": 32,
+            "startedAt": "2026-10-07T06:44:08.895Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-j7TbSL/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "surfaces-assumptions",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 가정",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 1,
+        "passRate": 1
+      }
+    }
+  ],
+  "aggregates": {
+    "casesTotal": 1,
+    "casesPassed": 1,
+    "overallScore": 1,
+    "overallPassRate": 1
+  }
+}

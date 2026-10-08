@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "claudeVersion": "2.1.278",
+  "startedAt": "2026-10-07T06:41:55.754Z",
+  "durationSeconds": 29,
+  "costUsd": 0.15668780000000002,
+  "partial": false,
+  "suite": {
+    "root": "/Users/yeonu/develop/personal/skills/.claude/worktrees/local-reasoning-lens-review-39a61b/plugins/be-workflow",
+    "ablation": "none",
+    "caseFilter": "routes-spec-writer",
+    "threshold": 1,
+    "concurrency": 1,
+    "plugins": [
+      {
+        "name": "be-workflow",
+        "version": "0.1.7",
+        "path": "/Users/yeonu/develop/personal/skills/.claude/worktrees/local-reasoning-lens-review-39a61b/plugins/be-workflow"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "name": "routes-spec-writer",
+      "dir": "evals/routes-spec-writer",
+      "source": "mixed",
+      "promptMarkdown": "프로필에 자기소개(bio) 필드를 추가하는 기능을 시작하려고 해. 저장할 때 선택으로 받고 최대 200자, 조회할 때 같이 내려줘야 해. 금칙어 필터링은 이번에 안 해. 구현 들어가기 전에 요구사항부터 문서로 정리해줘.",
+      "model": "sonnet",
+      "runsPerCase": 3,
+      "timeoutSeconds": 600,
+      "maxTurns": 15,
+      "graders": [
+        {
+          "name": "has-success-criteria",
+          "type": "regex",
+          "weight": 1,
+          "config": {
+            "target": "last_message",
+            "pattern": "성공 기준",
+            "flags": "",
+            "match": "contains"
+          }
+        },
+        {
+          "name": "no-other-workflow-skill",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?(task-breakdown|plan-executor|tdd|spec-conformance-check|adr-writer|using-agent-skills)\"",
+            "min": 0,
+            "max": 0,
+            "arm": "both"
+          }
+        },
+        {
+          "name": "reads-spec-template",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Read",
+            "input_match": "references/spec-template\\.md",
+            "arm": "with-only"
+          }
+        },
+        {
+          "name": "skill-fired",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?spec-writer\""
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 0.75,
+            "passed": false,
+            "turns": 12,
+            "costUsd": 0.15668780000000002,
+            "judgeCostUsd": 0,
+            "durationSeconds": 29,
+            "startedAt": "2026-10-07T06:41:55.777Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-5dWv7S/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "has-success-criteria",
+                "passed": false,
+                "weight": 1,
+                "explanation": "pattern not found in last_message",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "reads-spec-template",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 0.75,
+        "passRate": 0
+      }
+    }
+  ],
+  "aggregates": {
+    "casesTotal": 1,
+    "casesPassed": 0,
+    "overallScore": 0.75,
+    "overallPassRate": 0
+  }
+}

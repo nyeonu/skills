@@ -1,0 +1,1481 @@
+{
+  "schemaVersion": 1,
+  "claudeVersion": "2.1.278",
+  "startedAt": "2026-10-07T23:28:42.334Z",
+  "durationSeconds": 1119,
+  "costUsd": 6.3714811,
+  "partial": false,
+  "suite": {
+    "root": "/Users/yeonu/develop/personal/skills/.claude/worktrees/local-reasoning-lens-review-39a61b/plugins/be-workflow",
+    "ablation": "none",
+    "tagFilters": [
+      "routing"
+    ],
+    "threshold": 1,
+    "concurrency": 2,
+    "plugins": [
+      {
+        "name": "be-workflow",
+        "version": "0.1.7",
+        "path": "/Users/yeonu/develop/personal/skills/.claude/worktrees/local-reasoning-lens-review-39a61b/plugins/be-workflow"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "name": "routes-adr-writer",
+      "dir": "evals/routes-adr-writer",
+      "source": "mixed",
+      "promptMarkdown": "`docs/plan/2026-10-07-feature-profile-bio.md` 계획 승인했어. bio를 별도 테이블로 가져가기로 한 결정, 나중에 왜 그랬는지 알 수 있게 남겨줘.",
+      "model": "sonnet",
+      "runsPerCase": 3,
+      "timeoutSeconds": 600,
+      "maxTurns": 15,
+      "graders": [
+        {
+          "name": "next-adr-number",
+          "type": "regex",
+          "weight": 1,
+          "config": {
+            "target": "last_message",
+            "pattern": "ADR-002",
+            "flags": "",
+            "match": "contains"
+          }
+        },
+        {
+          "name": "no-other-workflow-skill",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?(interview-me|spec-writer|task-breakdown|plan-executor|tdd|spec-conformance-check|using-agent-skills)\"",
+            "min": 0,
+            "max": 0,
+            "arm": "both"
+          }
+        },
+        {
+          "name": "skill-fired",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?adr-writer\""
+          }
+        },
+        {
+          "name": "status-proposed",
+          "type": "regex",
+          "weight": 1,
+          "config": {
+            "target": "last_message",
+            "pattern": "Proposed",
+            "flags": "",
+            "match": "contains"
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 7,
+            "costUsd": 0.1523426,
+            "judgeCostUsd": 0,
+            "durationSeconds": 22,
+            "startedAt": "2026-10-07T23:28:42.385Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-NQHWFH/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "next-adr-number",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched ADR-002",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "status-proposed",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched Proposed",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 7,
+            "costUsd": 0.1504392,
+            "judgeCostUsd": 0,
+            "durationSeconds": 21,
+            "startedAt": "2026-10-07T23:28:42.385Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-JLX4pS/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "next-adr-number",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched ADR-002",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "status-proposed",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched Proposed",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 7,
+            "costUsd": 0.10965640000000001,
+            "judgeCostUsd": 0,
+            "durationSeconds": 23,
+            "startedAt": "2026-10-07T23:29:03.220Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-SlLAVg/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "next-adr-number",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched ADR-002",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "status-proposed",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched Proposed",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 1,
+        "passRate": 1
+      }
+    },
+    {
+      "name": "routes-interview-me",
+      "dir": "evals/routes-interview-me",
+      "source": "mixed",
+      "promptMarkdown": "프로필 쪽에 운영에서 보기 편한 대시보드 같은 거 하나 만들어줘.",
+      "model": "sonnet",
+      "runsPerCase": 3,
+      "timeoutSeconds": 600,
+      "maxTurns": 15,
+      "graders": [
+        {
+          "name": "asks-with-estimate",
+          "type": "regex",
+          "weight": 1,
+          "config": {
+            "target": "last_message",
+            "pattern": "추정",
+            "flags": "",
+            "match": "contains"
+          }
+        },
+        {
+          "name": "no-other-workflow-skill",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?(spec-writer|task-breakdown|plan-executor|tdd|spec-conformance-check|adr-writer|using-agent-skills)\"",
+            "min": 0,
+            "max": 0,
+            "arm": "both"
+          }
+        },
+        {
+          "name": "skill-fired",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?interview-me\""
+          }
+        },
+        {
+          "name": "states-confidence",
+          "type": "regex",
+          "weight": 1,
+          "config": {
+            "target": "last_message",
+            "pattern": "확신 정도",
+            "flags": "",
+            "match": "contains"
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 3,
+            "costUsd": 0.1654497,
+            "judgeCostUsd": 0,
+            "durationSeconds": 47,
+            "startedAt": "2026-10-07T23:29:04.343Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-EbKmS7/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "asks-with-estimate",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 추정",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "states-confidence",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 확신 정도",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 3,
+            "costUsd": 0.1535675,
+            "judgeCostUsd": 0,
+            "durationSeconds": 49,
+            "startedAt": "2026-10-07T23:29:26.359Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-WUdS0W/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "asks-with-estimate",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 추정",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "states-confidence",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 확신 정도",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 3,
+            "costUsd": 0.1538052,
+            "judgeCostUsd": 0,
+            "durationSeconds": 46,
+            "startedAt": "2026-10-07T23:29:51.263Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-COrOvY/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "asks-with-estimate",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 추정",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "states-confidence",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 확신 정도",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 1,
+        "passRate": 1
+      }
+    },
+    {
+      "name": "routes-plan-executor",
+      "dir": "evals/routes-plan-executor",
+      "source": "mixed",
+      "promptMarkdown": "`docs/plan/2026-10-07-feature-profile-bio.md` 계획대로 진행해줘.",
+      "model": "sonnet",
+      "runsPerCase": 3,
+      "timeoutSeconds": 600,
+      "maxTurns": 15,
+      "graders": [
+        {
+          "name": "asks-approval",
+          "type": "regex",
+          "weight": 1,
+          "config": {
+            "target": "last_message",
+            "pattern": "승인",
+            "flags": "",
+            "match": "contains"
+          }
+        },
+        {
+          "name": "no-other-workflow-skill",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?(interview-me|spec-writer|task-breakdown|tdd|spec-conformance-check|adr-writer|using-agent-skills)\"",
+            "min": 0,
+            "max": 0,
+            "arm": "both"
+          }
+        },
+        {
+          "name": "skill-fired",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?plan-executor\""
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 2,
+            "costUsd": 0.34091060000000006,
+            "judgeCostUsd": 0,
+            "durationSeconds": 88,
+            "startedAt": "2026-10-07T23:30:14.866Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-tynNvZ/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "asks-approval",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 승인",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 8,
+            "costUsd": 0.23764780000000005,
+            "judgeCostUsd": 0,
+            "durationSeconds": 59,
+            "startedAt": "2026-10-07T23:30:37.406Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-ilaZpd/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "asks-approval",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 승인",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 8,
+            "costUsd": 0.41011169999999997,
+            "judgeCostUsd": 0,
+            "durationSeconds": 159,
+            "startedAt": "2026-10-07T23:31:36.220Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-jUGXgt/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "asks-approval",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 승인",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 1,
+        "passRate": 1
+      }
+    },
+    {
+      "name": "routes-spec-conformance-check",
+      "dir": "evals/routes-spec-conformance-check",
+      "source": "mixed",
+      "promptMarkdown": "구현 끝났어. `docs/spec/2026-10-01-feature-birth-year-validation.md` 스펙대로 됐는지 확인해줘. 셸은 못 쓰니까 코드와 테스트 파일을 읽어서 판단해줘.",
+      "model": "sonnet",
+      "runsPerCase": 3,
+      "timeoutSeconds": 600,
+      "maxTurns": 25,
+      "graders": [
+        {
+          "name": "conformance-verdict",
+          "type": "llm",
+          "weight": 1,
+          "graderMarkdown": "마지막 메시지를 본다. 요청은 \"스펙대로 구현됐는지 확인\"이었다. 스펙의 성공 기준은 셋이다: 1900년 미만 거절 / 올해보다 큰 값 거절 / 범위 안 값 저장. 구현은 세 기준을 모두 만족하지만, 테스트는 \"올해보다 큰 값 거절\"을 덮지 않는다. 세션에는 셸이 없어 테스트를 실행할 수 없었다.\n\nPASS 조건 (모두 만족):\n1. 성공 기준 각각에 대해 판정이나 상태를 적는다 (기준별 PASS/FAIL 표 또는 기준 문장별 서술).\n2. 테스트를 실제로 실행하지 못했다는 사실을 숨기지 않고, 코드만 읽고 내린 판정임을 \"남은 불확실성\", \"검증 공백\", \"실행 증거 없음\" 같은 말로 밝힌다.\n3. \"올해보다 큰 birthYear 거절\" 기준에 대응하는 테스트가 없다는 사실을 지적한다(추적성 결함 또는 테스트 누락).\n4. 코드 품질 리뷰(가독성·아키텍처 등급 분류), 계획 작성, 코드 수정 제안으로 응답의 중심이 옮겨가지 않는다.\n\nFAIL 조건 (하나라도 해당):\n- 기준별 판정 없이 \"구현되어 있다\"로 뭉뚱그린다.\n- 실행하지 못한 검증을 실행한 것처럼 PASS로 단정한다.\n- 테스트 누락 기준을 언급하지 않는다.\n- Critical/Important/Suggestion 등급의 코드 리뷰나 작업 계획이 응답의 주된 내용이다.",
+          "config": {
+            "criteria": "마지막 메시지를 본다. 요청은 \"스펙대로 구현됐는지 확인\"이었다. 스펙의 성공 기준은 셋이다: 1900년 미만 거절 / 올해보다 큰 값 거절 / 범위 안 값 저장. 구현은 세 기준을 모두 만족하지만, 테스트는 \"올해보다 큰 값 거절\"을 덮지 않는다. 세션에는 셸이 없어 테스트를 실행할 수 없었다.\n\nPASS 조건 (모두 만족):\n1. 성공 기준 각각에 대해 판정이나 상태를 적는다 (기준별 PASS/FAIL 표 또는 기준 문장별 서술).\n2. 테스트를 실제로 실행하지 못했다는 사실을 숨기지 않고, 코드만 읽고 내린 판정임을 \"남은 불확실성\", \"검증 공백\", \"실행 증거 없음\" 같은 말로 밝힌다.\n3. \"올해보다 큰 birthYear 거절\" 기준에 대응하는 테스트가 없다는 사실을 지적한다(추적성 결함 또는 테스트 누락).\n4. 코드 품질 리뷰(가독성·아키텍처 등급 분류), 계획 작성, 코드 수정 제안으로 응답의 중심이 옮겨가지 않는다.\n\nFAIL 조건 (하나라도 해당):\n- 기준별 판정 없이 \"구현되어 있다\"로 뭉뚱그린다.\n- 실행하지 못한 검증을 실행한 것처럼 PASS로 단정한다.\n- 테스트 누락 기준을 언급하지 않는다.\n- Critical/Important/Suggestion 등급의 코드 리뷰나 작업 계획이 응답의 주된 내용이다.",
+            "focus": "last_message"
+          }
+        },
+        {
+          "name": "no-other-workflow-skill",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?(plan-executor|task-breakdown|spec-writer|tdd|interview-me|adr-writer)\"",
+            "min": 0,
+            "max": 0,
+            "arm": "both"
+          }
+        },
+        {
+          "name": "skill-fired",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?spec-conformance-check\""
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 10,
+            "costUsd": 0.6792155,
+            "judgeCostUsd": 0.004866,
+            "durationSeconds": 324,
+            "startedAt": "2026-10-07T23:31:43.249Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-Bz1zP3/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "conformance-verdict",
+                "passed": true,
+                "weight": 1,
+                "explanation": "judge votes: PASS PASS PASS",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  true,
+                  true,
+                  true
+                ],
+                "evidence": "직접 코드를 읽어 서브에이전트 보고를 검증했습니다. `BirthYearValidator.java:13`에 미래 연도 거절 로직(`birthYear > thisYear`)은 구현되어 있지만, 이를 검증하는 테스트가 전혀 없는 걸 확인했습니다.\n\n# 스펙 적합성 검증\n\n- 대상 스펙: `docs/spec/2026-10-01-feature-birth-year-validation.md`\n- 공통 스펙: 없음\n- **판정: FAIL**\n\n## 기준별 결과\n\n| 성공 기준 | 판정 | 근거 |\n|---|---|---|\n| 1900년 미만 거절 (400/-3) | PASS (코드+테스트 일치 확인, 실행은 셸 불가로 미수행) | `BirthYearValidator.java:13` 조건 존재, `ProfileServiceTest.rejectsBefore1900`이 1899로 호출해 `code()==-3` assert — 내용 일치 |\n| **올해보다 큰 값 거절 (400/-3)** | **FAIL** | 코드 로직(`birthYear > thisYear`)은 있으나 **대응하는 테스트가 존재하지 않음**. `ProfileServiceTest.java`에는 `rejectsBefore1900`, `savesInRange` 두 테스트뿐 |\n| 1900년 이상 올해 이하 정상 저장 | PASS (코드+테스트 일치 확인) | `savesInRange` 테스트가 1990으로 저장 후 size 확인 — 기준과 일치 |\n\n## 경계·범위 확인\n- 시그니처 `save(ProfileRequest)` 변경 없음 (준수)\n- 이력 저장 등 범위 밖 기능 추가 없음 (준수)\n\n## 결론\n구현 코드 자체는 세 조건을 모두 포함하고 있지만, **\"올해보다 큰 값 거절\" 기준에 대한 테스트가 누락**되어 있어 스펙 성공 기준을 테스트로 뒷받침하지 못합니다. 해당 테스트 하나만 추가하면 됩니다 (예시):\n\n```java\n@Test\n@DisplayName(\"올해보다 큰 birthYear로 저장하면 코드 -3으로 거절한다\")\nvoid rejectsFutureYear() {\n    int future = java.time.Year.now().getValue() + 1;\n    InvalidRequestException e = assertThrows(InvalidRequestException.class,\n        () -> service.save(new ProfileRequest(\"nick\", future)));\n    assertEquals(-3, e.code());\n}\n```\n\n참고로 이 환경엔 셸 실행 도구가 없어 `gradle test`를 직접 돌려보지는 못했고, 코드와 assertion 내용을 직접 대조하는 방식으로 확인했습니다.\n\n이 테스트를 `ProfileServiceTest.java`에 추가해드릴까요?"
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 2x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 8,
+            "costUsd": 0.6714174999999999,
+            "judgeCostUsd": 0.0072689999999999986,
+            "durationSeconds": 253,
+            "startedAt": "2026-10-07T23:34:14.912Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-pLXTR7/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "conformance-verdict",
+                "passed": true,
+                "weight": 1,
+                "explanation": "judge votes: PASS PASS PASS",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  true,
+                  true,
+                  true
+                ],
+                "evidence": "## 검증 결과\n\n실행 도구(Bash 등)가 이 환경에 전혀 없어서 `gradle test`를 실제로 돌릴 수 없었어(서브에이전트로도 재확인함). 아래는 코드·테스트 파일을 직접 읽고 로직을 수동으로 추적한 결과야.\n\n```markdown\n# 스펙 적합성 검증\n\n- 대상 스펙: docs/spec/2026-10-01-feature-birth-year-validation.md\n- 공통 스펙: 없음\n- 판정: FAIL\n\n## 기준별 결과\n\n| 성공 기준 | 판정 | 근거 |\n|---|---|---|\n| 1900년 미만 birthYear로 저장하면 400으로 거절한다 | PASS | `BirthYearValidator.validate`가 `birthYear < 1900`일 때 `InvalidRequestException(-3, ...)`을 던짐. `ProfileServiceTest.rejectsBefore1900`(1899)이 예외 발생과 code=-3을 assert. (실행은 불가, 테스트 코드 내용 확인) |\n| 올해보다 큰 birthYear로 저장하면 400으로 거절한다 | FAIL | 코드(`birthYear > thisYear` 체크)는 존재하지만, 이 분기를 검증하는 테스트가 **전혀 없음**. `ProfileServiceTest`에는 `rejectsBefore1900`, `savesInRange` 두 테스트만 존재. 증거 없는 통과 판정 불가. |\n| 1900년 이상 올해 이하 birthYear는 그대로 저장된다 | PASS (일반 케이스만) | `savesInRange`가 1990년으로 저장 성공을 확인. 다만 경계값(정확히 1900년, 정확히 올해)에 대한 테스트는 없음. |\n\n## 추적성\n\n- 스펙의 성공 기준 3개 중 1개(\"올해보다 큰 birthYear 거절\")는 대응하는 테스트가 아예 없음 — 추적성 결함.\n- 경계값 테스트(1899/1900 경계, 올해/내년 경계) 부재 — off-by-one 오류를 잡아낼 안전망 없음. 코드 자체는 `< MIN_YEAR`, `> thisYear`로 경계를 올바르게 포함하는 것으로 읽히지만(1900, 올해는 저장 허용), 이를 고정하는 테스트가 없어 향후 회귀에 취약.\n- 존재하는 두 테스트(`rejectsBefore1900`, `savesInRange`)는 이름과 `@DisplayName`이 검증 내용과 정확히 일치해 그 자체로는 추적성 문제 없음.\n\n## 경계 위반\n\n없음. \"생년월일 수정 이력 저장\"(제외 범위) 관련 코드는 없고, `ProfileService.save(ProfileRequest)` 시그니처도 스펙에 명시된 그대로 유지됨.\n\n## 실패 상세\n\n- **누락**: 올해보다 큰 생년월일 거절 케이스에 대한 테스트가 없음.\n  - 재현: `service.save(new ProfileRequest(\"nick\", Year.now().getValue() + 1))` 호출 시 `InvalidRequestException(-3, ...)`이 발생하는지 확인하는 테스트가 `ProfileServiceTest`에 추가되어야 함.\n  - 코드 로직(`BirthYearValidator.java:13`)은 올바르게 작성된 것으로 보이나, 테스트 없이는 \"스펙대로 동작함\"을 확인할 수 없음.\n- `InvalidRequestException`이 실제로 HTTP 400으로 변환되는 지점(컨트롤러/예외 핸들러)은 이 저장소에 존재하지 않음. 스펙 3절에 \"거절은 400 응답과 코드 -3으로 내려간다 (확인값, 기존 규칙)\"이라고 명시돼 있어 이 변환은 기존 인프라가 담당하는 것으로 전제하고, 이번 구현은 code=-3 예외를 던지는 부분까지만 책임지는 것으로 해석함. 이 전제가 맞다면 위반 아님.\n\n## 남은 불확실성\n\n- `gradle test`를 실제로 실행해 통과 여부를 확인하지 못함(환경에 셸 실행 도구 없음). 코드와 테스트 내용을 수동으로 추적한 결과이며, 컴파일 오류나 런타임 예외 같은 실행 시점 문제는 발견하지 못했을 수 있음.\n- `code=-3` → HTTP 400 변환이 실제로 기존 인프라에 존재하는지는 이 저장소 범위 밖이라 확인 불가.\n```\n\n**결론**: 코드 로직 자체는 세 기준을 모두 올바르게 구현한 것으로 읽히지만, \"올해보다 큰 생년월일 거절\" 기준에 대한 테스트가 빠져 있고 경계값 테스트도 없어서 **FAIL**로 판정했어. `ProfileServiceTest`에 다음 테스트를 추가하는 게 필요해 보여:\n- 올해보다 큰 값으로 저장 시 거절되는지\n- 정확히 1900년, 정확히 올해 경계값 테스트"
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 8,
+            "costUsd": 0.3201508,
+            "judgeCostUsd": 0.004824,
+            "durationSeconds": 150,
+            "startedAt": "2026-10-07T23:37:07.703Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-O1lIKg/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "conformance-verdict",
+                "passed": true,
+                "weight": 1,
+                "explanation": "judge votes: PASS PASS FAIL",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  true,
+                  true,
+                  false
+                ],
+                "evidence": "## 스펙 적합성 검증 결과: **PASS**\n\n격리된 서브에이전트(계획 문서·대화 맥락 없이 스펙 원문 + 코드만 전달)로 검증했고, `docs/plan/`에 추적성 표 자체가 없어 스펙 기준과 테스트를 직접 코드 레벨로 대조했습니다.\n\n| 성공 기준 | 판정 | 근거 |\n|---|---|---|\n| 1900년 미만 거절 (400/-3) | PASS | `BirthYearValidator.validate`에서 `birthYear < 1900` 체크, `ProfileServiceTest.rejectsBefore1900`이 1899 입력으로 직접 검증 |\n| 올해보다 큰 값 거절 (400/-3) | PASS (코드 추적) | `thisYear`가 `Year.now().getValue()`로 **런타임 계산**(하드코딩 아님), 조건식 off-by-one 없음을 확인. 단 **이 기준만 검증하는 전용 테스트가 없음** |\n| 1900년 이상 올해 이하는 저장 | PASS | `savesInRange` 테스트(1990년)로 검증. 정확히 1900/올해 경계값 전용 테스트는 없으나 조건식 추적상 정상 |\n\n**경계/제약**: `ProfileService.save(ProfileRequest)` 시그니처 유지 확인, \"수정 이력 저장\" 범위 외 기능 없음, 테스트 이름에 식별자 접두어 없음.\n\n**주의할 점**\n- \"올해보다 큰 값 거절\" 기준과 경계값(정확히 1900, 정확히 올해)을 직접 때리는 테스트가 없습니다. 로직 자체는 코드 추적으로 맞는 걸 확인했지만, 회귀 안전망이 약하니 테스트 보강을 권장합니다.\n- `InvalidRequestException(-3)` → 실제 HTTP 400 변환 레이어(컨트롤러/예외 핸들러)는 이 저장소에 존재하지 않습니다. 스펙 3절에 \"기존 규칙(확인값)\"이라고 명시돼 있어 이번 구현 범위 밖 기존 인프라로 해석했습니다.\n- 쉘 실행 불가로 실제 빌드/테스트 실행 결과는 확인 못 했고, 정적 코드 분석으로만 판단했습니다.\n\n전체 PASS로 판단해 스펙 상태를 `approved` → `implemented`로 변경했습니다. 다음 단계로 품질 검토(code-review 등)를 진행하셔도 되지만, 위 테스트 공백은 먼저 보강하는 걸 권합니다."
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 1,
+        "passRate": 1
+      }
+    },
+    {
+      "name": "routes-spec-writer",
+      "dir": "evals/routes-spec-writer",
+      "source": "mixed",
+      "promptMarkdown": "프로필에 자기소개(bio) 필드를 추가하는 기능을 시작하려고 해. 저장할 때 선택으로 받고 최대 200자, 조회할 때 같이 내려줘야 해. 금칙어 필터링은 이번에 안 해. 구현 들어가기 전에 요구사항부터 문서로 정리해줘.",
+      "model": "sonnet",
+      "runsPerCase": 3,
+      "timeoutSeconds": 600,
+      "maxTurns": 15,
+      "graders": [
+        {
+          "name": "no-other-workflow-skill",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?(task-breakdown|plan-executor|tdd|spec-conformance-check|adr-writer|using-agent-skills)\"",
+            "min": 0,
+            "max": 0,
+            "arm": "both"
+          }
+        },
+        {
+          "name": "skill-fired",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?spec-writer\""
+          }
+        },
+        {
+          "name": "surfaces-assumptions",
+          "type": "regex",
+          "weight": 1,
+          "config": {
+            "target": "last_message",
+            "pattern": "가정",
+            "flags": "",
+            "match": "contains"
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 12,
+            "costUsd": 0.1528824,
+            "judgeCostUsd": 0,
+            "durationSeconds": 27,
+            "startedAt": "2026-10-07T23:38:28.063Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-ksacFB/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "surfaces-assumptions",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 가정",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 14,
+            "costUsd": 0.18410580000000001,
+            "judgeCostUsd": 0,
+            "durationSeconds": 44,
+            "startedAt": "2026-10-07T23:38:55.357Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-XE8Nim/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "surfaces-assumptions",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 가정",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 14,
+            "costUsd": 0.1694666,
+            "judgeCostUsd": 0,
+            "durationSeconds": 32,
+            "startedAt": "2026-10-07T23:39:38.189Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-s9oOf3/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "surfaces-assumptions",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 가정",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 1,
+        "passRate": 1
+      }
+    },
+    {
+      "name": "routes-task-breakdown",
+      "dir": "evals/routes-task-breakdown",
+      "source": "mixed",
+      "promptMarkdown": "`docs/spec/2026-10-07-feature-profile-bio.md` 스펙 승인됐어. 이걸 어떻게 나눠서 작업할지 정리해줘.",
+      "model": "sonnet",
+      "runsPerCase": 3,
+      "timeoutSeconds": 600,
+      "maxTurns": 15,
+      "graders": [
+        {
+          "name": "has-traceability",
+          "type": "regex",
+          "weight": 1,
+          "config": {
+            "target": "last_message",
+            "pattern": "추적성",
+            "flags": "",
+            "match": "contains"
+          }
+        },
+        {
+          "name": "no-other-workflow-skill",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?(interview-me|spec-writer|plan-executor|tdd|spec-conformance-check|adr-writer|using-agent-skills)\"",
+            "min": 0,
+            "max": 0,
+            "arm": "both"
+          }
+        },
+        {
+          "name": "reads-plan-template",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Read",
+            "input_match": "references/plan-template\\.md",
+            "arm": "with-only"
+          }
+        },
+        {
+          "name": "skill-fired",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?task-breakdown\""
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 0.75,
+            "passed": false,
+            "turns": 16,
+            "costUsd": 0.3664224,
+            "judgeCostUsd": 0,
+            "durationSeconds": 152,
+            "startedAt": "2026-10-07T23:39:39.143Z",
+            "error": "exit 1: Reached maximum number of turns (15)",
+            "tracePath": "/private/tmp/e-HShHY7/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "has-traceability",
+                "passed": false,
+                "weight": 1,
+                "explanation": "pattern not found in last_message",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "reads-plan-template",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 17,
+            "costUsd": 0.7409539999999998,
+            "judgeCostUsd": 0,
+            "durationSeconds": 315,
+            "startedAt": "2026-10-07T23:40:09.997Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-f4ggIL/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "has-traceability",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 추적성",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "reads-plan-template",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 16,
+            "costUsd": 0.5729118,
+            "judgeCostUsd": 0,
+            "durationSeconds": 249,
+            "startedAt": "2026-10-07T23:42:10.987Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-o6wvs2/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "has-traceability",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 추적성",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "reads-plan-template",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 0.9166666666666666,
+        "passRate": 0.6666666666666666
+      }
+    },
+    {
+      "name": "routes-tdd",
+      "dir": "evals/routes-tdd",
+      "source": "mixed",
+      "promptMarkdown": "생년을 올해로 넣으면 저장이 거절돼. 올해까지는 허용이어야 해. 고쳐줘. 셸은 못 쓰니까 테스트 실행은 안 돼.",
+      "model": "sonnet",
+      "runsPerCase": 3,
+      "timeoutSeconds": 600,
+      "maxTurns": 15,
+      "graders": [
+        {
+          "name": "no-other-workflow-skill",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?(interview-me|spec-writer|task-breakdown|plan-executor|spec-conformance-check|adr-writer|using-agent-skills)\"",
+            "min": 0,
+            "max": 0,
+            "arm": "both"
+          }
+        },
+        {
+          "name": "skill-fired",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?tdd\""
+          }
+        },
+        {
+          "name": "writes-reproduction-test-first",
+          "type": "regex",
+          "weight": 1,
+          "config": {
+            "target": "last_message",
+            "pattern": "재현",
+            "flags": "",
+            "match": "contains"
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 0.3333333333333333,
+            "passed": false,
+            "turns": 9,
+            "costUsd": 0.11416059999999999,
+            "judgeCostUsd": 0,
+            "durationSeconds": 25,
+            "startedAt": "2026-10-07T23:45:24.756Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-WKSRpZ/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": false,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "writes-reproduction-test-first",
+                "passed": false,
+                "weight": 1,
+                "explanation": "pattern not found in last_message",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 0.3333333333333333,
+            "passed": false,
+            "turns": 7,
+            "costUsd": 0.09860300000000001,
+            "judgeCostUsd": 0,
+            "durationSeconds": 21,
+            "startedAt": "2026-10-07T23:45:49.921Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-v3rKGW/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": false,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "writes-reproduction-test-first",
+                "passed": false,
+                "weight": 1,
+                "explanation": "pattern not found in last_message",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 0.3333333333333333,
+            "passed": false,
+            "turns": 9,
+            "costUsd": 0.12276240000000002,
+            "judgeCostUsd": 0,
+            "durationSeconds": 31,
+            "startedAt": "2026-10-07T23:46:11.307Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-qUEEo5/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": false,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "writes-reproduction-test-first",
+                "passed": false,
+                "weight": 1,
+                "explanation": "pattern not found in last_message",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 0.3333333333333333,
+        "passRate": 0
+      }
+    },
+    {
+      "name": "routes-using-agent-skills",
+      "dir": "evals/routes-using-agent-skills",
+      "source": "mixed",
+      "promptMarkdown": "회원 프로필에 공개/비공개 설정을 넣어야 해. 우리 워크플로우 기준으로 어디서부터 시작해야 해?",
+      "model": "sonnet",
+      "runsPerCase": 3,
+      "timeoutSeconds": 600,
+      "maxTurns": 15,
+      "graders": [
+        {
+          "name": "names-entry-skill",
+          "type": "regex",
+          "weight": 1,
+          "config": {
+            "target": "last_message",
+            "pattern": "spec-writer|interview-me",
+            "flags": "",
+            "match": "contains"
+          }
+        },
+        {
+          "name": "no-wrong-entry-skill",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?(task-breakdown|plan-executor|tdd|spec-conformance-check|adr-writer)\"",
+            "min": 0,
+            "max": 0,
+            "arm": "both"
+          }
+        },
+        {
+          "name": "skill-fired",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?using-agent-skills\""
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 9,
+            "costUsd": 0.11474559999999998,
+            "judgeCostUsd": 0,
+            "durationSeconds": 28,
+            "startedAt": "2026-10-07T23:46:19.691Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-QkwDJr/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "names-entry-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched spec-writer|interview-me",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-wrong-entry-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 3,
+            "costUsd": 0.0751732,
+            "judgeCostUsd": 0,
+            "durationSeconds": 19,
+            "startedAt": "2026-10-07T23:46:42.083Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-GBA1qd/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "names-entry-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched spec-writer|interview-me",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-wrong-entry-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 10,
+            "costUsd": 0.1145788,
+            "judgeCostUsd": 0,
+            "durationSeconds": 33,
+            "startedAt": "2026-10-07T23:46:47.805Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-er7VMx/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "names-entry-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched spec-writer|interview-me",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-wrong-entry-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 1,
+        "passRate": 1
+      }
+    }
+  ],
+  "aggregates": {
+    "casesTotal": 8,
+    "casesPassed": 6,
+    "overallScore": 0.90625,
+    "overallPassRate": 0.8333333333333334
+  }
+}
