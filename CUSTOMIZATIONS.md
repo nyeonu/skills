@@ -317,7 +317,7 @@ fresh-context 교차 검증 아이디어는 addyosmani `doubt-driven-development
 
 **계기**: 스킬 작성 가이드 대조 보고서 3번 항목(description 축약)의 be-workflow 몫. be-review(0.1.8)에서 "핵심 용례 → 사용자 문구 예시 → 반드시 사용하라 → 인접 스킬 경계" 구조가 발동률을 올리고 절차 설명은 발동률에 기여하지 않음이 확인돼, be-workflow 스킬 8개를 같은 구조로 통일했다. be-workflow는 be-review와 달리 이미 여섯 개에 문구 예시와 "반드시"가 있어 문제는 발동률이 아니라 길이와 절차 혼입이었다(adr-writer 341자 중 절반이 Proposed/Accepted 시점 규칙).
 
-**방법 — 두 도구의 병렬 작성과 같은 자로 비교**: 같은 작업 지시문(배경·규칙·측정 명령·비교 기준)을 Claude Code(A, 브랜치 `feature/rewrite-description`)와 Codex(B, 브랜치 `feature/rewrite-description-b`)에 주고 독립 작성하게 했다. 공통 자로 스킬마다 "그 스킬이 받아야 할 요청" 라우팅 케이스를 하나씩 신설해(7개, 기존 spec-conformance-check와 합쳐 8개) 수정 전 기준선을 먼저 쟀다. B의 자체 측정은 Codex 실행자에게 스킬 목록을 보여 주고 고르게 하는 방식이라 원본도 B안도 24/24였고 Claude의 자동 발동률과 합칠 수 없어, B의 문구를 이 저장소에 넣고 같은 명령(`claude plugin eval . --tag routing --runs 3 --ablation none`, sonnet)으로 다시 쟀다.
+**방법 — 두 작성안의 병렬 작성과 같은 자로 비교**: 같은 작업 지시문(배경·규칙·측정 명령·비교 기준)으로 두 작성안(A: 이 저장소의 Claude Code 세션, B: 별도 세션)을 독립 작성하게 했다. 공통 자로 스킬마다 "그 스킬이 받아야 할 요청" 라우팅 케이스를 하나씩 신설해(7개, 기존 spec-conformance-check와 합쳐 8개) 수정 전 기준선을 먼저 쟀다. B의 자체 측정은 실행자에게 스킬 목록을 보여 주고 고르게 하는 방식이라 원본도 B안도 24/24였고 Claude의 자동 발동률과 합칠 수 없어, B의 문구를 이 저장소에 넣고 같은 명령(`claude plugin eval . --tag routing --runs 3 --ablation none`, sonnet)으로 다시 쟀다.
 
 **채택 — 절충안**: 일곱 스킬은 B의 문구(뜻을 잃지 않고 더 짧고 발동이 같음; spec-conformance-check의 인접 스킬 경계를 code-review-and-quality·security-and-hardening·performance-optimization 셋으로 명시한 것은 B가 A보다 낫다). tdd만 A의 판("~가 안 된다", "고쳐줘", "버그" 예시를 앞에 두고 "한 줄 수정이라도 코드를 고치기 전에 반드시"). using-agent-skills에는 B가 뺀 "모든 스킬에 공통인 운영 규칙" 구절을 되살렸다(세션 시작 때 읽혀야 할 이유). 본문 변경은 spec-writer 도입부에 "스펙 없이 코드를 먼저 쓰는 것은 금지다" 한 문장을 옮긴 것뿐이고, 나머지 뺀 절차는 본문에 이미 있다. 원본 adr-writer·spec-writer의 `scope: shared-app`은 따옴표 없는 YAML 값 안의 "콜론+공백"이라 엄격한 파서(PyYAML)에서 frontmatter가 깨지던 것을 함께 없앴다(B가 발견, 재확인함).
 
@@ -329,10 +329,10 @@ fresh-context 교차 검증 아이디어는 addyosmani `doubt-driven-development
 | tdd | 1/3 | 2/3 (누적 7/12) | 0/3 (누적 1/9) | A 판 |
 | description 합계 | 1,974자 | 1,677자 | 1,412자 | 1,452자 |
 
-산출물 채점기(spec/plan 템플릿 Read, 마지막 메시지의 가정·추정·승인·Proposed·ADR-002)는 발동한 회차에서 전부 통과했다. B의 Codex 실험에서 보인 "가정 확인 전 스펙 작성"은 Claude 측정에서 나타나지 않았다. 최장 항목은 spec-conformance-check 217자, adr-writer는 341자 → 185자.
+산출물 채점기(spec/plan 템플릿 Read, 마지막 메시지의 가정·추정·승인·Proposed·ADR-002)는 발동한 회차에서 전부 통과했다. B의 자체 실험에서 보인 "가정 확인 전 스펙 작성"은 Claude 측정에서 나타나지 않았다. 최장 항목은 spec-conformance-check 217자, adr-writer는 341자 → 185자.
 
 **tdd는 다음 작업으로 분리**: 작은 버그 수정 요청에서 tdd가 발동하지 않는 회차는 모두 같은 모양이다(Grep → Read → 조건식 한 줄 Edit → 끝). 모델이 한 줄 수정을 "사소한 변경"으로 보고 워크플로우를 건너뛴다. 사소함을 예외로 인정하지 않는 문장이 있는 판이 7/12, 없는 판이 1/9로 방향은 분명하지만 표본이 작다. 이 작업의 성공 조건은 "발동률을 떨어뜨리지 않는다"였고 tdd도 1/3 아래로 가지 않았으므로 여기서 닫고, 발동률을 올리는 것(과잉 발동 경계 케이스 포함)은 별도 작업으로 둔다.
 
 **측정에서 배운 것**: ① 평가 프롬프트의 "코드만 고쳐"가 테스트 작성을 막아 측정 대상을 바꿨다 — 케이스 프롬프트에는 사용자 요청만 담고 도구 제약은 중립적으로 적는다(routes-tdd 프롬프트 보정, tdd 기준선 0/3 → 1/3). ② API 무응답으로 턴 0·비용 0인 채 600초 시간 초과가 난 회차(한 묶음 24회 중 10회)는 발동 실패가 아니다 — 결과 JSON의 `error`로 가르고 그 케이스만 `-j 1`로 다시 잰다. ③ 3회로 갈리는 스킬은 6회 이상 더 잰다. ④ 다른 도구의 측정은 문구만 가져오고 수치는 같은 자로 다시 잰다. ⑤ B 보고서의 "생성된 테스트를 실제 JUnit으로 돌려 RED/GREEN 확인" 절차는 우리 묶음에 없는 검증이라 후보로 둔다.
 
-**정리**: 작업 지시문(`rewrite-description-brief.md`)과 A·B·비교 결과 문서는 저장소에서 제외했다. B 브랜치는 머지하지 않고 기록으로 남긴다. 보류: routes-task-breakdown의 max_turns를 25로(B 1회가 15에 걸림).
+**정리**: 작업 지시문(`rewrite-description-brief.md`)은 저장소에서 제외했다. 측정 결과 JSON과 A안·비교 문서는 `plugins/be-workflow/evals/history/`에 보관한다. 보류: routes-task-breakdown의 max_turns를 25로(B 1회가 15에 걸림).

@@ -36,4 +36,4 @@ claude plugin eval . --tag routing --runs 3 --ablation none --scaffold --trust-p
 
 ## 결과 기록
 
-`results/`는 로컬에만 남으므로, 비교 표(케이스별 `skill-fired` 통과 수와 산출물 채점기 통과 수)는 `CUSTOMIZATIONS.md`의 해당 절에 옮겨 적는다.
+`results/`는 원시 실행 디렉터리(HTML 보고서 포함)라 커밋하지 않는다. 보관할 결과는 `--json`으로 쓴 JSON을 `history/<측정일>-v<버전>-<무엇>.json`으로 복사하고 `history/README.md` 색인에 한 줄 추가한다. 비교 표(케이스별 `skill-fired` 통과 수와 산출물 채점기 통과 수)는 `CUSTOMIZATIONS.md`의 해당 절에 옮겨 적는다.

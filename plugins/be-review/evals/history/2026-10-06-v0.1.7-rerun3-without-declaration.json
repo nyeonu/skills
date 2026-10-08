@@ -1,0 +1,302 @@
+{
+  "schemaVersion": 1,
+  "claudeVersion": "2.1.278",
+  "startedAt": "2026-10-05T23:45:47.953Z",
+  "durationSeconds": 551,
+  "costUsd": 1.9533474000000002,
+  "partial": false,
+  "suite": {
+    "root": "/Users/yeonu/develop/personal/skills/.claude/worktrees/local-reasoning-lens-review-39a61b/plugins/be-review",
+    "ablation": "with-without",
+    "judgeModel": "sonnet",
+    "caseFilter": "local-reasoning-without-declaration",
+    "threshold": 0.8,
+    "concurrency": 2,
+    "plugins": [
+      {
+        "name": "be-review",
+        "version": "0.1.7",
+        "path": "/Users/yeonu/develop/personal/skills/.claude/worktrees/local-reasoning-lens-review-39a61b/plugins/be-review"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "name": "local-reasoning-without-declaration",
+      "dir": "evals/local-reasoning-without-declaration",
+      "source": "mixed",
+      "promptMarkdown": "머지 전 리뷰해줘. 작업 공간에 git 저장소가 있고, 변경 내용은 HEAD 커밋이자 `CHANGES.diff` 파일이야. 전체 소스는 `src/` 아래에 있어.\n\n변경 목적: 숨김 게시판의 글은 관리자만, 멤버십 전용 글은 해당 아티스트 멤버십 회원과 관리자만 조회할 수 있게 한다.\n\n`BoardRepository`·`MembershipClient`·`BoardDTO`·`AccessDeniedException`은 다른 기능에서 이미 쓰던 기존 코드라 diff에 없어.\n\n테스트는 아직 돌리지 못했어. 셸 실행 없이 코드만 보고 리뷰해줘.",
+      "model": "sonnet",
+      "runsPerCase": 3,
+      "timeoutSeconds": 600,
+      "maxTurns": 25,
+      "graders": [
+        {
+          "name": "reads-local-reasoning-checklist",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Read",
+            "input_match": "references/local-reasoning-checklist\\.md",
+            "arm": "with-only"
+          }
+        },
+        {
+          "name": "skill-fired",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?code-review-and-quality\""
+          }
+        },
+        {
+          "name": "structure-findings-capped-at-suggestion",
+          "type": "llm",
+          "weight": 1,
+          "graderMarkdown": "리뷰 결과(마지막 메시지)를 본다. 대상 저장소에는 CLAUDE.md가 없으므로 \"국소 추론 판정 기준 합의\" 선언이 없다.\n\n판단 대상은 **구조 변경 권고**뿐이다. 구조 변경 권고란, 항목의 수정 방향(권장 조치)이 다음 중 하나인 것을 말한다:\n- 접근 판정 로직을 다른 곳으로 옮기거나 분리하라 (같은 파일 static 메서드, 순수 함수, 별도 클래스, sealed 타입, 새 레이어)\n- 목(mock) 없이 테스트되도록 코드 구조를 바꿔라\n- 애노테이션·AOP·설정 기반 동작을 도입하거나 제거하라\n- 도메인 경계·import 방향·모듈 구조를 바꿔라\n\n다음은 구조 변경 권고가 **아니다** (어느 등급에 있어도 판단에 영향 없음):\n- 새 분기에 테스트가 없다, 테스트를 추가하라 — 설령 \"목을 여러 개 세워야 한다\"는 설명이 붙어 있어도 권장 조치가 \"테스트 추가\"면 테스트 부재 지적이다\n- 외부 호출을 조건부로만 하라, 호출 순서를 바꿔라 (성능·가용성 지적)\n- switchIfEmpty 누락, 예외 타입, 404/403 선택 같은 정확성·보안 지적\n\nPASS 조건 (둘 다 만족):\n1. `Suggestion`(또는 그에 해당하는 \"제안\" 등급) 아래에 **접근 판정을 IO에서 분리하라는 제안**이 적어도 하나 있다 — 같은 파일 static 메서드, 순수 함수, 값만 넣어 테스트되는 형태 등. 질문형(\"~하면 어떨까요\")이든 제안형이든 상관없다.\n2. 구조 변경 권고가 `Important`나 `Critical`(또는 그에 해당하는 \"중요\"·\"치명\" 등급) 아래에는 하나도 없다.\n\nFAIL 조건 (하나라도 해당):\n- 분리 제안이 어느 등급에도 없다 (구조에 대해 아무 말도 하지 않았다).\n- 구조 변경 권고가 `Important` 또는 `Critical` 아래에 있다.\n\n판단할 때 각 Important/Critical 항목의 **권장 조치가 무엇인지**만 보고, 설명 문장에 \"목\", \"체인\", \"분리\"라는 낱말이 나오는지로 판단하지 않는다.",
+          "config": {
+            "criteria": "리뷰 결과(마지막 메시지)를 본다. 대상 저장소에는 CLAUDE.md가 없으므로 \"국소 추론 판정 기준 합의\" 선언이 없다.\n\n판단 대상은 **구조 변경 권고**뿐이다. 구조 변경 권고란, 항목의 수정 방향(권장 조치)이 다음 중 하나인 것을 말한다:\n- 접근 판정 로직을 다른 곳으로 옮기거나 분리하라 (같은 파일 static 메서드, 순수 함수, 별도 클래스, sealed 타입, 새 레이어)\n- 목(mock) 없이 테스트되도록 코드 구조를 바꿔라\n- 애노테이션·AOP·설정 기반 동작을 도입하거나 제거하라\n- 도메인 경계·import 방향·모듈 구조를 바꿔라\n\n다음은 구조 변경 권고가 **아니다** (어느 등급에 있어도 판단에 영향 없음):\n- 새 분기에 테스트가 없다, 테스트를 추가하라 — 설령 \"목을 여러 개 세워야 한다\"는 설명이 붙어 있어도 권장 조치가 \"테스트 추가\"면 테스트 부재 지적이다\n- 외부 호출을 조건부로만 하라, 호출 순서를 바꿔라 (성능·가용성 지적)\n- switchIfEmpty 누락, 예외 타입, 404/403 선택 같은 정확성·보안 지적\n\nPASS 조건 (둘 다 만족):\n1. `Suggestion`(또는 그에 해당하는 \"제안\" 등급) 아래에 **접근 판정을 IO에서 분리하라는 제안**이 적어도 하나 있다 — 같은 파일 static 메서드, 순수 함수, 값만 넣어 테스트되는 형태 등. 질문형(\"~하면 어떨까요\")이든 제안형이든 상관없다.\n2. 구조 변경 권고가 `Important`나 `Critical`(또는 그에 해당하는 \"중요\"·\"치명\" 등급) 아래에는 하나도 없다.\n\nFAIL 조건 (하나라도 해당):\n- 분리 제안이 어느 등급에도 없다 (구조에 대해 아무 말도 하지 않았다).\n- 구조 변경 권고가 `Important` 또는 `Critical` 아래에 있다.\n\n판단할 때 각 Important/Critical 항목의 **권장 조치가 무엇인지**만 보고, 설명 문장에 \"목\", \"체인\", \"분리\"라는 낱말이 나오는지로 판단하지 않는다.",
+            "focus": "last_message"
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 20,
+            "costUsd": 0.3431332,
+            "judgeCostUsd": 0.019368000000000003,
+            "durationSeconds": 138,
+            "startedAt": "2026-10-05T23:45:47.970Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-uvogld/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "reads-local-reasoning-checklist",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": true,
+                "scored": false
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": true,
+                "scored": false
+              },
+              {
+                "name": "structure-findings-capped-at-suggestion",
+                "passed": true,
+                "weight": 1,
+                "explanation": "judge votes: PASS PASS PASS",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  true,
+                  true,
+                  true
+                ],
+                "evidence": "## 리뷰 요약\n\n**판정:** REQUEST CHANGES\n\n**개요:** 접근 제어 조건식 자체(숨김 게시판→관리자만, 멤버십 전용 글→멤버십 회원/관리자만)는 스펙과 일치하게 작성됐지만, 이 로직을 검증하는 테스트가 하나도 없고, 멤버십 조회가 불필요한 경로에서도 무조건 호출되는 성능·가용성 문제가 있다.\n\n### Important\n\n- **`PostServiceTest.java` 전체** — 이번 변경의 핵심인 접근 제어 분기(숨김 게시판+비관리자 거부, 숨김 게시판+관리자 허용, 멤버십 글+비멤버 거부, 멤버십 글+멤버 허용, 멤버십 글+관리자 허용)에 대한 테스트가 **하나도 없다**. 기존 테스트 2개(`returnsPostWhenFound`, `failsWhenMissing`)는 모두 `membersOnly=false`, `hidden=false` 조합만 다뤄 새 로직을 전혀 거치지 않는다. 이 기능의 존재 이유가 접근 제한인데 그 분기가 미검증 상태라 회귀를 전혀 잡지 못한다. `AccessDeniedException`이 던져지는 5가지 경로 각각에 대한 테스트 추가가 필요하다.\n\n- **`PostService.java:26`** — `membershipClient.isMember(user.id(), board.artistId())`가 `board.hidden()` 여부, `post.membersOnly()` 여부, `user.hasAdminRole()` 여부와 무관하게 **매번 호출**된다. 즉 숨김 게시판이라 어차피 에러로 끝날 요청, 멤버십과 무관한 일반 글 조회, 관리자의 조회에서도 외부 멤버십 서비스를 호출한다. 이는 (1) 모든 글 조회 요청에 불필요한 외부 호출을 추가하는 성능 저하이자, (2) 멤버십 서비스 장애/지연이 발생하면 멤버십과 무관한 일반 글 조회까지 전부 실패하게 만드는 가용성 리스크다. `board.hidden()` 검사는 `board`만으로 먼저 판단해 조기 반환하고, `membershipClient.isMember` 호출은 `post.membersOnly() && !user.hasAdminRole()`일 때만 하도록 순서를 바꿔야 한다.\n\n- **`PostService.java:25`** — `boardRepository.findById(post.boardId())`가 빈 결과를 반환하는 경우(예: 게시글이 참조하는 보드가 삭제됐거나 데이터 불일치)에 대한 처리가 없다. `postRepository.findById`는 `switchIfEmpty`로 `PostNotFoundException`을 명시적으로 던지는데, `boardRepository.findById`는 빈 `Mono`가 그대로 전파되어 `getPost`가 에러도 값도 없이 조용히 완료된다. 동일한 파일 안에서 하나는 명시적 예외, 하나는 조용한 빈 응답으로 처리 방식이 일관되지 않으며 호출부에서 디버깅하기 어렵다. `switchIfEmpty`로 명시적 예외 처리가 필요하다.\n\n### Suggestion\n\n- `PostService.java:25-35` — 접근 판정(숨김/멤버십 체크)이 `Repository`·`HTTP 클라이언트` 호출 사이에 끼어 있어, 이 판정 하나를 테스트하려면 `postRepository`·`boardRepository`·`membershipClient` 세 개의 목이 필요하다(실제로 Important 첫 항목의 테스트 부재와 맞물려 있다). 체크리스트 전/후 예시 1과 거의 동일한 모양이라, 판정 부분을 같은 파일의 `static` 메서드(`accessDenial(post, board, member, user)` → `RuntimeException` 또는 `null`)로 분리하면 목 없이 분기별 테스트가 가능해진다. 위 Important 두 번째 항목(호출 순서 변경)과 함께 적용하면 자연스럽게 분리된다. 강제하는 것은 아니고, 이 방식이 테스트 비용을 낮추는 데 도움이 될지 검토해보면 좋겠다.\n- `AccessDeniedException(postId)` — 숨김 게시판 거부와 멤버십 전용 거부가 동일한 메시지(`\"access denied: \" + postId`)를 낸다. 운영 중 로그만으로 어떤 규칙에 걸렸는지 구분하기 어려울 수 있어, 필요하면 사유를 메시지나 필드로 구분하는 것도 고려해볼 만하다.\n\n### 검증 확인\n\n- 테스트 리뷰: 했음 — 신규 접근 제어 로직에 대한 테스트 커버리지 0%를 확인함(위 Important 참고).\n- 빌드 확인: 안 했음 — 셸 실행 없이 코드만 리뷰. 작성자도 테스트를 실행하지 않았다고 밝힘.\n- 보안·성능 1차 확인: 했음 — 인가 조건식 자체(관리자 우회, 멤버십 비교 대상 artistId)는 스펙과 일치. SQL 인젝션·시크릿 노출 등 명백한 취약점은 없음. 다만 불필요한 외부 호출로 인한 성능/가용성 문제를 발견함(위 Important 참고).\n- 읽은 참고자료: `local-reasoning-checklist.md`, `performance-checklist-backend.md`, `security-checklist.md`\n- 전문 검토 연결: `MembershipClient`의 실제 구현(타임아웃·재시도·서킷 브레이커 설정)은 diff에 없어 이번 리뷰로 확인 불가. 호출 조건을 수정한 뒤에도 멤버십 서비스 장애 시 영향 범위(멤버십 전용 글만 영향받는지)를 `performance-optimization` 스킬 관점에서 한 번 더 점검하는 것을 권장한다."
+              }
+            ]
+          },
+          {
+            "score": 0,
+            "passed": false,
+            "turns": 20,
+            "costUsd": 0.1972086,
+            "judgeCostUsd": 0.015690000000000003,
+            "durationSeconds": 90,
+            "startedAt": "2026-10-05T23:45:47.970Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-eYITmq/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "reads-local-reasoning-checklist",
+                "passed": false,
+                "weight": 1,
+                "explanation": "Read called 0x (expected 1..∞)",
+                "withOnly": true,
+                "scored": false
+              },
+              {
+                "name": "skill-fired",
+                "passed": false,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 1..∞)",
+                "withOnly": true,
+                "scored": false
+              },
+              {
+                "name": "structure-findings-capped-at-suggestion",
+                "passed": false,
+                "weight": 1,
+                "explanation": "judge votes: FAIL FAIL FAIL",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  false,
+                  false,
+                  false
+                ],
+                "evidence": "## 리뷰 결과\n\n로직 자체(숨김 게시판→관리자만, 멤버십 전용 글→해당 아티스트 멤버 또는 관리자)는 스펙대로 정확하게 구현되어 있습니다. 다만 아래 항목들은 머지 전에 고치는 게 좋겠습니다.\n\n### 1. (High) 멤버십 API를 매번 불필요하게 호출함 — `PostService.java:26`\n```java\n.flatMap(board -> membershipClient.isMember(user.id(), board.artistId())\n    .flatMap(member -> { ... }))\n```\n`post.membersOnly()`가 `false`인, 즉 아예 멤버십 체크가 필요 없는 공개 글에도 매번 외부 `MembershipClient` HTTP 호출이 발생합니다. `MembershipClient`는 \"외부 멤버십 서비스 HTTP 클라이언트\"(주석 참고)이므로:\n- 모든 글 조회에 불필요한 레이턴시/트래픽이 추가되고\n- 멤버십 서비스가 느려지거나 장애가 나면 **멤버십과 무관한 공개 글 조회까지 전부 영향받습니다.**\n\n`post.membersOnly()`가 `true`이고 관리자가 아닐 때만 `isMember`를 호출하도록 분기하는 게 맞습니다.\n\n### 2. (Medium) 숨김 게시판 체크가 멤버십 호출 \"이후\"에 평가됨\n현재 구조상 `board.hidden() && !admin` 체크가 `isMember` 호출이 끝난 뒤 콜백 안에서 이뤄집니다. 숨김 게시판은 애초에 멤버십 여부와 무관하게 관리자만 봐야 하므로, 이 체크를 먼저 수행해 불필요한 외부 호출 자체를 막아야 합니다.\n\n1, 2를 합쳐 다음처럼 재구성하는 걸 권장합니다:\n```java\n.flatMap(post -> boardRepository.findById(post.boardId())\n    .flatMap(board -> {\n        if (board.hidden() && !user.hasAdminRole()) {\n            return Mono.error(new AccessDeniedException(postId));\n        }\n        if (!post.membersOnly() || user.hasAdminRole()) {\n            return Mono.just(post);\n        }\n        return membershipClient.isMember(user.id(), board.artistId())\n            .flatMap(member -> member\n                ? Mono.just(post)\n                : Mono.error(new AccessDeniedException(postId)));\n    }));\n```\n\n### 3. (Medium) 새 접근 제어 로직에 대한 테스트가 전혀 없음\n`PostServiceTest`에 추가된 건 기존 \"정상 조회\" 테스트가 새 생성자/mock을 받도록 고친 것뿐이고, 이번 PR의 핵심인\n- 숨김 게시판 + 비관리자 → 거부\n- 멤버십 전용 글 + 비멤버 → 거부\n- 멤버십 전용 글 + 멤버 → 허용\n- 숨김/멤버십 전용 글 + 관리자 → 허용\n\n위 케이스들을 검증하는 테스트가 하나도 없습니다. 접근 제어 기능 자체를 검증하는 테스트가 없는 상태로 머지하는 건 위험합니다.\n\n### 4. (Minor) `boardRepository.findById`가 빈 결과를 반환할 때 처리 없음\n`post.boardId()`에 해당하는 board가 없으면 (데이터 정합성이 깨진 경우) `flatMap`이 빈 `Mono`가 되어 `getPost`가 아무 에러 없이 조용히 빈 값으로 완료됩니다. `PostNotFoundException`처럼 명시적 에러로 처리하는 걸 고려해보세요(필수는 아니지만 디버깅 시 혼란 방지).\n\n### 5. (Nit) 들여쓰기\n`PostService.java:14-16` 생성자 파라미터 연속줄 들여쓰기가 한 칸 어긋나 있습니다(포매터로 잡힐 수준의 사소한 문제).\n\n---\n**결론**: 기능적 분기 조건 자체는 스펙에 맞지만, 1·2번(불필요한 외부 호출로 인한 성능/안정성 문제)과 3번(핵심 로직 테스트 부재)은 머지 전 반드시 보완을 권장합니다."
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 25,
+            "costUsd": 0.38704700000000003,
+            "judgeCostUsd": 0.026146000000000003,
+            "durationSeconds": 157,
+            "startedAt": "2026-10-05T23:47:18.253Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-ewceTS/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "reads-local-reasoning-checklist",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": true,
+                "scored": false
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": true,
+                "scored": false
+              },
+              {
+                "name": "structure-findings-capped-at-suggestion",
+                "passed": true,
+                "weight": 1,
+                "explanation": "judge votes: PASS FAIL PASS",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  true,
+                  false,
+                  true
+                ],
+                "evidence": "## 리뷰 요약\n\n**판정:** REQUEST CHANGES\n\n**개요:** 숨김 게시판·멤버십 전용 글 접근 제한 로직 자체는 방향이 맞지만, 핵심 분기(거부 케이스 전체)에 대한 테스트가 전혀 없고, 멤버십 여부와 무관하게 외부 호출을 항상 실행해 가용성 리스크를 만들며, board 조회 실패 시 처리가 빠져 있어 머지 전 보완이 필요합니다.\n\n### Important\n\n- **`PostService.java:25-35` — membersOnly·hidden 여부와 무관하게 `membershipClient.isMember()`를 항상 호출.** 사실: `board.hidden()`·`post.membersOnly()` 체크보다 먼저 `isMember()`가 실행되므로, 공개 게시판의 공개 글(hidden=false, membersOnly=false)을 조회할 때도 매번 외부 멤버십 서비스를 호출합니다. 영향: (1) 불필요한 지연이 모든 글 조회에 추가되고, (2) 멤버십 서비스에 타임아웃/장애가 생기면 `isMember()`의 에러가 체인에 그대로 전파되어 — 접근 제한과 무관한 공개 글 조회까지 전부 실패합니다. 외부 호출에는 성능 체크리스트가 요구하는 타임아웃·실패 격리도 diff에 보이지 않습니다. 수정 방향: `board.hidden() && !admin`는 멤버십 조회 전에 먼저 평가해 즉시 차단하고, `isMember()` 호출 자체를 `post.membersOnly() && !admin`일 때만 수행하도록 바꾸세요(관리자는 애초에 멤버십 조회가 필요 없음).\n\n- **`PostServiceTest.java` 전체 — 이번 변경의 핵심 동작(접근 거부)이 테스트에 전혀 없음.** 사실: 추가된 테스트는 happy path(비숨김 보드, 비멤버십 글, 일반 유저 허용) 1건과 `PostNotFoundException`(board/membership 로직에 도달하지 않음) 1건뿐입니다. `board.hidden()`으로 비관리자 차단, 관리자의 hidden board 우회, `membersOnly`+비멤버 차단, `membersOnly`+멤버 허용, `membersOnly`+관리자(비멤버) 우회 — PR 목적 자체인 5개 분기가 전부 미검증 상태입니다. 영향: 이 PR이 구현하려는 접근 제어가 실제로 동작하는지 회귀 없이 보장할 방법이 없습니다. 수정 방향: 위 5개 분기 각각에 대한 테스트 추가가 필요합니다.\n\n- **`PostService.java:25` — `boardRepository.findById(post.boardId())`가 빈 Mono를 반환하는 경우(orphaned post) 무처리.** 사실: `post.boardId()`가 가리키는 board가 없으면 `flatMap`은 조용히 빈 Mono로 완결되어, `getPost()`가 에러 없이 빈 결과를 반환합니다. 같은 메서드에서 글이 없을 때는 `PostNotFoundException`으로 명시적으로 처리하는 기존 관례와 다릅니다. 영향: 호출부(컨트롤러 등)가 \"빈 Mono\"를 어떻게 다루는지에 따라 404 대신 500/NPE 또는 빈 바디가 나갈 수 있고, 어떤 경우든 의도된 동작이 아닙니다. 수정 방향: `PostNotFoundException`과 유사하게 board 조회에도 `switchIfEmpty`로 명시적 예외 처리를 추가하세요.\n\n### Suggestion\n\n- **`PostService.java:22-36` (아키텍처/국소 추론)** — 접근 판정(`board.hidden()`, `post.membersOnly()`, admin 우회)이 Repository/HTTP 호출이 섞인 중첩 `flatMap` 체인 안에 있어, 이 판정 하나를 테스트하려면 `postRepository`·`boardRepository`·`membershipClient` 목이 3개 필요합니다(Important 항목의 테스트 공백도 이 구조 때문에 비용이 커진 측면이 있습니다). 같은 파일 안에 `static` 메서드로 판정만 분리하면(예: `accessDenial(BoardDTO board, PostDTO post, boolean isMember, UserDTO user)` → `RuntimeException` 또는 `null`) 목 없이 순수 값 테스트로 5개 분기를 전부 검증할 수 있습니다. 강제하는 건 아니고, 테스트를 채우는 김에 고려해볼 만한 구조입니다.\n- **`PostService.java:25-35`** — 3단계 중첩 `flatMap`이 가독성을 떨어뜨립니다. 위 분리를 적용하면 자연히 평탄해집니다.\n\n### 검증 확인\n- 테스트 리뷰: 했음 — 5출처 렌즈 기준 핵심 분기(거부 케이스) 전부 공백 확인.\n- 빌드 확인: 안 했음 — 셸 실행 없이 코드 리딩만 수행(요청사항).\n- 보안·성능 1차 확인: 했음 — 접근 제어 자체의 \"우회 가능한 틈\"은 찾지 못했음(로직상 admin 우회·멤버십 조건은 정확함). 다만 외부 호출 타임아웃/실패 격리 부재, 불필요한 호출로 인한 가용성 리스크는 확인됨.\n- 읽은 참고자료: `security-and-hardening/security-checklist.md`, `performance-optimization/performance-checklist-backend.md`, `code-review-and-quality/local-reasoning-checklist.md`\n- 전문 검토 연결: 불필요 — 이번 발견은 본 리뷰 수준(가용성/구조/테스트 공백)에서 해결 가능하며, 별도의 보안 취약점(인가 우회)이나 성능 프로파일링이 필요한 문제는 아님. 단, `membershipClient` 실패 시 실제 타임아웃/재시도 정책이 어떻게 설정되어 있는지는 `MembershipClient` 구현체(이번 diff 밖)를 봐야 확정할 수 있음 — 확인하지 못한 부분."
+              }
+            ]
+          }
+        ],
+        "without": [
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 6,
+            "costUsd": 0.30901330000000005,
+            "judgeCostUsd": 0.014250000000000013,
+            "durationSeconds": 169,
+            "startedAt": "2026-10-05T23:48:05.955Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-QkCfH0/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "structure-findings-capped-at-suggestion",
+                "passed": true,
+                "weight": 1,
+                "explanation": "judge votes: PASS PASS PASS",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  true,
+                  true,
+                  true
+                ],
+                "evidence": "코드를 직접 확인해서 아래 리뷰 내용을 검증했어. 머지 전 고쳐야 할 이슈들이야.\n\n## 🔴 Critical — 로직 버그\n\n**1. 게시판이 삭제된 경우 접근 제어가 통째로 무력화됨** (`PostService.java:25`)\n```java\n.flatMap(post -> boardRepository.findById(post.boardId())\n    .flatMap(board -> ...))\n```\n바로 위 `postRepository.findById`는 `switchIfEmpty`로 `PostNotFoundException`을 던지는데, `boardRepository.findById`에는 그런 처리가 없음. 보드가 삭제됐거나 데이터 정합성이 깨진 경우 `Mono.empty()`가 반환되고 `flatMap` 체인 전체가 조용히 빈 값으로 끝나버려서, 숨김/멤버십 체크 자체가 스킵된 채 **빈 200 응답**이 나갈 수 있음. 보안 체크를 추가하는 PR인데 바로 그 체크가 우회되는 경로가 생기는 셈 — `switchIfEmpty`로 명시적 예외 처리 필요.\n\n**2. 멤버십 외부 API를 모든 요청에서 무조건 호출** (`PostService.java:26`)\n```java\n.flatMap(board -> membershipClient.isMember(user.id(), board.artistId())\n```\n`hidden=false && membersOnly=false`인 일반 공개글, 심지어 관리자 조회에도 매번 외부 멤버십 서비스를 호출함. 결과값이 실제로 필요 없는 경우에도 호출하므로, 멤버십 서비스 장애/지연 시 **일반 공개글 조회까지 전부 타임아웃**나는 구조. `board.hidden()`이나 `post.membersOnly()`가 false면 멤버십 조회 자체를 건너뛰도록 분기 필요.\n\n## 🟡 확인 필요\n\n**3. `user`가 null일 가능성** (`PostService.java:28, 31`)\n`user.id()`, `user.hasAdminRole()`를 null 체크 없이 바로 호출. 비로그인(익명) 사용자가 공개글을 보는 경로가 존재한다면 NPE. 컨트롤러 쪽 코드가 diff에 없어서 실제로 null이 들어올 수 있는지는 코드만으로 단정 못함 — 호출부 확인 필요.\n\n## 🟢 테스트 커버리지 공백\n\n테스트가 `returnsPostWhenFound` 한 건만 수정됐고 `hidden=false, membersOnly=false`로만 검증함 (`PostServiceTest.java:26,28`). 이번 PR의 핵심인 다음 5가지 분기가 **전혀 테스트되지 않음**:\n- 숨김 게시판 + 일반 사용자 → 거부\n- 숨김 게시판 + 관리자 → 허용\n- 멤버십 전용 + 비회원 → 거부\n- 멤버십 전용 + 회원 → 허용\n- 멤버십 전용 + 관리자(비회원) → 허용\n\n머지 전 최소한 이 5개 케이스에 대한 테스트 추가를 권장함 (특히 위 1, 2번 버그는 테스트로 바로 드러날 가능성이 높음).\n\n## 참고 (선택)\n인증/인가 로직이 반응형 체인 안에 3단 중첩으로 인라인되어 있어서, 규칙이 늘어날수록 테스트하기 어려워질 수 있음. `AccessPolicy.check(post, board, isMember, user)` 같은 순수 함수로 분리하면 단위 테스트가 쉬워짐 — 지금 당장 블로킹 이슈는 아님."
+              }
+            ]
+          },
+          {
+            "score": 0,
+            "passed": false,
+            "turns": 5,
+            "costUsd": 0.26671530000000004,
+            "judgeCostUsd": 0.015342000000000022,
+            "durationSeconds": 145,
+            "startedAt": "2026-10-05T23:49:55.730Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-7VPWYl/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "structure-findings-capped-at-suggestion",
+                "passed": false,
+                "weight": 1,
+                "explanation": "judge votes: FAIL FAIL FAIL",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  false,
+                  false,
+                  false
+                ],
+                "evidence": "로직 자체는 맞게 보여. 확인된 리뷰 결과는 다음과 같아.\n\n## 로직 검증\n`PostService.getPost` (`src/main/java/com/example/post/PostService.java:21-36`)의 분기는 의도한 정책과 일치해:\n- `board.hidden() && !admin` → `AccessDeniedException` ✅\n- `post.membersOnly() && !member && !admin` → `AccessDeniedException` ✅\n- `UserDTO.hasAdminRole()`도 `roles.contains(\"ADMIN\")`로 정상 동작.\n\n핵심 권한 로직 자체에 버그는 없어. 다만 아래 네 가지는 머지 전 짚고 넘어갈 만해.\n\n## 지적 사항\n\n**1. 불필요한 멤버십 외부 호출 (line 26)**\n숨김/멤버십 전용 여부와 무관하게 `membershipClient.isMember()`가 **모든 글 조회에서 항상** 호출돼. 공개 게시판의 일반 글을 읽을 때도 외부 멤버십 서비스를 호출하게 되어, 그 서비스가 느려지거나 장애가 나면 평범한 공개 글 조회까지 전부 실패해. `board.hidden()` 체크는 멤버십 조회와 무관하니 먼저 분기하고, `membersOnly()`인 경우에만 `isMember()`를 호출하도록 바꾸는 게 좋아 보여.\n\n**2. `boardRepository.findById`에 빈 결과 처리 누락 (line 25)**\n바로 위 `postRepository.findById`는 `switchIfEmpty`로 명시적 예외를 던지는데, `boardRepository.findById(post.boardId())`는 그런 처리가 없어. 게시판이 삭제됐거나 데이터 정합성이 깨진 경우 `Mono.empty()`로 조용히 끝나버려서, 호출부에서 \"글 없음\"과 \"게시판 데이터 깨짐\"을 구분하기 어려워져.\n\n**3. 신규 접근 제어 분기에 대한 테스트 부재**\n수정된 테스트(`PostServiceTest.java`)는 숨김 아님·멤버십 전용 아님·비관리자인 성공 케이스 하나만 갱신했을 뿐, 이번 PR의 핵심인\n- 숨김 게시판 → 비관리자 거부 / 관리자 허용\n- 멤버십 전용 글 → 비멤버 거부 / 멤버 허용 / 관리자 허용\n\n케이스가 전혀 없어. 조건식이 실수로 뒤바뀌어도(`&&`→`||`, `!` 누락 등) 지금 테스트는 그대로 통과해. 머지 전에 최소한 이 네 가지 분기 테스트 추가를 권장해.\n\n**4. 체크 순서로 인한 불필요한 결합**\n`board.hidden()` 체크가 멤버십 조회 결과(`member`) 안에서 이루어지고 있어, 1번 이슈와 맞물려 \"숨김 게시판이라 거부되어야 할 요청\"도 먼저 외부 멤버십 호출을 기다려야 해. 숨김 체크를 멤버십 조회보다 앞으로 빼면 1, 4번이 동시에 해결돼.\n\n## 제안 리팩터링 방향\n```java\n.flatMap(post -> boardRepository.findById(post.boardId())\n    .switchIfEmpty(Mono.error(new BoardNotFoundException(post.boardId())))\n    .flatMap(board -> {\n        if (board.hidden() && !user.hasAdminRole()) {\n            return Mono.error(new AccessDeniedException(postId));\n        }\n        if (!post.membersOnly() || user.hasAdminRole()) {\n            return Mono.just(post);\n        }\n        return membershipClient.isMember(user.id(), board.artistId())\n            .flatMap(member -> member\n                ? Mono.just(post)\n                : Mono.error(new AccessDeniedException(postId)));\n    }));\n```\n\n**결론: 보안 로직 자체는 정확하지만, (1) 불필요한 외부 호출, (2) 게시판 미존재 처리 누락, (3) 테스트 커버리지 부재는 머지 전 보완을 권장해.**"
+              }
+            ]
+          },
+          {
+            "score": 0,
+            "passed": false,
+            "turns": 4,
+            "costUsd": 0.45022999999999996,
+            "judgeCostUsd": 0.014364000000000002,
+            "durationSeconds": 244,
+            "startedAt": "2026-10-05T23:50:54.700Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-AUECWF/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "structure-findings-capped-at-suggestion",
+                "passed": false,
+                "weight": 1,
+                "explanation": "judge votes: FAIL FAIL FAIL",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  false,
+                  false,
+                  false
+                ],
+                "evidence": "Confirmed — all 5 findings check out against the actual code (`src/main/java/com/example/post/PostService.java:22-37`, test file above). 리뷰 결과는 다음과 같습니다.\n\n## 주요 이슈\n\n**1. 매 조회마다 멤버십 서비스 호출 (PostService.java:26)**\n숨김 게시판도 아니고 멤버십 전용 글도 아닌 **일반 공개 글**을 조회할 때도 `membershipClient.isMember(...)`가 무조건 호출됩니다. 멤버십 서비스 장애/지연이 무관한 일반 글 조회까지 전부 막아버릴 수 있습니다. `board.hidden() || post.membersOnly()`일 때만 호출하도록 분기하는 게 맞습니다.\n\n**2. board/membership 조회 결과가 empty일 때 처리 없음 (PostService.java:25-26)**\n`postRepository.findById`는 `switchIfEmpty`로 `PostNotFoundException` 처리를 해두었는데, `boardRepository.findById`와 `membershipClient.isMember`는 그런 처리가 없습니다. 게시글이 삭제된 게시판을 참조하거나(고아 레코드), 멤버십 조회가 빈 응답을 주면 전체 체인이 **에러 없이 조용히 empty로 완료**됩니다. 호출부가 \"글 반환 또는 404/403 예외\"를 기대한다면 예상치 못한 빈 응답(200 with empty body 등)을 받게 됩니다.\n\n**3. `!member`에서 NPE 가능성 (PostService.java:31)**\n`member`는 `Boolean`(boxed)입니다. 외부 멤버십 서비스 응답이 역직렬화 과정에서 null을 반환하면 (`Mono.just(null)`) `!member`에서 NPE가 발생해 깔끔한 `AccessDeniedException` 대신 예외가 새어나갑니다.\n\n**4. 관리자 우회 로직 중복 (PostService.java:28, 31)**\n`!user.hasAdminRole()`가 두 if문에 각각 들어있습니다. 나중에 접근 제어 규칙이 하나 더 추가될 때 관리자 체크를 빠뜨릴 위험이 있습니다. 함수 맨 앞에서 `if (user.hasAdminRole()) return Mono.just(post);`로 한 번만 처리하는 편이 안전합니다.\n\n**5. 신규 접근 제어 로직에 대한 음성 테스트 부재 (PostServiceTest.java)**\n이번 diff의 핵심은 숨김 게시판/멤버십 전용 글 접근 제한인데, 추가된 테스트는 \"숨김 아님 + 멤버십 전용 아님\"인 허용 케이스 하나뿐입니다. 다음 케이스들이 빠져 있습니다:\n- 숨김 게시판 + 비관리자 → `AccessDeniedException`\n- 멤버십 전용 글 + 비회원 + 비관리자 → `AccessDeniedException`\n- 숨김 게시판/멤버십 전용 글 + 관리자 → 정상 조회(우회 확인)\n- 멤버십 전용 글 + 회원 → 정상 조회\n\n이 테스트들이 없으면 `!` 하나 빠지는 식의 리그레션이 그대로 머지될 수 있습니다.\n\n## 결론\n로직의 전체 방향(숨김→관리자만, 멤버십 전용→회원+관리자만)은 맞지만, 위 3번(NPE 가능성)과 5번(음성 테스트 부재)은 머지 전에 반드시 고치는 게 좋겠습니다. 1·2번은 운영 안정성 관점에서 강하게 권장하는 개선이고, 4번은 선택사항입니다."
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 0.6666666666666666,
+        "passRate": 0.6666666666666666,
+        "scoreWithout": 0.3333333333333333,
+        "passRateWithout": 0.3333333333333333,
+        "delta": 0.3333333333333333
+      }
+    }
+  ],
+  "aggregates": {
+    "casesTotal": 1,
+    "casesPassed": 0,
+    "overallScore": 0.6666666666666666,
+    "overallPassRate": 0.6666666666666666,
+    "meanDelta": 0.3333333333333333
+  }
+}

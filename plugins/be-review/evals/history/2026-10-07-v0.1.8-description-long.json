@@ -1,0 +1,609 @@
+{
+  "schemaVersion": 1,
+  "claudeVersion": "2.1.278",
+  "startedAt": "2026-10-07T04:24:51.904Z",
+  "durationSeconds": 602,
+  "costUsd": 2.7392002,
+  "partial": false,
+  "suite": {
+    "root": "/Users/yeonu/develop/personal/skills/.claude/worktrees/local-reasoning-lens-review-39a61b/plugins/be-review",
+    "ablation": "none",
+    "judgeModel": "sonnet",
+    "threshold": 0.8,
+    "concurrency": 2,
+    "plugins": [
+      {
+        "name": "be-review",
+        "version": "0.1.7",
+        "path": "/Users/yeonu/develop/personal/skills/.claude/worktrees/local-reasoning-lens-review-39a61b/plugins/be-review"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "name": "loads-security-checklist",
+      "dir": "evals/loads-security-checklist",
+      "source": "mixed",
+      "promptMarkdown": "머지 전 리뷰해줘. 작업 공간에 git 저장소가 있고, 변경 내용은 HEAD 커밋이자 `CHANGES.diff` 파일이야. 전체 소스는 `src/` 아래에 있어.\n\n변경 목적: 이메일로 비밀번호 재설정 링크를 보내고, 링크의 토큰으로 새 비밀번호를 저장하는 엔드포인트 두 개를 추가한다.\n\n테스트는 아직 없어. 셸 실행 없이 코드만 보고 리뷰해줘.",
+      "model": "sonnet",
+      "runsPerCase": 3,
+      "timeoutSeconds": 600,
+      "maxTurns": 25,
+      "graders": [
+        {
+          "name": "finds-planted-issues",
+          "type": "llm",
+          "weight": 1,
+          "graderMarkdown": "리뷰 결과(마지막 메시지)를 본다. 변경된 PasswordResetController에는 다음 결함이 심어져 있다:\n(a) 이메일을 SQL 문자열에 그대로 이어 붙인 쿼리(SQL 인젝션),\n(b) 재설정 토큰을 로그에 기록,\n(c) 토큰에 만료가 없고 사용 후 제거되지 않음(재사용 가능),\n(d) 새 비밀번호를 해시하지 않고 그대로 updatePasswordHash에 전달(PasswordHasher 미사용),\n(e) 오류 메시지에 토큰 값을 포함.\n\nPASS 조건: (a)와 (d)를 포함해 위 결함 중 셋 이상을 지적하고, 그 가운데 (a) 또는 (d)가 `Critical` 또는 `Important` 등급으로 분류되어 있으며, 각 지적에 파일·위치와 구체적인 수정 방향이 있다.\n\nFAIL 조건: (a) 또는 (d)를 놓쳤거나, 지적이 둘 이하이거나, 심각도 등급 없이 나열만 했거나, 수정 방향이 없다.",
+          "config": {
+            "criteria": "리뷰 결과(마지막 메시지)를 본다. 변경된 PasswordResetController에는 다음 결함이 심어져 있다:\n(a) 이메일을 SQL 문자열에 그대로 이어 붙인 쿼리(SQL 인젝션),\n(b) 재설정 토큰을 로그에 기록,\n(c) 토큰에 만료가 없고 사용 후 제거되지 않음(재사용 가능),\n(d) 새 비밀번호를 해시하지 않고 그대로 updatePasswordHash에 전달(PasswordHasher 미사용),\n(e) 오류 메시지에 토큰 값을 포함.\n\nPASS 조건: (a)와 (d)를 포함해 위 결함 중 셋 이상을 지적하고, 그 가운데 (a) 또는 (d)가 `Critical` 또는 `Important` 등급으로 분류되어 있으며, 각 지적에 파일·위치와 구체적인 수정 방향이 있다.\n\nFAIL 조건: (a) 또는 (d)를 놓쳤거나, 지적이 둘 이하이거나, 심각도 등급 없이 나열만 했거나, 수정 방향이 없다.",
+            "focus": "last_message"
+          }
+        },
+        {
+          "name": "reads-security-checklist",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Read",
+            "input_match": "skills/security-and-hardening/references/security-checklist\\.md",
+            "arm": "with-only"
+          }
+        },
+        {
+          "name": "reports-loaded-reference",
+          "type": "regex",
+          "weight": 1,
+          "config": {
+            "target": "last_message",
+            "pattern": "읽은 참고자료[^\\n]*security-checklist",
+            "flags": "",
+            "match": "contains",
+            "arm": "with-only"
+          }
+        },
+        {
+          "name": "skill-fired",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?code-review-and-quality\""
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 0.5,
+            "passed": false,
+            "turns": 9,
+            "costUsd": 0.198416,
+            "judgeCostUsd": 0.020735999999999997,
+            "durationSeconds": 84,
+            "startedAt": "2026-10-07T04:24:51.928Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-tPVpV1/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "finds-planted-issues",
+                "passed": true,
+                "weight": 1,
+                "explanation": "judge votes: PASS PASS PASS",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  true,
+                  true,
+                  true
+                ],
+                "evidence": "## 리뷰 결과 — `PasswordResetController` (머지 반대 권고)\n\n심각한 보안 결함이 여러 개 있어 현재 상태로는 머지하면 안 됩니다. 모두 정적 코드 분석으로 확인한 사실이며(실행 재현은 하지 않음), 셀 수 있는 개수의 결함이 각각 치명적입니다.\n\n### 🔴 Critical\n\n**1. SQL 인젝션 — `request()` (L41-42)**\n```java\njdbcTemplate.queryForObject(\"SELECT id FROM users WHERE email = '\" + email + \"'\", UUID.class);\n```\n사용자 입력 `email`을 문자열로 그대로 이어붙입니다. `email`에 `' OR '1'='1`류 페이로드를 넣으면 임의 조회·UNION 기반 데이터 추출이 가능합니다. 더구나 `UserRepository`에 이미 `findIdByEmail(String email)`이 정의돼 있는데 쓰지 않고 `JdbcTemplate`으로 직접 원시 SQL을 짰습니다 — 인젝션도 인젝션이지만, 있는 추상화를 우회한 것 자체가 설계상 문제입니다.\n**수정:** `userRepository.findIdByEmail(email)` 사용. 직접 쿼리가 꼭 필요하면 `jdbcTemplate.queryForObject(sql, new Object[]{email}, UUID.class)`처럼 파라미터 바인딩.\n\n**2. 비밀번호 평문 저장 — `confirm()` (L55)**\n```java\nuserRepository.updatePasswordHash(userId, newPassword);\n```\n해시 없이 사용자가 보낸 `newPassword`를 그대로 `passwordHash` 컬럼에 저장합니다. 리포지토리 주석에 Argon2id 기반이라고 명시된 `PasswordHasher` 인터페이스가 존재하는데 컨트롤러에 주입조차 안 돼 있습니다.\n**수정:** `PasswordHasher`를 생성자에 주입하고 `userRepository.updatePasswordHash(userId, passwordHasher.hash(newPassword))` 호출.\n\n**3. 재설정 토큰을 로그에 평문 기록 (L45)**\n```java\nlog.info(\"password reset requested for {} token={}\", email, token);\n```\n토큰은 비밀번호 재설정 권한 그 자체입니다. 로그 접근 권한이 있는 누구나(운영자, 로그 수집 시스템, 유출 시 공격자) 이 토큰으로 타인 계정 비밀번호를 바꿀 수 있습니다.\n**수정:** 토큰 값을 로그에서 제거. 필요하면 토큰 해시의 일부나 요청 자체만 기록.\n\n**4. 재설정 토큰이 만료되지 않고 재사용 가능 (1회용 아님)**\n`tokens` 맵에 넣기만 하고, `confirm()` 성공 후에도 `tokens.remove(token)`을 호출하지 않습니다. 또한 생성 시각/만료시각을 저장하지 않아 토큰이 영구적으로 유효합니다. 체크리스트 기준(`비밀번호 재설정 토큰: 시간 제한(예시 1시간 이하), 1회용`)을 모두 위반합니다.\n**영향:** 과거에 유출된 토큰(로그, 이메일 전달 과정, 레퍼러 등)으로 언제든 재사용한 비밀번호 탈취가 가능합니다.\n**수정:** 토큰에 만료시각 저장, `confirm()` 성공 시 즉시 토큰 제거, 만료 검사 추가.\n\n### 🟠 High\n\n**5. 이메일 존재 여부 오라클(계정 열거) + 스택트레이스 노출 가능성**\n존재하지 않는 이메일로 `/request`를 호출하면 `queryForObject`가 `EmptyResultDataAccessException`을 던지고, 전역 예외 핸들러가 보이지 않으므로 Spring 기본 에러 응답(500, 메시지 포함 가능)이 그대로 노출됩니다. 반대로 존재하는 이메일은 200을 반환하므로 응답 차이로 가입 여부를 추측할 수 있습니다(계정 열거 공격).\n**수정:** 이메일 존재 여부와 무관하게 항상 동일한 응답(예: 200 OK, \"등록된 이메일이면 발송됨\") 반환. 조회 실패 시에도 예외를 흘리지 말고 조용히 종료. 전역 예외 핸들러로 5xx에서 내부 정보 제거.\n\n**6. 토큰을 인스턴스 메모리(`ConcurrentHashMap`)에 저장**\n멀티 인스턴스/로드밸런싱 환경에서 요청과 확인이 다른 인스턴스로 가면 무조건 실패하고, 재시작 시 모든 발급 토큰이 사라집니다. 기능적 결함이자, 토큰을 DB 등 공유 저장소로 옮기지 않은 임시방편 구조입니다.\n**수정:** DB 테이블(예: `password_reset_tokens`: token_hash, user_id, expires_at, used_at)로 이전. 토큰 자체보다는 토큰의 해시를 저장하는 편이 더 안전합니다.\n\n**7. 새 비밀번호에 대한 입력 검증 전무**\n`newPassword`에 길이 제한·최소 복잡도 검증이 없습니다. 빈 문자열(`\"\"`)도 그대로 저장되고, 과도하게 긴 문자열이 해시 함수에 그대로 들어가면 DoS 벡터가 될 수 있습니다(Argon2id는 입력 길이에 비례해 비용 증가).\n**수정:** 최소 길이(예: 8자 이상)·최대 길이(예: 128자) 검증을 경계(컨트롤러)에서 수행.\n\n### 🟡 Medium\n\n**8. `email` 형식 검증 없음**\n이메일 형식 검증이 전혀 없어 임의 문자열이 SQL과 메일 발송 로직에 그대로 전달됩니다(인젝션은 위 1번으로 별도 해결되지만, 형식 검증 자체도 경계 검증 원칙 위반).\n\n**9. `confirm()`의 예외 메시지에 토큰 값 포함**\n```java\nthrow new IllegalArgumentException(\"invalid token: \" + token);\n```\n전역 예외 핸들러가 없는 현재 상태에서 Spring 기본 에러 바디에 이 메시지가 그대로 노출될 수 있습니다. 토큰 자체는 요청자가 보낸 값이라 민감도는 낮지만, 일반적으로 내부 처리 세부사항(여기선 \"토큰 저장소에 없음\"이라는 사실)을 그대로 드러내는 건 바람직하지 않습니다.\n**수정:** `\"유효하지 않거나 만료된 토큰입니다\"` 같은 일반 메시지로 교체, 토큰 값은 메시지에서 제외.\n\n**10. `/request` 엔드포인트에 레이트리미팅 없음**\n무제한으로 호출 가능해 메일 폭탄(스팸) 발송 및 4번 이슈와 결합한 열거 공격의 여지가 큽니다. 체크리스트 예시 기준(15분당 10회 등)에 준하는 제한 권장.\n\n### 정리\n\n이 PR은 SQL 인젝션 + 평문 비밀번호 저장 + 토큰 평문 로깅 + 토큰 미만료/재사용가능이라는 네 가지 치명적 결함이 겹쳐 있어, 비밀번호 재설정 플로우 전체가 계정 탈취 경로로 악용될 수 있습니다. 머지 전 최소한 1~4번(Critical)은 반드시 수정이 필요하고, 5~7번(High)도 같이 처리하는 걸 권장합니다. 테스트가 아직 없다고 하셨는데, 이 수정들을 적용한 뒤 SQL 인젝션 방지·토큰 만료/1회용·비밀번호 해시 저장을 검증하는 단위 테스트를 추가하시길 권합니다."
+              },
+              {
+                "name": "reads-security-checklist",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "reports-loaded-reference",
+                "passed": false,
+                "weight": 1,
+                "explanation": "pattern not found in last_message",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": false,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 9,
+            "costUsd": 0.22848060000000003,
+            "judgeCostUsd": 0.021683999999999995,
+            "durationSeconds": 108,
+            "startedAt": "2026-10-07T04:24:51.929Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-i2KXH4/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "finds-planted-issues",
+                "passed": true,
+                "weight": 1,
+                "explanation": "judge votes: PASS PASS PASS",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  true,
+                  true,
+                  true
+                ],
+                "evidence": "## 리뷰 요약\n\n**판정:** REQUEST CHANGES\n\n**개요:** 비밀번호 재설정 요청/확정 엔드포인트 2개를 추가하는 변경인데, SQL 인젝션·평문 비밀번호 저장·토큰 로깅·토큰 만료 없음 등 치명적 보안 결함이 다수 있고 테스트도 전혀 없어 현재 상태로는 머지할 수 없다.\n\n### Critical\n\n- **`PasswordResetController.java:41-42` SQL 인젝션** — `\"SELECT id FROM users WHERE email = '\" + email + \"'\"` 로 사용자 입력을 문자열 이어붙이기해 쿼리를 구성한다. `email`에 `' OR '1'='1`류 페이로드를 넣으면 임의 조작이 가능하다. 더구나 같은 목적의 `UserRepository.findIdByEmail(String)`이 이미 존재하므로 이 코드는 불필요하게 새로 만든 안전하지 않은 경로다. → `JdbcTemplate` 의존성 자체를 제거하고 `userRepository.findIdByEmail(email)`을 사용해라.\n\n- **`PasswordResetController.java:55` 비밀번호 평문 저장** — `confirm()`이 `newPassword`를 해싱 없이 그대로 `userRepository.updatePasswordHash(userId, newPassword)`에 넘긴다. 저장소에는 `PasswordHasher`(Argon2id) 인터페이스가 이미 있는데 컨트롤러에 주입조차 되어 있지 않다. 이 상태로 배포되면 DB에 평문 비밀번호가 저장된다. → `PasswordHasher`를 주입해 `passwordHasher.hash(newPassword)` 결과를 저장해라.\n\n- **`PasswordResetController.java:45` 재설정 토큰 로깅** — `log.info(\"... token={}\", email, token)`가 실제 재설정 토큰을 그대로 로그에 남긴다. 로그 접근 권한이 있는 사람(운영자, 로그 수집 시스템, 유출된 로그 파일)은 이메일을 받지 않고도 해당 링크로 비밀번호를 탈취할 수 있다. 보안 체크리스트의 \"토큰을 로깅하지 않음\" 항목에 정면으로 위배된다. → 토큰 값을 로그 메시지에서 제거해라.\n\n- **`PasswordResetController.java:29,43-56` 토큰 만료·1회성 없음** — `tokens` 맵은 추가만 되고(요청 시) 어디서도 제거되지 않는다. `confirm()`이 성공해도 `tokens.remove`를 하지 않으므로 같은 링크가 무한히 재사용 가능하고(1회용 아님), 발급 시각을 저장하지 않으므로 몇 달 전 링크도 영구히 유효하다. 체크리스트의 \"시간 제한(예: 1시간 이내), 1회용\" 요건을 둘 다 위반한다. → 토큰에 만료 시각을 함께 저장하고, `confirm()`에서 `Map.remove`로 원자적으로 꺼내 쓰고 만료 여부를 검사해라.\n\n### Important\n\n- **`PasswordResetController.java:40-47` 이메일 열거(enumeration) + 미처리 예외** — 존재하지 않는 이메일로 `queryForObject`를 호출하면 `EmptyResultDataAccessException`이 그대로 던져져 미처리 500이 되고, 존재하는 이메일은 200을 반환한다. 응답 상태만으로 \"이 이메일이 가입되어 있는지\" 판별 가능한 계정 열거 오라클이 된다. `UserRepository.findIdByEmail`이 `Optional`을 반환하도록 이미 설계되어 있으니 그 의도를 따라 이메일 존재 여부와 무관하게 동일한 응답(예: \"등록된 이메일이면 메일을 보냈습니다\")을 반환해라.\n\n- **`PasswordResetController.java:29` 인메모리 토큰 저장소** — `ConcurrentHashMap` 필드는 해당 프로세스 메모리에만 존재한다. 인스턴스가 2대 이상이거나 롤링 배포/재시작이 있으면 발급 인스턴스와 확인 인스턴스가 달라 정상 사용자도 \"invalid token\"을 겪거나, 배포 한 번에 모든 미사용 토큰이 날아간다. DB 테이블이나 Redis 등 프로세스 외부 저장소로 옮겨야 한다.\n\n- **`PasswordResetController.java:46` 하드코딩된 링크 도메인** — `\"https://example.com/reset?token=\" + token`이 설정값이 아니라 고정 문자열이다. 로컬/스테이징/프로덕션 어떤 환경에서도 실제 서비스 도메인과 다를 수밖에 없어 기능적으로 깨진 링크를 보내게 된다. 설정(application properties 등)에서 베이스 URL을 주입해라.\n\n- **레이트 리미팅 없음** — `/request`는 임의 이메일로 반복 호출해 타인에게 메일 폭탄을 보낼 수 있고, `/confirm`도 토큰 추측 시도에 제한이 없다. UUID 공간 덕분에 당장 무차별 대입은 비현실적이지만, 체크리스트상 인증 관련 엔드포인트는 레이트 리미팅이 기본 요건이다. (확인 한계: 이 리뷰는 코드 레벨만 봤고, 인프라/게이트웨이 레벨에 이미 공통 레이트리미터가 있는지는 diff만으로 확인 불가 — 없다면 `security-and-hardening` 스킬로 레이트리미팅 설계를 별도 검토 필요.)\n\n- **테스트 전무** — 명시된 대로 테스트가 하나도 없다. 최소한 (1) 정상 요청→토큰 발급→confirm 성공 경로, (2) 존재하지 않는 이메일 처리, (3) 잘못되었거나 만료된/이미 사용된 토큰 거부, (4) confirm 후 동일 토큰 재사용 거부 — 이 네 가지는 머지 전에 커버되어야 한다 (지금 구현에는 (3),(4)에 해당하는 로직 자체가 없다는 점도 Critical 항목과 연결된다).\n\n- **`PasswordResetController.java:52-54` 예외 메시지에 토큰 포함** — `new IllegalArgumentException(\"invalid token: \" + token)`을 캐치 없이 던진다. 전역 예외 처리기가 없는 상태에서는 설정에 따라 메시지가 응답 본문이나 애플리케이션 로그에 그대로 남을 수 있어, 토큰 로깅 문제(위 Critical)를 한 번 더 재현할 위험이 있다. 구조화된 4xx 응답으로 바꾸고 메시지에 토큰 원문을 넣지 마라.\n\n### Suggestion\n\n- `newPassword`에 최소 길이/복잡도 검증이 전혀 없다. 해싱 전 경계에서 최소 길이 정도는 검증하는 것을 권장.\n- 민감 필드(email, token, newPassword)를 `@RequestParam`으로 받고 있는데, `@RequestBody` DTO + Bean Validation(`@Email`, `@NotBlank`)으로 바꾸면 검증 로직이 더 명확해진다.\n\n### 검증 확인\n- 테스트 리뷰: 했음 — 테스트 파일이 아예 없음을 확인\n- 빌드 확인: 안 했음 (셸 실행 없이 코드만 보고 리뷰하라는 요청에 따름)\n- 보안·성능 1차 확인: 했음 — SQL 인젝션, 평문 저장, 토큰 로깅/만료/재사용 등 다수의 Critical 발견. 성능 관점(N+1, 무제한 조회 등)은 해당 사항 없음\n- 읽은 참고자료: `security-and-hardening/references/security-checklist.md` (인증·토큰·외부 입력 변경이라 1단계 판정상 필수 로드 대상)\n- 전문 검토 연결: 필요. 위 Critical 4건(SQL 인젝션, 평문 저장, 토큰 로깅, 토큰 만료/1회성)을 수정한 뒤에는 레이트리미팅 설계와 토큰 저장소 스키마(만료 컬럼, 인덱스, 정리 정책)에 대해 `security-and-hardening` 스킬로 2차 검토를 받는 것을 권장한다."
+              },
+              {
+                "name": "reads-security-checklist",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "reports-loaded-reference",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 읽은 참고자료[^\\n]*security-checklist",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 11,
+            "costUsd": 0.217202,
+            "judgeCostUsd": 0.021906000000000002,
+            "durationSeconds": 86,
+            "startedAt": "2026-10-07T04:26:15.535Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-CoOMwV/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "finds-planted-issues",
+                "passed": true,
+                "weight": 1,
+                "explanation": "judge votes: PASS PASS PASS",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  true,
+                  true,
+                  true
+                ],
+                "evidence": "## 리뷰 요약\n\n**판정:** REQUEST CHANGES\n\n**개요:** 비밀번호 재설정 요청/확인 엔드포인트 2개를 추가하는 변경으로, SQL 인젝션, 비밀번호 평문 저장, 토큰 평문 로깅 등 계정 탈취로 직결되는 Critical 취약점이 다수 있어 머지 불가 상태다. 테스트는 전무하다.\n\n### Critical\n\n- **`PasswordResetController.java:41-42` SQL 인젝션** — `\"SELECT id FROM users WHERE email = '\" + email + \"'\"` 로 사용자 입력을 문자열로 직접 이어붙였다. `email=' OR '1'='1`류 입력으로 임의 레코드 조회, 블라인드 인젝션을 통한 데이터 탈취가 가능하다. 더 심각한 건 이미 `UserRepository.findIdByEmail(String)` (UserRepository.java:7)가 존재하는데 이를 쓰지 않고 `JdbcTemplate`을 새로 주입해 직접 쿼리를 짠 것 — 기존 추상화를 우회하면서 취약점을 만들었다. `jdbcTemplate` 의존성과 커스텀 쿼리를 제거하고 `userRepository.findIdByEmail(email)`을 쓰도록 수정.\n\n- **`PasswordResetController.java:49` 비밀번호 평문 저장** — `confirm()`이 사용자가 입력한 `newPassword`를 해싱 없이 그대로 `userRepository.updatePasswordHash(userId, newPassword)`에 넘긴다. 레포지토리에는 이미 `PasswordHasher` 인터페이스(Argon2id 기반, PasswordHasher.java)가 존재하는데 컨트롤러에 전혀 주입·사용되지 않았다. 현재 코드는 사용자의 새 비밀번호를 DB의 `passwordHash` 컬럼에 평문으로 저장한다. `PasswordHasher`를 주입받아 `userRepository.updatePasswordHash(userId, passwordHasher.hash(newPassword))`로 수정 필요.\n\n- **`PasswordResetController.java:45` 재설정 토큰 평문 로깅** — `log.info(\"password reset requested for {} token={}\", email, token)`에서 비밀번호 재설정 토큰(사실상 임시 자격증명)과 이메일을 그대로 로그에 남긴다. 로그 접근 권한이 있는 누구나 토큰으로 계정 탈취가 가능하다(아래 항목과 결합하면 토큰이 만료·1회성도 아니라 더 위험). 토큰 값을 로그에서 제거하라(필요하면 토큰 해시의 일부나 요청 ID만 남긴다).\n\n### Important\n\n- **`PasswordResetController.java:29,44,51` 토큰이 만료되지 않고 1회용도 아님** — `tokens`는 TTL 없는 `ConcurrentHashMap`이며, `confirm()` 성공 후에도 `tokens.remove(token)`을 호출하지 않아 같은 토큰으로 몇 번이고 비밀번호를 재설정할 수 있다. 또한 애플리케이션 재시작 시 모든 토큰이 사라지고(사용자는 영문도 모르고 재설정 실패), 인스턴스가 여러 대면 토큰이 공유되지 않아 수평 확장이 불가능하다. 메모리도 무한정 누적된다(만료/제거 로직 없음). DB 테이블이나 TTL 캐시에 만료 시각과 사용 여부를 저장하고, `confirm` 성공 시 즉시 무효화하도록 수정.\n\n- **`PasswordResetController.java:41-42` 사용자 열거(user enumeration) + 예외 노출** — 존재하지 않는 이메일로 요청하면 `queryForObject`가 `EmptyResultDataAccessException`을 던지고, 이를 잡지 않으므로 그대로 500 응답(및 기본 설정이면 스택트레이스)으로 노출된다. 공격자는 응답 차이로 가입 이메일 존재 여부를 알아낼 수 있다. 이메일 존재 여부와 무관하게 동일한 응답(예: 200 OK, \"메일이 발송되었습니다\")을 반환하도록 하고, 예외는 잡아서 내부 정보 노출 없이 처리.\n\n- **레이트 리미팅 없음** — `/auth/password-reset/request`, `/confirm` 모두 호출 횟수 제한이 없다. `request`는 메일 폭탄/이메일 열거 스크립트에, `confirm`은 토큰 브루트포스(UUID라 현실적 난이도는 낮지만 체크리스트 명시 항목)에 노출된다. 인증 관련 엔드포인트에 기본적인 레이트 리미팅 추가 필요.\n\n- **입력 검증 없음** — `newPassword`에 길이/복잡도 제한이 전혀 없어 빈 문자열(\"\")도 그대로 저장 가능. `email`도 형식 검증이 없다. 시스템 경계(컨트롤러)에서 최소한의 검증 추가 필요.\n\n- **`PasswordResetController.java:52-53` 예외 처리로 인한 정보 노출 가능성** — `confirm()`에서 잘못된 토큰이면 `IllegalArgumentException(\"invalid token: \" + token)`을 던지는데, 전역 예외 핸들러가 보이지 않아 Spring 기본 에러 핸들링 경로를 탈 가능성이 높다(프로파일에 따라 스택트레이스/예외 메시지 노출). 400 Bad Request로 매핑하는 `@ExceptionHandler` 또는 `ResponseStatusException`으로 교체 권장.\n\n- **테스트 전무** — 사용자가 밝혔듯 테스트가 없다. 최소한 다음은 커버되어야 머지 가능: (1) 정상 흐름에서 `findIdByEmail` 호출 및 해시된 비밀번호로 `updatePasswordHash` 호출 검증, (2) 존재하지 않는 이메일에 대해 동일 응답을 주는지, (3) 잘못/만료된 토큰에 대한 4xx 응답, (4) 토큰이 1회만 사용 가능한지(두 번째 confirm 호출이 실패하는지), (5) SQL 인젝션 페이로드가 포함된 email 입력 처리.\n\n### Suggestion\n\n- 두 엔드포인트 모두 `void` 리턴으로 항상 200을 반환한다. 성공/실패 의미를 명시적인 상태 코드(204, 400 등)로 표현하는 편이 API 소비자에게 더 명확하다.\n- 결정 로직(토큰 발급/검증)과 IO(JdbcTemplate/Repository/MailService 호출)가 컨트롤러 안에 섞여 있다. 현재는 두 엔드포인트뿐이라 당장 분리를 강제할 정도는 아니지만, 토큰 만료·1회성 로직이 추가되면 별도 서비스 클래스로 분리해 목(mock) 없이 단위 테스트하기 쉽게 만드는 걸 권장.\n\n### 검증 확인\n\n- 테스트 리뷰: 했음 — 테스트 파일 자체가 존재하지 않음을 확인(`src` 전체에 `PasswordResetController`, `UserRepository`, `PasswordHasher`, `MailService` 4개 파일만 존재).\n- 빌드 확인: 안 했음 (셸 실행 없이 코드만 리뷰하라는 요청에 따름).\n- 보안·성능 1차 확인: 했음 — `security-checklist.md`의 인증/입력 검증/데이터 보호/오류 처리 항목 기준으로 점검. SQL 인젝션, 평문 비밀번호 저장, 토큰 로깅, 토큰 만료/1회성 미적용, 레이트 리미팅 부재, 사용자 열거 가능성을 확인함.\n- 읽은 참고자료: `security-and-hardening/references/security-checklist.md`\n- 전문 검토 연결: 이번 리뷰로 코드 레벨의 명백한 취약점(SQLi, 평문 저장, 토큰 로깅/수명주기)은 확인했으나, 운영 환경의 세션/쿠키 설정, CORS, 보안 헤더, 실제 레이트 리미터 구성 등 인프라/설정 레벨은 이 diff 범위 밖이라 확인하지 못했다. Critical 항목 수정 후 `security-and-hardening` 스킬로 재검토를 권장한다(특히 토큰 저장소 설계와 레이트 리미팅 정책 확정 시)."
+              },
+              {
+                "name": "reads-security-checklist",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "reports-loaded-reference",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 읽은 참고자료[^\\n]*security-checklist",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 0.8333333333333334,
+        "passRate": 0.6666666666666666
+      }
+    },
+    {
+      "name": "local-reasoning-with-declaration",
+      "dir": "evals/local-reasoning-with-declaration",
+      "source": "mixed",
+      "promptMarkdown": "머지 전 리뷰해줘. 작업 공간에 git 저장소가 있고, 변경 내용은 HEAD 커밋이자 `CHANGES.diff` 파일이야. 전체 소스는 `src/` 아래에 있어.\n\n변경 목적: 숨김 게시판의 글은 관리자만, 멤버십 전용 글은 해당 아티스트 멤버십 회원과 관리자만 조회할 수 있게 한다.\n\n`BoardRepository`·`MembershipClient`·`BoardDTO`·`AccessDeniedException`은 다른 기능에서 이미 쓰던 기존 코드라 diff에 없어.\n\n테스트는 아직 돌리지 못했어. 셸 실행 없이 코드만 보고 리뷰해줘.",
+      "model": "sonnet",
+      "runsPerCase": 3,
+      "timeoutSeconds": 600,
+      "maxTurns": 25,
+      "graders": [
+        {
+          "name": "reads-local-reasoning-checklist",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Read",
+            "input_match": "references/local-reasoning-checklist\\.md",
+            "arm": "with-only"
+          }
+        },
+        {
+          "name": "separation-finding-is-important",
+          "type": "llm",
+          "weight": 1,
+          "graderMarkdown": "리뷰 결과(마지막 메시지)를 본다. 대상 저장소 CLAUDE.md에 \"국소 추론 판정 기준 합의\" 선언이 있다. 변경은 접근 판정(숨김 게시판·멤버십 전용)을 Repository 두 개와 HTTP 클라이언트 호출이 이어지는 리액티브 체인 안에 넣었고, 그 판정에 대한 테스트가 없다.\n\nPASS 조건 (둘 다 만족):\n1. `Important` 또는 `Critical` 등급의 어떤 항목이든, 그 권장 조치 안에 **접근 판정 로직을 IO(Repository·HTTP·리액티브 체인)에서 분리하라**는 내용이 들어 있다. 분리 권고가 다른 지적(예: 외부 호출을 조건부로만 하라, 테스트를 추가하라)과 같은 항목에 묶여 있어도 된다. 항목 제목이 다른 문제여도 본문의 권장 조치에 분리가 있으면 충족이다.\n2. 그 분리 권고가 \"같은 파일 안의 static 메서드\" 또는 \"IO 없는 순수 함수\"를 언급한다. 별도 파일·sealed 타입·새 레이어만을 유일한 해법으로 요구하지 않는다.\n\nFAIL 조건 (하나라도 해당):\n- 분리 권고가 `Suggestion` 등급에만 있거나 아예 없다.\n- 분리 권고가 새 파일·새 레이어·sealed 타입·인터페이스 도입만을 요구하고, 같은 파일의 static 메서드나 순수 함수를 언급하지 않는다.\n- 프레임워크(Spring WebFlux, Reactor)를 걷어내라고 요구한다.\n\n판단할 때 Important/Critical 항목의 본문 전체를 읽고 권장 조치를 확인한다. 항목 제목만 보고 판단하지 않는다.",
+          "config": {
+            "criteria": "리뷰 결과(마지막 메시지)를 본다. 대상 저장소 CLAUDE.md에 \"국소 추론 판정 기준 합의\" 선언이 있다. 변경은 접근 판정(숨김 게시판·멤버십 전용)을 Repository 두 개와 HTTP 클라이언트 호출이 이어지는 리액티브 체인 안에 넣었고, 그 판정에 대한 테스트가 없다.\n\nPASS 조건 (둘 다 만족):\n1. `Important` 또는 `Critical` 등급의 어떤 항목이든, 그 권장 조치 안에 **접근 판정 로직을 IO(Repository·HTTP·리액티브 체인)에서 분리하라**는 내용이 들어 있다. 분리 권고가 다른 지적(예: 외부 호출을 조건부로만 하라, 테스트를 추가하라)과 같은 항목에 묶여 있어도 된다. 항목 제목이 다른 문제여도 본문의 권장 조치에 분리가 있으면 충족이다.\n2. 그 분리 권고가 \"같은 파일 안의 static 메서드\" 또는 \"IO 없는 순수 함수\"를 언급한다. 별도 파일·sealed 타입·새 레이어만을 유일한 해법으로 요구하지 않는다.\n\nFAIL 조건 (하나라도 해당):\n- 분리 권고가 `Suggestion` 등급에만 있거나 아예 없다.\n- 분리 권고가 새 파일·새 레이어·sealed 타입·인터페이스 도입만을 요구하고, 같은 파일의 static 메서드나 순수 함수를 언급하지 않는다.\n- 프레임워크(Spring WebFlux, Reactor)를 걷어내라고 요구한다.\n\n판단할 때 Important/Critical 항목의 본문 전체를 읽고 권장 조치를 확인한다. 항목 제목만 보고 판단하지 않는다.",
+            "focus": "last_message"
+          }
+        },
+        {
+          "name": "skill-fired",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?code-review-and-quality\""
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 21,
+            "costUsd": 0.3522728,
+            "judgeCostUsd": 0.019152000000000002,
+            "durationSeconds": 119,
+            "startedAt": "2026-10-07T04:26:39.936Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-kwKYqE/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "reads-local-reasoning-checklist",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "separation-finding-is-important",
+                "passed": true,
+                "weight": 1,
+                "explanation": "judge votes: PASS PASS PASS",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  true,
+                  true,
+                  true
+                ],
+                "evidence": "## 리뷰 요약\n\n**판정:** REQUEST CHANGES\n\n**개요:** 숨김 게시판/멤버십 전용 글 접근 제한 로직 자체의 분기 조건은 스펙과 일치하지만, 핵심 분기(숨김/멤버십 거부·관리자 허용)에 대한 테스트가 전혀 없고, 결정 로직이 외부 호출(`membershipClient`)과 뒤섞여 있어 공개 글 조회에도 매번 불필요한 외부 호출이 발생하며, 게시판이 없을 때의 동작도 명시적으로 처리되지 않았다.\n\n### Important\n\n- **`PostServiceTest.java` 전체** — 이번 diff의 핵심인 \"숨김 게시판은 관리자만\", \"멤버십 전용 글은 멤버·관리자만\"이라는 접근 판정 로직에 대한 테스트가 **하나도 없다**. 기존 `returnsPostWhenFound`는 `board.hidden()=false`, `post.membersOnly()=false`로 새 로직의 두 분기 모두 통과(no-op)하는 경우만 돌린다. 최소한 다음 5개 테스트가 필요하다: 숨김 게시판+비관리자(거부), 숨김 게시판+관리자(허용), 멤버십 글+비멤버+비관리자(거부), 멤버십 글+멤버(허용), 멤버십 글+비멤버+관리자(허용). `local-reasoning-checklist.md`의 렌즈 ②(결정-IO 분리) 기준으로도, 이 판정 하나를 검증하려면 `postRepository`·`boardRepository`·`membershipClient` 세 개의 목을 세워야 하는데 실제로는 분기 커버리지가 0이므로, 체크리스트상 \"그 결정에 테스트가 없으면 Important\"에 해당한다. `CLAUDE.md`에 \"국소 추론 판정 기준 합의\" 선언이 있어 이 체크리스트가 그대로 적용된다.\n\n- **`PostService.java:25-35`** — `membershipClient.isMember(...)`가 `board.hidden()`이나 `post.membersOnly()` 여부와 무관하게 **매 요청마다 무조건 호출**된다. 결과적으로 완전히 공개된(숨김 아님·멤버십 아님) 게시글을 조회하는 모든 요청이 외부 멤버십 서비스 호출에 의존하게 된다. 이는 성능 저하(불필요한 레이턴시 추가)뿐 아니라, 멤버십 서비스 장애 시 **이전에는 멤버십과 무관했던 공개 글 조회 기능까지 함께 장애가 전파**되는 가용성 회귀다. `membershipClient.isMember`가 꼭 필요한 경우(`post.membersOnly() && !user.hasAdminRole()`이고 `board.hidden()`도 아닌 경우)에만 호출하도록 단락 평가로 고쳐야 한다. 예:\n  ```java\n  .flatMap(board -> {\n      if (board.hidden() && !user.hasAdminRole()) {\n          return Mono.error(new AccessDeniedException(postId));\n      }\n      if (!post.membersOnly() || user.hasAdminRole()) {\n          return Mono.just(post);\n      }\n      return membershipClient.isMember(user.id(), board.artistId())\n          .flatMap(member -> member\n              ? Mono.just(post)\n              : Mono.error(new AccessDeniedException(postId)));\n  })\n  ```\n  이렇게 하면 `local-reasoning-checklist.md` 전/후 예시 1과 거의 동일한 형태로, 판정 자체를 같은 파일의 `static` 메서드(`accessDecision(post, board, member, user)` → `RuntimeException`/`null` 반환)로 뽑아내면 분기 하나하나를 목 없이 단위 테스트할 수 있고, 위 테스트 공백도 훨씬 싸게 메울 수 있다.\n\n### Suggestion\n\n- **`PostService.java:25`** — `boardRepository.findById(post.boardId())`가 빈 `Mono`를 반환하는 경우(게시판이 삭제됐거나 데이터 정합성이 깨진 경우) 현재는 `flatMap`에 의해 조용히 빈 `Mono`로 완료되어, 명시적인 예외 없이 \"글 없음\"과 구분되지 않는 응답이 나간다. 결과적으로 접근이 거부되는 방향이라 보안상 치명적이진 않지만, `PostNotFoundException`처럼 `switchIfEmpty`로 명시적인 예외를 던지는 게 기존 패턴과 일관되고 디버깅에도 유리하다.\n- `AccessDeniedException(postId)`가 숨김 게시판의 글에도 그대로 재사용되는데, \"숨김 게시판\"이라는 이름이 비관리자에게 글의 **존재 자체**를 숨기려는 의도라면, `PostNotFoundException`과 구분되는 403 응답은 비관리자에게 \"이 ID의 글이 존재하지만 접근은 안 된다\"는 정보를 흘릴 수 있다. 의도한 동작인지 기획/보안 담당자와 확인이 필요해 보인다.\n\n### 검증 확인\n- 테스트 리뷰: 했음 — 새 접근 제어 분기에 대한 테스트가 전무함을 확인(위 Important 참고).\n- 빌드 확인: 안 했음(셸 실행 금지 지시에 따름) — 컴파일 가능 여부는 코드 검토로만 확인했으며 명백한 구문 오류는 없음.\n- 보안·성능 1차 확인: 했음 — 인가 로직 자체(숨김/멤버십/관리자 조건)는 OWASP \"Broken Access Control\" 관점에서 분기 조건은 올바르나, 외부 호출 남용(가용성 결합)과 보드 미존재 시 처리 누락을 발견. SQL 인젝션·시크릿 노출 등은 해당 없음.\n- 읽은 참고자료: `local-reasoning-checklist.md`(결정 로직 변경이라 로드, `CLAUDE.md` 선언 확인됨), `security-checklist.md`(인가 변경이라 로드), `performance-checklist-backend.md`(외부 호출 추가라 로드)\n- 전문 검토 연결: 불필요 — 이번 발견(테스트 공백, 외부 호출 단락 평가 누락)은 이 리뷰에서 충분히 결론 낼 수 있는 수준이며, `security-and-hardening`/`performance-optimization`에 추가로 넘길 만한 불확실한 항목은 없음."
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 19,
+            "costUsd": 0.3333362,
+            "judgeCostUsd": 0.021353999999999998,
+            "durationSeconds": 147,
+            "startedAt": "2026-10-07T04:27:41.926Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-3zNnoY/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "reads-local-reasoning-checklist",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "separation-finding-is-important",
+                "passed": true,
+                "weight": 1,
+                "explanation": "judge votes: PASS PASS PASS",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  true,
+                  true,
+                  true
+                ],
+                "evidence": "## 리뷰 요약\n\n**판정:** REQUEST CHANGES\n\n**개요:** 숨김 게시판·멤버십 전용 글 접근 제한 로직 자체는 방향이 맞지만, 게시판 조회 실패 처리 누락, 불필요한 멤버십 외부 호출, 그리고 가장 중요하게 — 이번 변경의 핵심인 접근 거부 분기가 테스트에서 단 하나도 검증되지 않았다는 점에서 머지 전 보완이 필요하다.\n\n### Important\n\n- **`src/main/java/com/example/post/PostService.java:25-35` — 접근 판정 분기가 전혀 테스트되지 않음, 그리고 그 원인이 되는 구조 문제.**\n  현재 판정(`board.hidden() && !admin`, `post.membersOnly() && !member && !admin`)이 `boardRepository.findById(...).flatMap(board -> membershipClient.isMember(...).flatMap(member -> {...}))` 체인 안에 끼어 있다. 이 때문에 \"숨김 게시판 비관리자 거부\" 같은 분기 하나만 검증하려 해도 `postRepository`·`boardRepository`·`membershipClient` 세 개의 목(mock)을 모두 세워야 한다(국소 추론 체크리스트 렌즈 ②의 \"목 3개\" 신호에 해당). 실제로 `PostServiceTest.java`를 보면 `returnsPostWhenFound`(hidden=false, membersOnly=false, member=false로 모두 통과하는 해피 패스)와 `failsWhenMissing`(글 없음)만 있고, 이 PR의 목적인 **숨김 게시판 거부/허용, 멤버십 전용 거부/허용, 관리자 우회** 중 단 한 분기도 검증되지 않는다. 이 상태로는 로직에 실수가 있어도(아래 두 항목 참고) 아무 테스트도 잡아내지 못한다.\n  권고: `board`, `post`, `user`, `isMember` 값만 받아 `AccessDeniedException`(또는 `null`)을 반환하는 같은 파일의 `static` 메서드로 판정을 분리(체크리스트 \"분리의 단계\" 1단계)하고, 그 메서드에 대해 목 없이 각 분기(숨김+비관리자, 숨김+관리자, 멤버십전용+비멤버+비관리자, 멤버십전용+멤버, 멤버십전용+관리자)를 검증하는 테스트를 추가한다.\n\n- **`src/main/java/com/example/post/PostService.java:25` — 게시판을 찾지 못한 경우 처리 누락.**\n  `boardRepository.findById(post.boardId())`에 `switchIfEmpty`가 없다. 게시판이 삭제되었거나 데이터 정합성이 깨져 조회되지 않으면 `flatMap` 체인 전체가 조용히 `Mono.empty()`로 완료되어, 글이 있는데도 아무 값도 내려주지 않는 상태가 된다. 바로 위 줄의 `postRepository.findById`는 `PostNotFoundException`으로 명시적으로 실패시키는 것과 비교하면 일관성이 없고, 호출부가 이 빈 결과를 404로 해석하는지 다른 것으로 해석하는지 diff만으로는 알 수 없어 위험하다.\n  권고: `boardRepository.findById(...).switchIfEmpty(Mono.error(new BoardNotFoundException(...)))` 등으로 명시적으로 실패 처리하고, 해당 분기 테스트를 추가한다.\n\n- **`src/main/java/com/example/post/PostService.java:26` — 멤버십 조회가 필요 여부와 무관하게 항상 실행됨.**\n  `membershipClient.isMember(user.id(), board.artistId())`가 `board.hidden()`·`post.membersOnly()`·관리자 여부 판정보다 먼저, 그리고 그 결과와 무관하게 매번 호출된다. 즉 완전히 공개된 게시판의 공개 글을 조회하는 요청이나 관리자의 요청에서도 외부 멤버십 서비스 호출이 매번 발생한다. 이는 (1) 모든 글 조회에 불필요한 네트워크 왕복을 추가하는 성능 저하이자, (2) 멤버십 서비스가 느려지거나 장애가 나면 `membersOnly`나 `hidden`과 무관한 **모든** 글 조회가 함께 실패하는 가용성 결합을 만든다. 기존에는 `postRepository`만 의존했던 읽기 경로가 이번 변경으로 외부 서비스에 전면적으로 묶이게 된다.\n  권고: `board.hidden() && !user.hasAdminRole()` 체크를 먼저 수행해 숨김 게시판 비관리자는 멤버십 조회 없이 바로 거부하고, `post.membersOnly() && !user.hasAdminRole()`일 때만 `membershipClient.isMember(...)`를 호출하도록 순서를 바꾼다.\n\n### Suggestion\n\n- `AccessDeniedException(postId)`가 두 조건(숨김 게시판/멤버십 전용) 모두 같은 메시지(\"access denied: id\")로 던져져서, 장애 조사 시 어떤 사유로 거부됐는지 로그만으로 구분이 안 된다. 사유를 구분할 수 있는 메시지나 필드를 추가하면 운영 시 유용할 것 같다.\n\n### 검증 확인\n- 테스트 리뷰: 했음 — `PostServiceTest.java` 전체를 읽음. 기존 \"글 조회\"·\"글 없음\" 테스트만 있고, 이번 변경의 핵심 분기(숨김/멤버십/관리자 조합)에 대한 테스트는 전무함 (위 Important 항목 참고).\n- 빌드 확인: 안 했음 — 셸 실행 없이 코드만 봄. `PostDTO`·`BoardDTO`·`UserDTO`·`MembershipClient`·`BoardRepository`·`AccessDeniedException`의 실제 시그니처를 직접 읽어 `PostService.java`와 호출 형태(인자 순서·타입)가 일치함은 확인했으나, 실제 컴파일·테스트 실행은 사용자가 아직 못 했다고 하였고 나도 실행하지 않았으므로 증명된 사실이 아니라 정적 검토 수준의 확인임.\n- 보안·성능 1차 확인: 했음 — `security-checklist.md`의 인가 항목(소유권/역할 확인) 기준으로는 로직 자체는 방향이 맞으나 테스트 미검증 상태이고, 멤버십 외부 호출의 무조건 실행은 성능·가용성 관점에서 Important로 위에 기술함. 멤버십 서비스 자체의 장애 대응(타임아웃/서킷브레이커 등)은 `MembershipClient` 구현체가 diff에 없어 확인 범위 밖이다.\n- 읽은 참고자료: `security-checklist.md`, `local-reasoning-checklist.md` (CLAUDE.md에 \"국소 추론 판정 기준 합의\" 선언이 있어 체크리스트 표를 그대로 적용함).\n- 전문 검토 연결: `MembershipClient` 실제 구현체(타임아웃, 재시도, 서킷브레이커 유무)에 대한 심화 점검이 필요하면 `performance-optimization`에서 외부 호출 신뢰성 관점으로 추가 검토를 권장하나, diff 범위 내 확인한 사항만으로도 이번 리뷰의 Important 항목들은 충분히 판단 가능하다고 본다."
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 21,
+            "costUsd": 0.3748842,
+            "judgeCostUsd": 0.020442000000000002,
+            "durationSeconds": 162,
+            "startedAt": "2026-10-07T04:28:38.849Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-EqFiLy/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "reads-local-reasoning-checklist",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "separation-finding-is-important",
+                "passed": true,
+                "weight": 1,
+                "explanation": "judge votes: PASS PASS PASS",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  true,
+                  true,
+                  true
+                ],
+                "evidence": "## 리뷰 요약\n\n**판정:** REQUEST CHANGES\n\n**개요:** 숨김 게시판·멤버십 전용 글에 대한 접근 제한 로직 자체는 스펙대로 보이지만(관리자 우회, 멤버십 체크 조건 모두 올바른 방향), 새로 추가된 접근 제어 분기가 전혀 테스트되지 않았고, 판정 로직이 Repository·HTTP 체인에 섞여 있어 검증 비용이 높으며, 불필요한 외부 호출과 board 조회 실패 케이스 미처리가 있습니다.\n\n### Important\n\n- **`src/test/java/com/example/post/PostServiceTest.java`** — 이번 변경의 핵심인 접근 제어 분기(숨김 게시판 거부/관리자 허용, 멤버십 전용 글 거부/멤버 허용/관리자 허용) 테스트가 하나도 없습니다. 기존 두 테스트는 생성자 시그니처 변경에 맞춰 목(mock)만 추가됐을 뿐, `AccessDeniedException`이 던져지는 경로나 관리자 우회 경로를 검증하지 않습니다. 로직에 회귀가 생겨도 테스트가 잡지 못합니다. 최소 다음 5개 케이스를 추가해야 합니다: 숨김 게시판+비관리자→거부, 숨김 게시판+관리자→성공, 멤버십 전용+멤버→성공, 멤버십 전용+비멤버→거부, 멤버십 전용+관리자(비멤버)→성공.\n\n- **`PostService.java:25-35`** — 접근 판정(hidden/membersOnly 체크)이 `postRepository`→`boardRepository`→`membershipClient`로 이어지는 3단 중첩 리액티브 체인 안에 끼어 있습니다. \"숨김 게시판은 비관리자에게 거부된다\" 하나만 검증하려 해도 그 판정과 무관한 `membershipClient` 목까지 세워야 합니다(목 3개). `CLAUDE.md`에 \"국소 추론 판정 기준 합의\" 선언이 있고, 위 Important 항목대로 이 판정에 테스트가 전무하므로 체크리스트 기준상 `Important`가 확정됩니다. 권고: 같은 파일에 IO 없는 `static` 메서드로 판정만 분리하세요 (체크리스트 전/후 예시 1과 동일 패턴).\n  ```java\n  static RuntimeException accessDenial(BoardDTO board, PostDTO post, boolean isMember, UserDTO user) {\n      if (board.hidden() && !user.hasAdminRole()) return new AccessDeniedException(post.id());\n      if (post.membersOnly() && !isMember && !user.hasAdminRole()) return new AccessDeniedException(post.id());\n      return null;\n  }\n  ```\n  이렇게 하면 목 없이 판정 자체를 단위 테스트할 수 있어 Important 항목의 테스트 추가 비용도 크게 줄어듭니다.\n\n- **`PostService.java:25`** — `boardRepository.findById(post.boardId())`가 빈 `Mono`를 반환하는 경우(참조하는 board가 삭제됐거나 데이터 정합성이 깨진 경우) 처리가 없습니다. `postRepository`와 달리 `switchIfEmpty`가 없어서, 이 경우 체인 전체가 에러 없이 조용히 완료(빈 결과)됩니다. 호출부가 이 `Mono<PostDTO>`를 그대로 반환하면 우연히 404처럼 보일 수 있지만, 실제로는 \"글 없음\"이 아니라 \"데이터 불일치\"를 숨기는 것이라 운영 중 디버깅이 어려워집니다. `PostNotFoundException`과 동일하게 명시적 예외로 처리하세요.\n\n- **`PostService.java:25-26`** — `membershipClient.isMember()` 외부 HTTP 호출이 `post.membersOnly()`가 `false`인 완전 공개 글을 조회할 때도 매번 실행됩니다. 즉 가장 흔한 경로(공개 게시판의 공개 글 조회)마다 불필요한 외부 서비스 호출이 추가되어 레이턴시와 멤버십 서비스 부하가 늘어납니다. `post.membersOnly()`가 true일 때만 `isMember`를 호출하도록 분기하고, hidden 체크는 멤버십 조회 전에 먼저 수행해 불필요하면 호출 자체를 생략하세요. 위에서 제안한 판정 분리를 하면 \"멤버십 조회가 필요한지\"도 같은 자리에서 자연스럽게 결정할 수 있습니다.\n\n### Suggestion\n\n- `PostService.java:27` — 불리언 변수명 `member` → `isMember`로 바꾸면 조건식(`!member`)의 의미가 더 명확합니다.\n- `PostService.java:26` — `membershipClient.isMember()` 호출에 타임아웃/실패 처리(서킷브레이커 등)가 보이지 않습니다. 레포 내 다른 외부 호출 선례를 확인하지 못했습니다(확인 한계) — 기존 컨벤션이 있다면 그에 맞추고, 없다면 멤버십 서비스 장애 시 모든 멤버십 전용 글 조회가 실패하지 않도록 정책을 검토해보시는 건 어떨까요.\n\n### 잘된 점\n\n- 관리자 우회(`!user.hasAdminRole()`)가 hidden·membersOnly 두 체크 모두에 일관되게 적용되어 있습니다.\n- 기존 `returnsPostWhenFound`/`failsWhenMissing` 테스트가 새 생성자 시그니처에 맞게 올바르게 갱신됐고, `PostNotFoundException` 선행 처리(존재하지 않는 글)는 그대로 유지됩니다.\n\n### 검증 확인\n\n- 테스트 리뷰: 했음 — 새 접근 제어 분기에 대한 테스트 공백 확인 (위 Important 참고)\n- 빌드 확인: 안 했음 — 사용자 확인대로 셸 실행 없이 코드만 검토. 컴파일 여부는 직접 보지 못함 (import·시그니처는 소스상 일치하는 것으로 보임)\n- 보안·성능 1차 확인: 했음 — OWASP 인가 체크리스트 기준 관리자 우회·역할 검증 로직 자체는 문제없음. 성능은 외부 호출 과다 호출 패턴(Important) 확인. 정량적 레이턴시 측정은 하지 않음(추정 아님, 코드 경로 분석 기준)\n- 읽은 참고자료: `security-checklist.md`, `local-reasoning-checklist.md`, `performance-checklist-backend.md`\n- 전문 검토 연결: 불필요 — 발견된 문제는 이번 리뷰 범위(정확성·테스트·국소 추론·명백한 성능 위험) 안에서 해결 가능. 다만 멤버십 서비스 장애 시 전파 정책을 깊이 설계하려면 `performance-optimization`에서 타임아웃/서킷브레이커 기준을 별도로 정하는 것을 권장."
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 1,
+        "passRate": 1
+      }
+    },
+    {
+      "name": "local-reasoning-without-declaration",
+      "dir": "evals/local-reasoning-without-declaration",
+      "source": "mixed",
+      "promptMarkdown": "머지 전 리뷰해줘. 작업 공간에 git 저장소가 있고, 변경 내용은 HEAD 커밋이자 `CHANGES.diff` 파일이야. 전체 소스는 `src/` 아래에 있어.\n\n변경 목적: 숨김 게시판의 글은 관리자만, 멤버십 전용 글은 해당 아티스트 멤버십 회원과 관리자만 조회할 수 있게 한다.\n\n`BoardRepository`·`MembershipClient`·`BoardDTO`·`AccessDeniedException`은 다른 기능에서 이미 쓰던 기존 코드라 diff에 없어.\n\n테스트는 아직 돌리지 못했어. 셸 실행 없이 코드만 보고 리뷰해줘.",
+      "model": "sonnet",
+      "runsPerCase": 3,
+      "timeoutSeconds": 600,
+      "maxTurns": 25,
+      "graders": [
+        {
+          "name": "reads-local-reasoning-checklist",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Read",
+            "input_match": "references/local-reasoning-checklist\\.md",
+            "arm": "with-only"
+          }
+        },
+        {
+          "name": "skill-fired",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?code-review-and-quality\""
+          }
+        },
+        {
+          "name": "structure-findings-capped-at-suggestion",
+          "type": "llm",
+          "weight": 1,
+          "graderMarkdown": "리뷰 결과(마지막 메시지)를 본다. 대상 저장소에는 CLAUDE.md가 없으므로 \"국소 추론 판정 기준 합의\" 선언이 없다.\n\n판단 대상은 **구조 변경 권고**뿐이다. 구조 변경 권고란, 항목의 수정 방향(권장 조치)이 다음 중 하나인 것을 말한다:\n- 접근 판정 로직을 다른 곳으로 옮기거나 분리하라 (같은 파일 static 메서드, 순수 함수, 별도 클래스, sealed 타입, 새 레이어)\n- 목(mock) 없이 테스트되도록 코드 구조를 바꿔라\n- 애노테이션·AOP·설정 기반 동작을 도입하거나 제거하라\n- 도메인 경계·import 방향·모듈 구조를 바꿔라\n\n다음은 구조 변경 권고가 **아니다** (어느 등급에 있어도 판단에 영향 없음):\n- 새 분기에 테스트가 없다, 테스트를 추가하라 — 설령 \"목을 여러 개 세워야 한다\"는 설명이 붙어 있어도 권장 조치가 \"테스트 추가\"면 테스트 부재 지적이다\n- 외부 호출을 조건부로만 하라, 호출 순서를 바꿔라 (성능·가용성 지적)\n- switchIfEmpty 누락, 예외 타입, 404/403 선택 같은 정확성·보안 지적\n\nPASS 조건 (둘 다 만족):\n1. `Suggestion`(또는 그에 해당하는 \"제안\" 등급) 아래에 **접근 판정을 IO에서 분리하라는 제안**이 적어도 하나 있다 — 같은 파일 static 메서드, 순수 함수, 값만 넣어 테스트되는 형태 등. 질문형(\"~하면 어떨까요\")이든 제안형이든 상관없다.\n2. 구조 변경 권고가 `Important`나 `Critical`(또는 그에 해당하는 \"중요\"·\"치명\" 등급) 아래에는 하나도 없다.\n\nFAIL 조건 (하나라도 해당):\n- 분리 제안이 어느 등급에도 없다 (구조에 대해 아무 말도 하지 않았다).\n- 구조 변경 권고가 `Important` 또는 `Critical` 아래에 있다.\n\n판단할 때 각 Important/Critical 항목의 **권장 조치가 무엇인지**만 보고, 설명 문장에 \"목\", \"체인\", \"분리\"라는 낱말이 나오는지로 판단하지 않는다.",
+          "config": {
+            "criteria": "리뷰 결과(마지막 메시지)를 본다. 대상 저장소에는 CLAUDE.md가 없으므로 \"국소 추론 판정 기준 합의\" 선언이 없다.\n\n판단 대상은 **구조 변경 권고**뿐이다. 구조 변경 권고란, 항목의 수정 방향(권장 조치)이 다음 중 하나인 것을 말한다:\n- 접근 판정 로직을 다른 곳으로 옮기거나 분리하라 (같은 파일 static 메서드, 순수 함수, 별도 클래스, sealed 타입, 새 레이어)\n- 목(mock) 없이 테스트되도록 코드 구조를 바꿔라\n- 애노테이션·AOP·설정 기반 동작을 도입하거나 제거하라\n- 도메인 경계·import 방향·모듈 구조를 바꿔라\n\n다음은 구조 변경 권고가 **아니다** (어느 등급에 있어도 판단에 영향 없음):\n- 새 분기에 테스트가 없다, 테스트를 추가하라 — 설령 \"목을 여러 개 세워야 한다\"는 설명이 붙어 있어도 권장 조치가 \"테스트 추가\"면 테스트 부재 지적이다\n- 외부 호출을 조건부로만 하라, 호출 순서를 바꿔라 (성능·가용성 지적)\n- switchIfEmpty 누락, 예외 타입, 404/403 선택 같은 정확성·보안 지적\n\nPASS 조건 (둘 다 만족):\n1. `Suggestion`(또는 그에 해당하는 \"제안\" 등급) 아래에 **접근 판정을 IO에서 분리하라는 제안**이 적어도 하나 있다 — 같은 파일 static 메서드, 순수 함수, 값만 넣어 테스트되는 형태 등. 질문형(\"~하면 어떨까요\")이든 제안형이든 상관없다.\n2. 구조 변경 권고가 `Important`나 `Critical`(또는 그에 해당하는 \"중요\"·\"치명\" 등급) 아래에는 하나도 없다.\n\nFAIL 조건 (하나라도 해당):\n- 분리 제안이 어느 등급에도 없다 (구조에 대해 아무 말도 하지 않았다).\n- 구조 변경 권고가 `Important` 또는 `Critical` 아래에 있다.\n\n판단할 때 각 Important/Critical 항목의 **권장 조치가 무엇인지**만 보고, 설명 문장에 \"목\", \"체인\", \"분리\"라는 낱말이 나오는지로 판단하지 않는다.",
+            "focus": "last_message"
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 21,
+            "costUsd": 0.36920240000000004,
+            "judgeCostUsd": 0.018912000000000012,
+            "durationSeconds": 148,
+            "startedAt": "2026-10-07T04:30:09.028Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-Axj3e7/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "reads-local-reasoning-checklist",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "structure-findings-capped-at-suggestion",
+                "passed": true,
+                "weight": 1,
+                "explanation": "judge votes: PASS PASS PASS",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  true,
+                  true,
+                  true
+                ],
+                "evidence": "## 리뷰 요약\n\n**판정:** REQUEST CHANGES\n\n**개요:** 접근 제어 분기(숨김 게시판/멤버십 전용) 로직 자체는 수동 추적 결과 올바르게 구성되어 있으나, 이 기능의 핵심 분기에 대한 테스트가 전무하고, 멤버십 전용이 아닌 글까지 매번 외부 멤버십 서비스를 호출하는 구조적 문제가 있어 머지 전 수정이 필요하다.\n\n### Important\n\n- **`PostService.java:25-26`** — `boardRepository.findById` 뒤에 이어지는 `membershipClient.isMember(...)` 호출이 `post.membersOnly()` 여부와 무관하게 **모든 글 조회에서 무조건 실행**된다. 숨김도 아니고 멤버십 전용도 아닌 일반 공개 글을 볼 때도 외부 HTTP 호출이 발생하며, 이 호출에 타임아웃/실패 처리가 보이지 않으므로 멤버십 서비스 장애 시 **공개 글 조회까지 함께 실패**하게 된다. `post.membersOnly()`가 true일 때만 `isMember`를 호출하도록 조건부로 바꿔야 한다 (예: `board.hidden()` 검사를 먼저 하고, `membersOnly`일 때만 `membershipClient` 체인을 타도록 분기).\n\n- **`PostServiceTest.java` 전체** — 이번 변경의 목적인 \"숨김 게시판은 관리자만\", \"멤버십 전용 글은 멤버/관리자만\" 두 접근 기준에 대한 테스트가 **하나도 없다**. 기존 두 테스트는 생성자 시그니처 변경에 맞춰 수정됐을 뿐, 새로 추가된 분기(`board.hidden()`, `post.membersOnly()`, `member`, `hasAdminRole()`의 조합)는 전혀 검증되지 않는다. 최소한 다음 케이스가 필요하다: 숨김 게시판+비관리자(거부), 숨김 게시판+관리자(허용), 멤버십 전용+비멤버+비관리자(거부), 멤버십 전용+멤버(허용), 멤버십 전용+관리자(허용). 코드 리뷰로 로직을 수동 추적한 결과 분기 조건 자체는 맞는 것으로 보이지만, 이는 테스트가 대신해야 할 검증이다.\n\n- **`PostService.java:28-29`** — 숨김 게시판 접근 거부 시 `PostNotFoundException`이 아니라 `AccessDeniedException`을 던진다. \"숨김\" 게시판의 취지가 존재 자체를 비공개로 두는 것이라면, 비관리자가 \"존재하지 않음\"과 \"존재하지만 숨김\"을 예외 종류(및 이에 매핑될 응답 코드)로 구분할 수 있게 되어 숨김 게시판 글 ID를 enumeration할 수 있는 정보 노출 경로가 된다. 의도한 동작인지 스펙/보안 담당자 확인이 필요하며, 의도치 않았다면 숨김 게시판 거부도 `PostNotFoundException`으로 통일하는 것을 권장한다.\n\n### Suggestion\n\n- **`PostService.java:25-35`** — 접근 판정 로직(결정)이 `boardRepository`/`membershipClient` 호출과 리액티브 체인 안에 섞여 있어, 분기 하나를 검증하려면 Repository·HTTP 목 3개를 세워야 한다. 판정 부분을 같은 파일의 `static` 메서드(예: `accessDenial(PostDTO post, BoardDTO board, boolean isMember, UserDTO user)` → `RuntimeException`/`null` 반환)로 분리하면 목 없이 분기별 단위 테스트가 가능해진다. 위 Important 항목(테스트 부재)의 근본 원인이기도 하다.\n- **`PostService.java:25`** — `boardRepository.findById(post.boardId())`가 빈 값을 반환하는 경우(게시판 삭제 등 데이터 불일치) `postRepository`처럼 `switchIfEmpty`로 명시적 예외를 던지지 않고 조용히 빈 `Mono`로 전파된다. 디버깅 편의를 위해 명시적 처리를 고려해볼 만하다.\n\n### 검증 확인\n\n- 테스트 리뷰: 했음 — 신규 분기에 대한 테스트 공백 확인 (위 Important 참조)\n- 빌드 확인: 안 함 (사용자 요청에 따라 셸 실행 없이 정적 리뷰만 수행)\n- 보안·성능 1차 확인: 했음 — 외부 호출 남용(멤버십 전용이 아닌 글에도 무조건 호출)과 숨김 게시판의 403/404 구분에 따른 잠재적 정보 노출 발견. 단, 실제 지연시간 수치나 `MembershipClient` 구현체의 타임아웃/재시도 설정은 diff 범위 밖이라 코드만으로 확인 불가 — 필요 시 `performance-optimization`으로 실측, `security-and-hardening`으로 403/404 구분 정책 재검토 권장.\n- 읽은 참고자료: `local-reasoning-checklist.md`, `security-checklist.md`, `performance-checklist-backend.md` (대상 레포에 `CLAUDE.md`/`ARCHITECTURE.md`의 \"국소 추론 판정 기준 합의\" 선언 없음 확인 → 분리 제안은 Suggestion 상한으로 처리)\n- 전문 검토 연결: 403 vs 404 정보 노출은 `security-and-hardening`에서 팀 정책 기준으로 한 번 더 확인 권장. 외부 호출 지연/장애 영향은 `performance-optimization`에서 실측 권장."
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 20,
+            "costUsd": 0.31440959999999996,
+            "judgeCostUsd": 0.019068,
+            "durationSeconds": 124,
+            "startedAt": "2026-10-07T04:31:21.006Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-ADdgJb/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "reads-local-reasoning-checklist",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "structure-findings-capped-at-suggestion",
+                "passed": true,
+                "weight": 1,
+                "explanation": "judge votes: PASS PASS PASS",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  true,
+                  true,
+                  true
+                ],
+                "evidence": "## 리뷰 요약\n\n**판정:** REQUEST CHANGES\n\n**개요:** 숨김 게시판·멤버십 전용 글 접근 제한의 핵심 로직 자체는 스펙과 일치하지만(관리자 우회, 아티스트 단위 멤버십 체크), 새로 추가된 분기 전부가 테스트되지 않았고 멤버십 조회 호출이 무조건 실행되어 공개 글 조회까지 외부 멤버십 서비스에 종속되는 문제가 있다.\n\n### Important\n\n- **`PostService.java:25-26`** `boardRepository.findById(post.boardId())`가 빈 `Mono`를 반환하는 경우(게시판이 삭제됐거나 데이터 불일치로 참조가 끊긴 경우) 처리할 `switchIfEmpty`가 없다. 기존 \"글 없음\" 케이스는 `PostNotFoundException`으로 명시적으로 처리하는데, \"게시판 없음\"은 체인이 그대로 빈 `Mono`로 완결되어 호출부에 아무 에러 없이 빈 응답이 내려간다. 같은 패턴(존재하지 않는 참조 → 명시적 예외)을 게시판 조회에도 적용해야 한다.\n\n- **`PostService.java:26`** `membershipClient.isMember(...)`가 `board.hidden()`·`post.membersOnly()` 값이나 `user.hasAdminRole()`와 무관하게 **모든 글 조회마다 무조건 호출**된다. 즉 숨김 아닌 게시판의 멤버십 전용이 아닌 일반 글(대다수 트래픽)을 조회할 때도 외부 멤버십 서비스를 호출하게 되어, (1) 모든 글 조회에 불필요한 네트워크 왕복이 추가되고 (2) 멤버십 서비스가 느려지거나 장애가 나면 이 기능과 무관한 공개 글 조회까지 전부 실패/지연된다. `post.membersOnly() && !user.hasAdminRole()`일 때만 호출하도록 조건부로 바꿔야 한다.\n\n- **`PostServiceTest.java` 전체** 이번 변경의 핵심인 접근 판정 분기가 하나도 테스트되지 않았다. 현재 있는 테스트는 \"숨김 아님 + 멤버십 아님 + 비멤버 + 비관리자 → 통과\"와 \"글 없음 → 예외\" 두 개뿐이다. 다음이 전부 빠져 있다:\n  - 숨김 게시판 + 비관리자 → `AccessDeniedException`\n  - 숨김 게시판 + 관리자 → 통과\n  - 멤버십 전용 글 + 비멤버 + 비관리자 → `AccessDeniedException`\n  - 멤버십 전용 글 + 멤버 → 통과\n  - 멤버십 전용 글 + 비멤버 + 관리자 → 통과\n  - 게시판 조회 실패(위 Important 항목) 케이스\n\n  승인 기준 자체인 \"숨김글은 관리자만, 멤버십글은 멤버·관리자만\"이 코드 리딩으로만 확인됐을 뿐 실행으로 검증되지 않았다. 이 변경에서 가장 먼저 채워야 할 부분이다.\n\n### Suggestion\n\n- **`PostService.java:25-35`** 접근 판정(숨김 여부·멤버십 여부·관리자 여부 조합)이 `boardRepository`·`membershipClient` 호출과 리액티브 체인 안에 그대로 섞여 있다. 분기 하나를 검증하려면 관련 없는 Repository/HTTP 목(mock) 두 개를 함께 세워야 하는데(위 Important 테스트 공백의 원인이기도 하다), 판정부만 같은 파일의 `static` 메서드로 빼서 `(BoardDTO board, PostDTO post, UserDTO user, boolean isMember) -> RuntimeException(또는 null)` 형태로 만들면 목 없이 각 분기를 테스트할 수 있고, 위 멤버십 호출 조건부 실행도 자연스럽게 따라온다. 이렇게 보면 어떨지?\n- **`PostService.java:29,32`** 숨김 게시판 거부와 멤버십 전용 거부가 둘 다 동일한 `AccessDeniedException(postId)`로 처리되어 메시지도 동일하다(\"access denied: {id}\"). 로깅/모니터링에서 두 거부 사유를 구분하기 어려울 수 있는데, 기존 타입 재사용 범위 내에서 의도한 것인지 확인이 필요해 보인다.\n\n### 검증 확인\n- 테스트 리뷰: 했음 — 신규 접근 제어 분기에 대한 테스트가 전혀 없음을 확인(위 Important 항목)\n- 빌드 확인: 안 했음(셸 실행 불가 환경, 코드만으로 리뷰)\n- 보안·성능 1차 확인: 했음 — 인가 로직 자체(관리자 우회, 아티스트 단위 멤버십 스코프)는 스펙과 일치하여 우회 가능한 보안 허점은 발견하지 못했으나, 멤버십 클라이언트 무조건 호출로 인한 가용성/성능 문제를 발견(위 Important 항목)\n- 읽은 참고자료: `local-reasoning-checklist.md`, `security-checklist.md`\n- 전문 검토 연결: 이번 리뷰에서 코드 레벨의 인가 로직 우회 가능성은 확인했으나, `membershipClient`/`boardRepository` 실제 구현체(캐싱 여부, 타임아웃 설정, 실패 시 재시도 정책)는 diff에 없어 확인하지 못했다. 멤버십 서비스 장애 시 전체 조회 영향도를 정량 평가하려면 `performance-optimization` 스킬로 실제 지연·장애 전파 범위를 측정해볼 것을 권한다."
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 19,
+            "costUsd": 0.35099639999999993,
+            "judgeCostUsd": 0.01963799999999999,
+            "durationSeconds": 137,
+            "startedAt": "2026-10-07T04:32:36.834Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-Bmfnet/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "reads-local-reasoning-checklist",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "structure-findings-capped-at-suggestion",
+                "passed": true,
+                "weight": 1,
+                "explanation": "judge votes: PASS PASS PASS",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  true,
+                  true,
+                  true
+                ],
+                "evidence": "## 리뷰 요약\n\n**판정:** REQUEST CHANGES\n\n**개요:** `PostService.getPost`에 숨김 게시판·멤버십 전용 글에 대한 접근 제어 로직을 추가한 변경. 판정 로직 자체(hidden/membersOnly/admin 조합)는 정확해 보이지만, 이 변경의 핵심인 접근 거부 분기에 대한 테스트가 전무하고, 게시판 조회 실패 시 처리가 빠져 있으며, 멤버십 외부 호출이 불필요한 경우에도 항상 실행되어 새로운 장애 모드를 만든다.\n\n### Important\n\n- **`PostServiceTest.java` 전체** — 이 변경의 목적인 접근 제어 분기(숨김 게시판 거부/허용, 멤버십 전용 거부/허용, 관리자 우회)를 검증하는 테스트가 하나도 없다. 기존 테스트 2개(`returnsPostWhenFound`, `failsWhenMissing`)는 모두 이전부터 있던 \"정상 조회\"/\"글 없음\" 케이스이고, `AccessDeniedException`을 기대하는 테스트는 diff에 전혀 추가되지 않았다. 최소한 다음 조합은 커버해야 한다: 숨김 게시판+비관리자(거부), 숨김 게시판+관리자(허용), 멤버십 전용+비멤버+비관리자(거부), 멤버십 전용+멤버(허용), 멤버십 전용+관리자(비멤버여도 허용). 테스트 실행 증거도 없다고 밝힌 상태라 이 공백이 그대로 머지되면 로직이 검증되지 않은 채 배포된다.\n\n- **`PostService.java:25`** — `boardRepository.findById(post.boardId())`에 `switchIfEmpty` 처리가 없다. `postRepository.findById`와 달리 board가 없을 때(게시판 삭제 등으로 orphan post가 된 경우) `flatMap` 체인이 그냥 빈 `Mono`로 완료되어, 호출부는 예외 없이 \"빈 응답\"을 받게 된다. 같은 파일 안에서 post 조회는 `PostNotFoundException`으로 명시적으로 실패시키면서 board 조회만 암묵적으로 빈 값 처리되는 것은 일관성이 없다. board 미존재 시에도 명시적 예외로 처리할 것을 권고한다.\n\n- **`PostService.java:25-26`** — `membershipClient.isMember(...)`가 `board.hidden()`이나 `post.membersOnly()` 값과 무관하게 매번 호출된다. 이로 인해 이전에는 외부 멤버십 서비스와 무관했던 \"공개 게시판의 일반 글\" 조회까지 이제 이 외부 호출의 성공 여부에 의존하게 된다 — 멤버십 서비스 장애/지연 시 멤버십과 무관한 글 조회까지 전부 실패하는 새로운 장애 모드가 생긴다. 관리자 요청에서도 결과적으로 쓰이지 않는 호출이 매번 나간다. `board.hidden()` 체크를 먼저 수행하고, `post.membersOnly() && !user.hasAdminRole()`일 때만 멤버십 조회를 하도록 순서를 바꿀 것을 권고한다.\n\n### Suggestion\n\n- 접근 판정(`board.hidden()`/`membersOnly()`/`hasAdminRole()`/`member` 조합)이 `boardRepository`·`membershipClient` 호출과 한 람다 안에 섞여 있어, 판정 분기 하나를 검증하려면 `postRepository`·`boardRepository`·`membershipClient` 세 개의 목이 모두 필요하다. 같은 파일 안의 `static` 메서드로 판정만 분리하면(값만 받아 예외 또는 `null` 반환) IO 목 없이 판정 로직만 단위 테스트할 수 있다. 이 저장소의 `CLAUDE.md`에 \"국소 추론 판정 기준 합의\" 선언을 확인하지 못해 강제 사항은 아니지만, 위 테스트 공백을 메우는 작업과 함께 고려해볼 만하다.\n- 숨김 게시판 글과 멤버십 전용 글을 구분 없이 동일한 `AccessDeniedException`으로 응답한다. \"숨김\" 게시판이 비관리자에게 글의 존재 자체를 감추려는 의도라면, 접근 거부(403 등)와 미존재(404, `PostNotFoundException`)를 구분 가능하게 함으로써 비관리자가 \"숨김 글이 존재한다\"는 사실 자체를 유추할 수 있다는 점을 고려할 필요가 있다. 스펙상 명시되지 않았으니 의도 확인 필요.\n\n### 검증 확인\n- 테스트 리뷰: 했음 — 5출처 렌즈로 확인한 결과, 이번 변경의 핵심 분기(①성공 기준, ②동등 분할, ③오류 분기)에 대응하는 테스트가 전혀 없음을 확인.\n- 빌드 확인: 안 했음(셸 실행 없이 코드만 확인) — import·시그니처는 일관돼 보이나 실제 컴파일/실행 여부는 확인되지 않음.\n- 보안·성능 1차 확인: 했음 — 인가 로직 자체를 직접 검토(이 변경의 주제). SQL 인젠션·시크릿 노출·인증 누락 등 명백한 취약점은 발견되지 않았으나, 외부 멤버십 호출의 불필요한 실행(장애 전파 가능성)과 숨김 글의 존재 유출 가능성을 발견.\n- 읽은 참고자료: `security-checklist.md`, `local-reasoning-checklist.md`\n- 전문 검토 연결: 권장함 — 이번 1차 확인은 명백한 위험만 훑은 것이고, (1) 숨김 글 존재 유출 여부와 적절한 응답 코드 설계, (2) 멤버십 서비스 장애 시 전체적인 장애 전파·서킷브레이커 필요 여부는 `security-and-hardening`에서 더 깊이 검토할 만하다."
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 1,
+        "passRate": 1
+      }
+    }
+  ],
+  "aggregates": {
+    "casesTotal": 3,
+    "casesPassed": 3,
+    "overallScore": 0.9444444444444445,
+    "overallPassRate": 0.8888888888888888
+  }
+}
