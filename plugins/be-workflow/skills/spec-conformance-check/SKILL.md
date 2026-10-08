@@ -1,6 +1,6 @@
 ---
 name: spec-conformance-check
-description: 구현 완료된 결과물이 승인된 스펙(docs/spec/)의 성공 기준을 실제로 충족하는지 독립 검증하는 스킬. plan-executor의 실행이 완료됐거나, 사용자가 "스펙대로 됐는지 확인해줘", "기능 검증", "적합성 검증" 등을 언급하면 반드시 이 스킬을 사용하라. 코드 품질·보안·성능 검토에는 review 스킬들을 사용한다 — 이 스킬은 "맞는 것을 만들었는가"만 검증한다.
+description: 구현물을 승인된 스펙의 성공 기준과 대조해 독립 검증하는 스킬. 사용자가 "스펙대로 됐는지 확인해줘", "기능 검증", "적합성 검증"이라고 하거나, plan-executor 실행 완료 시 반드시 이 스킬을 사용하라. 코드 품질은 code-review-and-quality, 보안은 security-and-hardening, 성능은 performance-optimization을 사용한다.
 ---
 
 # Spec Conformance Check
