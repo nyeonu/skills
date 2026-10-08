@@ -14,4 +14,4 @@
 claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet
 ```
 
-국소 추론 두 케이스의 루브릭은 "권장 조치가 무엇인가"를 읽어야 해서 기본 심판(haiku)이 오독한다 — `--judge-model sonnet`을 붙인다. 채점기 점검용 단일 실행: `--case <이름> --runs 1 --ablation none`. 모델은 각 `prompt.md`가 sonnet으로 고정하고 있고 `--model`로 덮어쓴다. `results/`는 커밋하지 않는다.
+국소 추론 두 케이스의 루브릭은 "권장 조치가 무엇인가"를 읽어야 해서 기본 심판(haiku)이 오독한다 — `--judge-model sonnet`을 붙인다. 채점기 점검용 단일 실행: `--case <이름> --runs 1 --ablation none`. 모델은 각 `prompt.md`가 sonnet으로 고정하고 있고 `--model`로 덮어쓴다. `results/`는 원시 실행 디렉터리라 커밋하지 않는다. 보관할 결과는 `--json`으로 쓴 JSON을 `history/<측정일>-v<버전>-<무엇>.json`으로 복사하고 `history/README.md` 색인에 한 줄 추가한다.
