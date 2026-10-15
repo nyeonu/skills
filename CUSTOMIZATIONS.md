@@ -369,3 +369,23 @@ fresh-context 교차 검증 아이디어는 addyosmani `doubt-driven-development
 **회귀 확인 (sonnet 3회, sonnet 심판)**: be-workflow 9케이스 발동 26/27(tdd 2/3은 sonnet 평소 범위인 11/18 안), 산출물 채점기 전부 통과. be-review 3케이스 발동 9/9, 참고자료 로드 9/9, 선언 있음 루브릭 2/3(이전에도 1대 2 편차가 있던 항목). 비용 9.7달러.
 
 **전체 길이는 그대로다**: 분할은 구조만 바꾸므로 합계 10만 자(SKILL.md 11개 5.7만 자, 참고자료 3.6만 자, 에이전트 0.75만 자)는 변하지 않았다. 가장 긴 것은 plan-executor 9,113자(실행자 프롬프트 템플릿과 보고 슬롯이 절반), task-breakdown 6,841자, code-review-and-quality 6,420자. 내용을 줄이는 것은 규칙을 빼는 결정이라 별도 작업으로 둔다.
+
+## 공통 스펙(shared-app) 개념 제거 — 스펙 하나는 애플리케이션 하나 (be-workflow 0.1.11)
+
+**계기**: 사용자가 spec-template에서 `scope`·`parent`·`participants` 필드와 통합 성공 기준 표를 직접 지웠다. 여러 애플리케이션에 걸친 변경을 공통 스펙 하나로 묶고 app 스펙이 `parent`로 가리키는 구조는 팀 운영이 전제였는데, 개인 사용 단계에서는 쓰이지 않으면서 스펙 작성·분해·검증 절차마다 분기를 만들어 스킬을 길게 했다.
+
+**바꾼 것**: 스펙 하나가 애플리케이션 하나의 변경을 다루는 것으로 단순화했다. 다른 시스템과 주고받는 API·이벤트·스키마가 바뀌는 경우는 스펙 4절 "외부 계약과 흐름"(계약 표, 호출 흐름 전/후, 내부 흐름, 배포 순서)으로 남겼다.
+
+| 파일 | 제거·변경 |
+|---|---|
+| spec-template.md | frontmatter의 `scope`·`parent`·`participants`, scope 요약 표, shared-app 전용 4절 규칙과 통합 기준 표, 계약 변경 절차 소절. spec_id는 `<YYYY-MM-DD-주제-kebab-case>`로 파일명과 같게 |
+| spec-writer | "1. scope 결정" 단계(절 번호 1~4로), 사용 시점의 여러 애플리케이션 줄, 저장 위치·승인 조건의 scope 분기, L0·L1의 app·participants 문구, 통합 브랜치 규칙, 체크리스트 3줄 |
+| spec-conformance-check | 스펙 로드의 parent·통합 기준·shared-app 불렛 → "4절 외부 계약 검증" 하나, 보고서의 공통 스펙 줄과 "범위 밖(통합 성공 기준)" 절, 체크리스트 |
+| task-breakdown | 입력 조건의 shared-app 불렛, 스펙 로드의 parent 불렛 → "4절 외부 계약 반영" 하나, `parent_spec` 기록 문장 |
+| adr-writer | 시점 1′(공통 스펙 승인 직후)과 description의 공통 스펙·통합 기준 문구 |
+| plan-executor · plan-template | `parent_spec`·`parent_spec_rev` |
+| 평가 픽스처 4개, README | 스펙 파일의 `scope: app`, 운영 규칙 문구 |
+
+be-workflow 스킬·참고자료 합계 53,613자 → 48,866자(−4,747자). 제거 뒤 shared-app·participants·parent_spec·공통 스펙을 스킬·템플릿·픽스처·README에서 검색해 남은 것이 없음을 확인했다.
+
+**측정하지 않은 이유**: description을 바꾸지 않았으므로 발동률은 바뀌지 않는다. 본문·템플릿 변경은 그 스킬 케이스의 산출물 채점기(가정 표면화, plan-template 읽기와 추적성 표, 승인 질문, ADR 번호, 적합성 루브릭)에만 닿는데, 지운 것은 픽스처가 쓰지 않는 분기(parent 없는 스펙)라 채점기 결과가 바뀔 경로가 없다. 이 판단 기준을 evals README "언제 재는가" 절로 적었다 — description 변경만 전체 라우팅 측정, 본문·템플릿 변경은 해당 케이스만, 문구·줄바꿈은 생략.

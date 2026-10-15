@@ -115,7 +115,6 @@ spec_id: 2026-10-07-feature-profile-bio
 title: 프로필 자기소개(bio) 필드 추가
 status: approved
 created: 2026-10-07
-scope: app
 ---
 
 # 프로필 자기소개(bio) 필드 추가

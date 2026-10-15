@@ -9,7 +9,6 @@ cat > docs/spec/2026-10-01-feature-birth-year-validation.md <<'EOF'
 spec_id: 2026-10-01-feature-birth-year-validation
 title: 생년월일 저장 검증
 status: approved
-scope: app
 author: eval
 ---
 

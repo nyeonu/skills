@@ -38,6 +38,17 @@ claude plugin eval . --tag routing --runs 3 --ablation none --scaffold --trust-p
 
 파일 내용 채점기(`regex`에 `target: { source: file, path: … }`)는 실행 후 작업 공간의 그 파일만 본다. routes-tdd의 테스트 개수 채점기는 `ProfileServiceTest.java`만 검사하므로, 모델이 새 테스트 파일을 따로 만들면 세지 못한다.
 
+## 언제 재는가
+
+측정은 바꾼 것이 채점기에 닿을 때만 한다. 한 묶음이 7~10달러이므로 매 수정마다 돌리지 않는다.
+
+| 바꾼 것 | 재는 범위 |
+|---|---|
+| description | 라우팅 케이스 전체(발동률이 바뀔 수 있음). 실제 조건 확인은 fable로 |
+| 본문 절차·참고자료·템플릿 | 그 스킬의 케이스만(`--case`). 산출물 채점기가 그 부분을 보지 않으면 생략 |
+| 픽스처·채점기·프롬프트 | 그 케이스 1회 연기 테스트로 채점기 동작만 확인 |
+| 문구만(오타, 줄바꿈) | 생략 |
+
 ## 결과 기록
 
 `results/`는 원시 실행 디렉터리(HTML 보고서 포함)라 커밋하지 않는다. 보관할 결과는 `--json`으로 쓴 JSON을 `history/<측정일>-v<버전>-<무엇>.json`으로 복사하고 `history/README.md` 색인에 한 줄 추가한다. 비교 표(케이스별 `skill-fired` 통과 수와 산출물 채점기 통과 수)는 `CUSTOMIZATIONS.md`의 해당 절에 옮겨 적는다.
