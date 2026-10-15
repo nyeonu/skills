@@ -4,7 +4,7 @@
 
 ## 케이스
 
-모두 `routing` 태그다. 재는 것은 두 층이다: 스킬이 발동했는가(`skill-fired`), 발동했다면 그 스킬의 첫 산출물 모양이 나왔는가(참고자료 Read 또는 마지막 메시지 regex). 결과 품질을 심판(llm)으로 재는 채점기는 `routes-spec-conformance-check`에만 있다.
+`routes-tdd-config-change`는 `boundary` 태그이고 나머지는 `routing` 태그다. 재는 것은 두 층이다: 스킬이 발동했는가(`skill-fired`), 발동했다면 그 스킬의 첫 산출물 모양이 나왔는가(참고자료 Read 또는 마지막 메시지 regex). 결과 품질을 심판(llm)으로 재는 채점기는 `routes-spec-conformance-check`에만 있다.
 
 | 케이스 | 요청 | 기대 스킬 | 산출물 확인 |
 |---|---|---|---|
@@ -13,7 +13,8 @@
 | `routes-spec-writer` | 요구사항은 명확하고 스펙이 없는 새 기능 | spec-writer | 스펙을 쓰기 전에 `가정`을 드러내고 확인을 요청하며 멈춘다 |
 | `routes-task-breakdown` | 승인된 스펙을 "어떻게 나눠서 작업할지" | task-breakdown | plan-template Read, `추적성` |
 | `routes-plan-executor` | draft 상태 계획을 "계획대로 진행해줘" | plan-executor | 실행하지 않고 `승인`을 묻는다 |
-| `routes-tdd` | "올해 생년이 거절돼. 고쳐줘" (버그) | tdd | `재현` 테스트 언급 |
+| `routes-tdd` | "올해 생년이 거절돼. 고쳐줘" (버그) | tdd | `재현` 언급, 테스트 파일에 `@Test` 3개 이상(기존 2개 + 추가), 5개 미만(재현 1개 + 경계 1개까지) |
+| `routes-tdd-config-change` | application.yml 값 하나를 바꿔 달라는 요청 (경계) | 없음 | tdd와 다른 워크플로우 스킬이 발동하지 않고 Edit로 직접 고친다 |
 | `routes-adr-writer` | 승인된 계획의 스키마 결정을 "남겨줘" | adr-writer | `Proposed`, 기존 ADR 다음 번호 `ADR-002` |
 | `routes-spec-conformance-check` | "스펙대로 됐는지 확인해줘" | spec-conformance-check | 기준별 판정과 검증 공백 보고(llm) |
 
@@ -29,10 +30,13 @@ claude plugin eval . --tag routing --runs 3 --ablation none --scaffold --trust-p
 
 - `--ablation none`: description 전후 비교처럼 "플러그인 있음" arm만 필요할 때. 기준선 arm까지 보려면 빼면 된다(비용 2배).
 - `--allow-tools Write Edit`: spec-writer·tdd 같은 스킬이 파일을 쓸 수 있게 한다. Bash는 없으므로 테스트 실행은 불가능하고, 케이스는 그 전제로 쓰여 있다.
+- `--model fable`: 실행 모델을 바꾼다. 스킬 선택은 사용자가 쓰는 세션 모델이 하므로 실제 조건은 fable이고, sonnet은 지시를 덜 따르는 하한이다. 두 값이 다르면 fable이 실제 발동률이다(tdd: sonnet 11/18, fable 12/12). fable은 한 회 비용이 sonnet의 3~5배다.
 - `--judge-model sonnet`: llm 채점기가 있는 `routes-spec-conformance-check`를 포함할 때 붙인다. haiku 심판은 루브릭을 오독한 전력이 있다.
 - 이 저장소의 Claude Code 세션 안에서 중첩 실행할 때는 `env -u CLAUDECODE -u CLAUDE_CODE_ENTRYPOINT -u ANTHROPIC_BASE_URL -u ANTHROPIC_API_KEY`를 앞에 붙인다(`.zshrc`의 Ollama 변수가 인증을 가로챈다).
 
 채점기 점검용 단일 실행: `--case <이름> --runs 1`. 모델은 `prompt.md`가 sonnet으로 고정하고 있고 `--model`로 덮어쓴다. `results/`는 커밋하지 않는다. 한 케이스 1회가 0.2~0.5달러, 8케이스 3회 묶음이 7~10달러다.
+
+파일 내용 채점기(`regex`에 `target: { source: file, path: … }`)는 실행 후 작업 공간의 그 파일만 본다. routes-tdd의 테스트 개수 채점기는 `ProfileServiceTest.java`만 검사하므로, 모델이 새 테스트 파일을 따로 만들면 세지 못한다.
 
 ## 결과 기록
 
