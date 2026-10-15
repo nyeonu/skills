@@ -357,3 +357,15 @@ fresh-context 교차 검증 아이디어는 addyosmani `doubt-driven-development
 **결론**: 실제 조건에서는 발동률 문제가 없고 과잉 발동도 없으므로 description은 바꾸지 않는다. sonnet 7/12는 하한 모델의 특성이었다. 측정 비용 약 11달러.
 
 **배운 것**: ① 발동률은 실제로 스킬을 고르는 모델로 재야 한다 — 실행자 모델이 sonnet이라고 측정도 sonnet으로 하면 틀린 결론이 난다. sonnet은 "하한"으로만 읽는다. ② 응답 낱말 채점은 실제 산출물과 어긋난다. 파일이 남는 스킬은 파일 내용으로 잰다. ③ 경계 케이스(발동하면 안 되는 요청)를 긍정 케이스와 짝으로 둬야 설명문을 강하게 써도 안심할 수 있다. 보류: 다른 스킬 7개의 fable 발동률은 sonnet 3/3이 하한이므로 따로 재지 않았다.
+
+## 긴 문단 분할 — 300자 넘는 한 줄 22건을 하위 불렛으로 (be-workflow 0.1.10 / be-review 0.1.9)
+
+**계기**: 스킬 작성 가이드 대조 보고서의 보류 항목 ①. 보고서는 "1,000자 넘는 한 줄 문단"이라고 적었지만 글자 수로 다시 세니 1,000자 넘는 줄은 없었고(바이트 기준이었던 것으로 보인다), 300자 이상이 24줄, 최장 715자였다. 한 줄에 규칙 다섯 개가 이어진 문단은 모델이 중간 규칙을 놓치기 쉽다.
+
+**규칙**: 문장은 한 글자도 바꾸지 않고 줄바꿈과 구조만 바꾼다. 긴 불렛은 "첫 문장 + 하위 불렛", 긴 문단은 "결론 문장 + 불렛"으로 나눈다. 표 셀(local-reasoning-checklist ②·④ 행, 462자·371자)은 표 안이라 두었다.
+
+**대상**: SKILL.md 7개(code-review-and-quality 3건, adr-writer 1, plan-executor 4, spec-conformance-check 1, spec-writer 1, task-breakdown 6, tdd 2), 참고자료 3개(local-reasoning-checklist 1, performance-checklist-frontend 1, security-checklist 1), code-reviewer 에이전트 1. 합계 22건, 11개 파일.
+
+**회귀 확인 (sonnet 3회, sonnet 심판)**: be-workflow 9케이스 발동 26/27(tdd 2/3은 sonnet 평소 범위인 11/18 안), 산출물 채점기 전부 통과. be-review 3케이스 발동 9/9, 참고자료 로드 9/9, 선언 있음 루브릭 2/3(이전에도 1대 2 편차가 있던 항목). 비용 9.7달러.
+
+**전체 길이는 그대로다**: 분할은 구조만 바꾸므로 합계 10만 자(SKILL.md 11개 5.7만 자, 참고자료 3.6만 자, 에이전트 0.75만 자)는 변하지 않았다. 가장 긴 것은 plan-executor 9,113자(실행자 프롬프트 템플릿과 보고 슬롯이 절반), task-breakdown 6,841자, code-review-and-quality 6,420자. 내용을 줄이는 것은 규칙을 빼는 결정이라 별도 작업으로 둔다.
