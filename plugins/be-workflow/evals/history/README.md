@@ -1,6 +1,6 @@
 # be-workflow 평가 결과 이력
 
-`claude plugin eval --json`이 쓴 결과 파일을 단계별로 보관한다. 파일 이름은 `<측정일>-v<플러그인 버전>-<무엇>.json`. 각 파일에는 케이스별 실행 3회(또는 명시한 횟수)의 채점기 통과 여부, 턴 수, 비용, 오류가 들어 있다. 실행 기록(transcript)은 들어 있지 않다. 원시 실행 디렉터리(`results/`, HTML 보고서 포함)는 커밋하지 않는다.
+`claude plugin eval --json`이 쓴 결과 파일을 단계별로 보관한다. 실행 모델은 파일 이름에 적는다(없으면 sonnet). 파일 이름은 `<측정일>-v<플러그인 버전>-<무엇>.json`. 각 파일에는 케이스별 실행 3회(또는 명시한 횟수)의 채점기 통과 여부, 턴 수, 비용, 오류가 들어 있다. 실행 기록(transcript)은 들어 있지 않다. 원시 실행 디렉터리(`results/`, HTML 보고서 포함)는 커밋하지 않는다.
 
 | 파일 | 무엇을 쟀나 | 케이스별 결과 | 비용 |
 |---|---|---|---|
@@ -24,6 +24,12 @@
 | `2026-10-08-v0.1.8-after-adopted-tdd.json` | 절충안(채택) tdd 3회 → 1/3 | routes-tdd: with 발동 1/3 | $0.39 |
 | `2026-10-08-v0.1.8-after-adopted-tdd-x6.json` | 절충안 tdd 추가 6회 → 4/6 (채택판 누적 7/12) | routes-tdd: with 발동 4/6 | $0.77 |
 | `2026-10-08-v0.1.8-after-adopted-using-agent-skills.json` | 절충안 using-agent-skills(공통 규칙 구절 복원) 3/3 | routes-using-agent-skills: with 발동 3/3 | $0.29 |
+| `2026-10-15-v0.1.9-smoke-tdd-fable.json` | `--model fable`이 실제로 fable로 실행되는지 1회 확인(실행 기록 모델 ID claude-fable-5-1). 발동·재현 통과 | routes-tdd: no-other-workflow-skill 1/1, skill-fired 1/1, writes-reproduction-test-first 1/1 | $0.64 |
+| `2026-10-15-v0.1.9-smoke-config-change-fable.json` | 신설한 경계 케이스 routes-tdd-config-change 1회 연기 테스트 | routes-tdd-config-change: edits-config-directly 1/1, no-other-workflow-skill 1/1, tdd-not-fired 1/1 | $0.2 |
+| `2026-10-15-v0.1.9-tdd-fable-x12.json` | 채택 description(0.1.8 그대로)으로 tdd 긍정 케이스 fable 12회. 발동 12/12, 재현 테스트 12/12 | routes-tdd: no-other-workflow-skill 12/12, skill-fired 12/12, writes-reproduction-test-first 12/12 | $6.1 |
+| `2026-10-15-v0.1.9-config-change-fable-x6.json` | 경계 케이스 fable 6회. tdd 미발동 6/6, Edit 직접 처리 6/6 | routes-tdd-config-change: edits-config-directly 6/6, no-other-workflow-skill 6/6, tdd-not-fired 6/6 | $1.21 |
+| `2026-10-15-v0.1.9-tdd-and-config-change-sonnet-x6.json` | sonnet 비교: 긍정 발동 4/6(채택판 sonnet 누적 11/18), 경계 미발동 6/6 | routes-tdd: no-other-workflow-skill 6/6, skill-fired 4/6, writes-reproduction-test-first 2/6<br>routes-tdd-config-change: edits-config-directly 6/6, no-other-workflow-skill 6/6, tdd-not-fired 6/6 | $1.12 |
+| `2026-10-15-v0.1.9-tdd-file-graders-check-fable-x3.json` | 파일 내용 채점기(adds-test-to-suite ≥3 @Test, test-count-bounded <5 @Test) 추가 후 fable 3회. 테스트 추가 3/3, 상한 2/3(1회는 요청과 무관한 1900년 경계 테스트까지 추가) | routes-tdd: adds-test-to-suite 3/3, no-other-workflow-skill 3/3, skill-fired 3/3, test-count-bounded 2/3, writes-reproduction-test-first 2/3 | $1.53 |
 
 ## 문서
 
