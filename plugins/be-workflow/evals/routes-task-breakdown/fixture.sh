@@ -108,10 +108,10 @@ class ProfileServiceTest {
 }
 JAVA
 git add -A && git commit -qm "프로필 서비스 초기 구현"
-mkdir -p docs/spec
-cat > docs/spec/2026-10-07-feature-profile-bio.md <<'MD'
+mkdir -p docs/PROFILE-7
+cat > docs/PROFILE-7/spec.md <<'MD'
 ---
-spec_id: 2026-10-07-feature-profile-bio
+spec_id: PROFILE-7
 title: 프로필 자기소개(bio) 필드 추가
 status: approved
 created: 2026-10-07

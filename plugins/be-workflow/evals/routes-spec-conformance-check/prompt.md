@@ -8,4 +8,4 @@ allowed_tools: [Read, Glob, Grep, Skill, Agent]
 expected_outcome: spec-conformance-check 발동. 기준별 판정 보고 형식이거나, 실행 증거를 만들 수 없음을 남은 불확실성으로 명시. 코드 수정·계획 작성·일반 코드 리뷰 없음
 ---
 
-구현 끝났어. `docs/spec/2026-10-01-feature-birth-year-validation.md` 스펙대로 됐는지 확인해줘. 셸은 못 쓰니까 코드와 테스트 파일을 읽어서 판단해줘.
+구현 끝났어. `docs/PROFILE-3/spec.md` 스펙대로 됐는지 확인해줘. 셸은 못 쓰니까 코드와 테스트 파일을 읽어서 판단해줘.

@@ -74,9 +74,9 @@ plugins/
 flowchart TD
     start([요구사항 도착])
     interview["1. interview-me<br>의도 확정"]
-    spec["2. spec-writer<br>docs/spec/ 스펙 작성"]
+    spec["2. spec-writer<br>docs/&lt;티켓&gt;/spec.md 작성"]
     gate1{스펙 승인}
-    plan["3. task-breakdown<br>docs/plan/ 계획 작성"]
+    plan["3. task-breakdown<br>docs/&lt;티켓&gt;/plan.md 작성"]
     gate2{계획 승인}
     exec["4. plan-executor<br>실행자(저비용 모델) 위임 실행"]
     verify["5. spec-conformance-check<br>스펙 적합성 독립 검증"]
@@ -124,7 +124,7 @@ flowchart TD
 - 버그·장애 → 디버깅 후 수정 범위가 크면 3으로 합류
 - 사소한 변경(단일 파일, 명확한 범위) → 워크플로우 생략, 직접 처리
 
-진행 상태의 단일 원본은 `docs/spec/`·`docs/plan/` frontmatter의 `status`다. 세션이 끊겨도 문서 상태를 읽으면 중단 지점부터 잇는다.
+진행 상태의 단일 원본은 `docs/<티켓 키>/spec.md`·`plan.md` frontmatter의 `status`다. 세션이 끊겨도 문서 상태를 읽으면 중단 지점부터 잇는다.
 
 ### 핵심 규칙
 

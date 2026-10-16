@@ -8,4 +8,4 @@ allowed_tools: [Read, Glob, Grep, Skill, Write, Edit]
 expected_outcome: plan-executor 발동. 계획 status가 draft임을 확인하고 실행하지 않은 채 승인 여부를 묻는다. 계획 재작성이나 직접 구현 없음
 ---
 
-`docs/plan/2026-10-07-feature-profile-bio.md` 계획대로 진행해줘.
+`docs/PROFILE-7/plan.md` 계획대로 진행해줘.

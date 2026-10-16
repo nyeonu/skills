@@ -36,7 +36,7 @@ description: 작업에 맞는 진입 스킬을 고르고 모든 스킬에 공통
         (계획 승인 직후 Proposed / 스펙 적합성 검증 통과 후 Accepted)
 ```
 
-진행 상태의 단일 원본은 `docs/spec/`·`docs/plan/` frontmatter의 `status`다. 세션이
+진행 상태의 단일 원본은 `docs/<티켓 키>/spec.md`·`plan.md` frontmatter의 `status`다. 세션이
 끊겨도 문서 status를 읽으면 중단 지점부터 잇는다.
 
 ## 공통 운영 규칙
