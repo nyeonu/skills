@@ -3,10 +3,10 @@
 set -euo pipefail
 export GIT_AUTHOR_NAME=eval GIT_AUTHOR_EMAIL=eval@example.com GIT_COMMITTER_NAME=eval GIT_COMMITTER_EMAIL=eval@example.com
 git init -q -b main .
-mkdir -p docs/spec src/main/java/com/example/profile src/test/java/com/example/profile
-cat > docs/spec/2026-10-01-feature-birth-year-validation.md <<'EOF'
+mkdir -p docs/PROFILE-3 src/main/java/com/example/profile src/test/java/com/example/profile
+cat > docs/PROFILE-3/spec.md <<'EOF'
 ---
-spec_id: 2026-10-01-feature-birth-year-validation
+spec_id: PROFILE-3
 title: 생년월일 저장 검증
 status: approved
 author: eval

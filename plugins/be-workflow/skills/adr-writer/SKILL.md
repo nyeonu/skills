@@ -30,9 +30,9 @@ description: 되돌리기 비싼 기술 결정을 ADR로 기록하는 스킬. �
 ## 작성 절차
 
 1. 결정의 맥락을 수집한다. task-breakdown이 작성한 계획 문서가 있다면 그 "선택한 방식과 이유" 섹션이 초안 재료다 — 대안과 트레이드오프가 이미 정리되어 있다.
-2. `docs/decisions/`에서 기존 ADR을 확인해 다음 번호를 정한다. 파일명: `ADR-NNN-<YYYY-MM-DD>-<브랜치명>-<주제-kebab-case>.md` (예: `ADR-003-2026-07-30-feature-login-session-storage.md`). 브랜치명은 `git branch --show-current`로 확인하고, `/`가 포함되면 `-`로 치환한다 (예: `feature/login` → `feature-login`).
+2. `docs/decisions/`에서 기존 ADR을 확인해 다음 번호를 정한다. 파일명: `ADR-NNN-<YYYY-MM-DD>-<티켓 키>-<주제-kebab-case>.md` (예: `ADR-003-2026-07-30-TICKET-123-session-storage.md`). 티켓 키는 결정이 나온 스펙·계획 폴더명(`docs/<티켓 키>/`)이다. 티켓이 없으면 브랜치명(`/`는 `-`로 치환)을 대신 쓴다. ADR은 티켓 폴더가 아니라 `docs/decisions/`에 둔다 — 결정은 티켓보다 오래 살고, 뒤 티켓이 앞 결정을 대체하므로 한 목록에서 보여야 한다.
 3. 아래 템플릿으로 작성한다. 특히 **기각한 대안과 그 이유**를 생략하지 마라 — ADR 가치의 절반이 여기 있다.
-4. 기존 결정을 뒤집는 경우, 옛 ADR을 삭제·수정하지 말고 새 ADR을 작성한 뒤 옛 것의 상태를 `Superseded by ADR-NNN-<YYYY-MM-DD>-<브랜치명>` 형식(새 ADR의 번호·날짜·브랜치명)으로 갱신한다. 파일명 앞부분과 일치시켜 대체한 ADR 파일을 바로 찾을 수 있게 한다. 옛 ADR은 역사적 맥락이다.
+4. 기존 결정을 뒤집는 경우, 옛 ADR을 삭제·수정하지 말고 새 ADR을 작성한 뒤 옛 것의 상태를 `Superseded by ADR-NNN-<YYYY-MM-DD>-<티켓 키>` 형식(새 ADR의 번호·날짜·티켓 키)으로 갱신한다. 파일명 앞부분과 일치시켜 대체한 ADR 파일을 바로 찾을 수 있게 한다. 옛 ADR은 역사적 맥락이다.
 
 ## 템플릿
 
@@ -42,10 +42,13 @@ description: 되돌리기 비싼 기술 결정을 ADR로 기록하는 스킬. �
 # ADR-NNN: <결정 한 줄 요약>
 
 ## 상태
-Proposed | Accepted | Superseded by ADR-NNN-<YYYY-MM-DD>-<브랜치명> | Deprecated
+Proposed | Accepted | Superseded by ADR-NNN-<YYYY-MM-DD>-<티켓 키> | Deprecated
 
 ## 날짜
 YYYY-MM-DD
+
+## 티켓
+<결정이 나온 업무의 티켓 키 — `docs/<티켓 키>/` 폴더명. 없으면 "없음">
 
 ## 배경
 <결정이 필요했던 배경과 요구사항·제약. 실제 확인된 사실만. 작성 당시의
@@ -66,7 +69,7 @@ YYYY-MM-DD
 이 결정을 다시 검토해야 하는 조건을 함께 적는다.>
 
 ## 참고 자료
-<관련 스펙(docs/spec/...), 계획 문서(docs/plan/...), 이슈, PR 링크>
+<관련 스펙(docs/<티켓 키>/spec.md), 계획 문서(docs/<티켓 키>/plan.md), 이슈, PR 링크>
 ```
 
 ## 라이프사이클

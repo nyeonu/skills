@@ -8,4 +8,4 @@ allowed_tools: [Read, Glob, Grep, Skill, Write, Edit]
 expected_outcome: adr-writer 발동. docs/decisions/의 기존 ADR을 확인해 ADR-002 Proposed로 작성하고 검토한 대안을 적는다. 계획 수정이나 구현 없음
 ---
 
-`docs/plan/2026-10-07-feature-profile-bio.md` 계획 승인했어. bio를 별도 테이블로 가져가기로 한 결정, 나중에 왜 그랬는지 알 수 있게 남겨줘.
+`docs/PROFILE-7/plan.md` 계획 승인했어. bio를 별도 테이블로 가져가기로 한 결정, 나중에 왜 그랬는지 알 수 있게 남겨줘.

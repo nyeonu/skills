@@ -389,3 +389,29 @@ fresh-context 교차 검증 아이디어는 addyosmani `doubt-driven-development
 be-workflow 스킬·참고자료 합계 53,613자 → 48,866자(−4,747자). 제거 뒤 shared-app·participants·parent_spec·공통 스펙을 스킬·템플릿·픽스처·README에서 검색해 남은 것이 없음을 확인했다.
 
 **측정하지 않은 이유**: description을 바꾸지 않았으므로 발동률은 바뀌지 않는다. 본문·템플릿 변경은 그 스킬 케이스의 산출물 채점기(가정 표면화, plan-template 읽기와 추적성 표, 승인 질문, ADR 번호, 적합성 루브릭)에만 닿는데, 지운 것은 픽스처가 쓰지 않는 분기(parent 없는 스펙)라 채점기 결과가 바뀔 경로가 없다. 이 판단 기준을 evals README "언제 재는가" 절로 적었다 — description 변경만 전체 라우팅 측정, 본문·템플릿 변경은 해당 케이스만, 문구·줄바꿈은 생략.
+
+## 계획 문서 재구성 — 스펙 재서술 제거, 코드 블록 작업 블록, 티켓 폴더 계층 (be-workflow 0.1.12)
+
+**계기**: 업무 저장소의 prd·plan·task 3단 문서를 분석하면서 두 가지가 보였다. 첫째, 거기서는 plan이 Kotlin 시그니처·DTO 정의를 코드 블록으로 적어 리뷰어가 계획 단계에서 correctness 메모를 넣었는데, 내 PLAN.md는 작업 내용을 산문으로 적어 사용자 확인과 실행자 해석 모두 느렸다. 둘째, 거기서는 plan과 task 양쪽에 DTO가 있어 기획 확정 뒤 한쪽만 고쳐진 채 어긋나 있었다. 내 PLAN.md도 목표·범위를 스펙에서 옮겨 적고 있어 같은 종류의 어긋남 지점이었다. 사용자는 Jira 에픽 → 스펙 티켓 → 작업 티켓 계층에 맞춰 문서 폴더를 티켓 단위로 두고 계획을 작업 티켓마다 나누기를 원했다.
+
+**바꾼 것 1 — 계획이 스펙을 재서술하지 않는다**: PLAN.md의 1절 목표·4절 범위를 지웠다. 실행자 브리프의 Goal·Do not touch는 plan-executor가 스펙 1절(한눈에 보기)·2절 제외·6절(제약과 경계)에서 제목 기준 `awk`로 잘라 넣는다. 전체 검증은 "방법"만, 위험과 롤백은 "실행·배포 위험"만 적고 스펙 5절·3절을 반복하지 않는다. 옛 계획(목표·범위 절이 있는 것)은 그 절을 그대로 쓴다.
+
+**바꾼 것 2 — 작업 블록은 표·코드 블록·수도코드로**: 산문 "작업 내용"을 변경 파일 표(파일·신규/수정·요지), 인터페이스 코드 블록(시그니처·DTO·포맷, 구현 본문 없음), 결정 로직 수도코드(IO 없는 함수에 한함)로 바꿨다. 산문은 주의사항에만 남는다. 둘 이상 작업이 공유하는 인터페이스는 새 2절 "공통 설계"에 한 번만 적고 작업 블록은 백틱 이름으로 참조한다. 참조 해소는 오케스트레이터의 일이다 — plan-executor가 이름을 2절에서 전부 찾아 Shared design 슬롯에 넣고, 하나라도 없으면 실행자를 띄우지 않고 계획 결함으로 보고한다(하위 모델에게 모르는 이름을 주면 추측으로 만들어 낸다).
+
+**바꾼 것 3 — 에픽은 계획을 둘로**: `plan-template.md`에 `kind: single | epic`을 뒀다. 단일 티켓은 4절에 작업 블록을 직접 둔다(현행과 같은 모양). 에픽은 4절 "분할과 순서"에 작업 plan 목록·의존·체크포인트만 두고, 승인된 뒤 작업 plan(`work-plan-template.md`, 신규)을 작업 티켓마다 쓴다. 작업 plan은 상위를 재서술하지 않고 추적성 표의 자기 행만 인용하며, `parent_rev`로 상위 변경을 감지한다(`spec_rev`와 같은 장치). 작업 plan 하나 = 브랜치·PR 하나 = 작업 T 2~4개.
+
+**바꾼 것 4 — 산출물 위치를 티켓 폴더로**: `docs/spec/<날짜-주제>.md`·`docs/plan/<날짜-브랜치-주제>.md` → `docs/<티켓 키>/spec.md`·`plan.md`, 에픽은 `docs/<에픽 키>/<작업 티켓 키>/plan.md`. `spec_id`·`plan_id`는 폴더명(티켓 키)과 같다. ADR은 `docs/decisions/`에 그대로 둔다 — 결정은 티켓보다 오래 살고 뒤 티켓이 앞 결정을 대체하므로 한 목록에서 보여야 한다. 대신 ADR 파일명의 브랜치명을 티켓 키로 바꾸고 템플릿에 "## 티켓" 절을 더해 양방향으로 찾게 했다. interview-me의 intent 메모는 티켓이 아직 없는 시점이라 `docs/intent/` 유지.
+
+| 파일 | 변경 |
+|---|---|
+| task-breakdown/references/plan-template.md | 재작성: 6절(선택 이유·공통 설계·추적성·분할과 순서/작업·전체 검증·위험과 롤백), `kind`, `work_plans` |
+| task-breakdown/references/work-plan-template.md | 신규: 작업 plan 5절 + 작업 블록 정의 |
+| task-breakdown/SKILL.md | 입력 조건·8단계·산출물 위치 |
+| plan-executor/SKILL.md | 계획 탐색(티켓 키·`kind: epic` 제외), `parent_rev` 감지, 스펙 절 추출 명령, 참조 해소 절차, Shared design 슬롯, 에픽 `work_plans` 집계 |
+| spec-writer/SKILL.md · spec-template.md | 저장 위치, `spec_id`=티켓 키, `ticket` 필드 |
+| spec-conformance-check · using-agent-skills · interview-me | 경로 문구 |
+| adr-writer/SKILL.md | 파일명 티켓 키, "## 티켓" 절, Superseded 표기, 위치 유지 근거 |
+| evals 픽스처·프롬프트 8개 | `docs/PROFILE-7/`, `docs/PROFILE-3/` |
+| README.md | 흐름도·상태 원본 문구 |
+
+**남긴 것**: plan-executor description의 "docs/plan/의 계획" 구절은 옛 경로지만 라우팅에 영향 없는 꼬리 구절이라 두었다 — 고치면 description 변경이라 전체 라우팅 측정을 같이 돌려야 한다. 측정은 "언제 재는가" 규칙에 따라 템플릿·픽스처가 바뀐 4케이스(task-breakdown·plan-executor·adr-writer·spec-conformance-check)만 해당하며, 실사용 뒤 돌리기로 했다.

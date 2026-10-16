@@ -108,10 +108,10 @@ class ProfileServiceTest {
 }
 JAVA
 git add -A && git commit -qm "프로필 서비스 초기 구현"
-mkdir -p docs/spec
-cat > docs/spec/2026-10-07-feature-profile-bio.md <<'MD'
+mkdir -p docs/PROFILE-7
+cat > docs/PROFILE-7/spec.md <<'MD'
 ---
-spec_id: 2026-10-07-feature-profile-bio
+spec_id: PROFILE-7
 title: 프로필 자기소개(bio) 필드 추가
 status: approved
 created: 2026-10-07
@@ -162,17 +162,16 @@ created: 2026-10-07
 없음
 MD
 git add -A && git commit -qm "bio 스펙 승인"
-mkdir -p docs/plan
-SPEC_REV=$(git log -1 --format=%H -- docs/spec/2026-10-07-feature-profile-bio.md)
-cat > docs/plan/2026-10-07-feature-profile-bio.md <<MD
+SPEC_REV=$(git log -1 --format=%H -- docs/PROFILE-7/spec.md)
+cat > docs/PROFILE-7/plan.md <<MD
 ---
-plan_id: 2026-10-07-feature-profile-bio
+plan_id: PROFILE-7
 title: 프로필 자기소개(bio) 필드 추가
 status: approved
 author: task-breakdown
 created: 2026-10-07
 target: profile-api
-spec: docs/spec/2026-10-07-feature-profile-bio.md
+spec: spec.md
 spec_rev: ${SPEC_REV}
 tasks:
   - id: T1

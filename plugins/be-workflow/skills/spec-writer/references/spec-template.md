@@ -13,7 +13,8 @@ frontmatter와 목차 순서는 고정이다 — 기계 계약이므로 필드 �
 
 ````markdown
 ---
-spec_id: <YYYY-MM-DD-주제-kebab-case>   # 예: 2026-09-15-membership-extra-api. 파일명과 같게 쓴다
+spec_id: <티켓 키>                  # 예: TICKET-123. 폴더명(docs/<티켓 키>/)과 같게 쓴다. 티켓이 없으면 YYYY-MM-DD-주제-kebab-case
+ticket: <스펙 티켓 키>               # 에픽일 때 스펙 작성 티켓이 따로 있으면. 없으면 이 줄을 지운다
 title: <스펙 제목>
 status: draft                # draft | approved | implemented | superseded. superseded 면 본문 첫 줄에 "대체: <새 spec_id>"
 created: <YYYY-MM-DD>
@@ -159,7 +160,7 @@ sequenceDiagram
 
 ## 작성 시 체크리스트
 
-- [ ] `spec_id`가 파일명과 같고 `<YYYY-MM-DD-주제-kebab-case>` 형식인가
+- [ ] `spec_id`가 폴더명(티켓 키)과 같고 파일명이 `spec.md`인가
 - [ ] 4절이 맞는가 — 외부 계약이 없으면 `해당 없음`, 있으면 계약 방식과 계약 파일 항목이 채워졌는가
 - [ ] 호출 흐름이 바뀌는 경로만, 시스템·엔드포인트 수준까지만이고, 엔드포인트 이름이 계약 표와 같은가
 - [ ] 내부 흐름을 그렸다면 네 조건 중 어디에 걸리는지 말할 수 있는가
