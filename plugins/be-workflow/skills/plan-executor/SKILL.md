@@ -18,7 +18,7 @@ task-breakdown이 작성하고 사용자가 승인한 계획 문서를 실행하
   - 다르면 실행하지 않고 사용자에게 알린다 — 계획이 참조한 스펙 이후에 스펙이 바뀌었으므로, 변경 내용(`git diff <spec_rev>..HEAD -- <spec>`)을 보여주고 task-breakdown으로 계획을 재검토할지 확인받는다.
   - `spec_rev`가 없는 옛 계획은 경고만 하고 진행한다.
 - **상위 계획 변경 감지**(작업 plan일 때): frontmatter에 `parent`가 있으면 `parent_rev`와 현재 값(`git log -1 --format=%H -- <parent>`)을 같은 방식으로 비교한다. 다르면 실행하지 않고 변경 내용을 보여준 뒤 재검토 여부를 확인받는다. 상위 계획의 `status`가 `approved` 또는 `in_progress`가 아니어도 실행하지 않는다.
-- **브리프 재료는 스크립트가 뽑는다**: 계획은 목표·범위를 재서술하지 않으므로 Goal과 Do not touch는 스펙에서 온다. 추출·참조 해소·통계는 `references/assemble_brief.py`가 제목 기준으로 결정적으로 수행한다(2절 참고). 손으로 자르거나 줄 번호로 자르지 않는다. 계획에 "목표"·"범위" 절이 남아 있는 옛 계획(0.1.11 이전)은 스크립트 대신 그 절을 그대로 쓴다.
+- **브리프 재료는 스크립트가 뽑는다**: 계획은 목표·범위를 재서술하지 않으므로 Goal과 Do not touch는 스펙에서 온다. 추출·참조 해소·통계는 `references/assemble_brief.py`가 제목 기준으로 결정적으로 수행한다(2절 참고). 손으로 자르거나 줄 번호로 자르지 않는다. 2절이 "공통 설계"가 아닌 옛 계획(0.1.11 이전, "목표"·"범위" 절이 있는 것)에는 스크립트를 쓰지 않는다 — 스크립트는 `## 2.`를 공통 설계로 읽어 엉뚱한 줄을 Shared design에 넣는다. 그 경우 Goal·Do not touch는 계획의 목표·범위 절을, Your task는 작업 섹션을 `references/executor-brief-template.md`의 슬롯에 손으로 넣는다.
 - 실행 시작 시 `status: in_progress`로 갱신한다.
 
 ### 2. 작업 디스패치
