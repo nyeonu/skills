@@ -18,13 +18,7 @@ task-breakdown이 작성하고 사용자가 승인한 계획 문서를 실행하
   - 다르면 실행하지 않고 사용자에게 알린다 — 계획이 참조한 스펙 이후에 스펙이 바뀌었으므로, 변경 내용(`git diff <spec_rev>..HEAD -- <spec>`)을 보여주고 task-breakdown으로 계획을 재검토할지 확인받는다.
   - `spec_rev`가 없는 옛 계획은 경고만 하고 진행한다.
 - **상위 계획 변경 감지**(작업 plan일 때): frontmatter에 `parent`가 있으면 `parent_rev`와 현재 값(`git log -1 --format=%H -- <parent>`)을 같은 방식으로 비교한다. 다르면 실행하지 않고 변경 내용을 보여준 뒤 재검토 여부를 확인받는다. 상위 계획의 `status`가 `approved` 또는 `in_progress`가 아니어도 실행하지 않는다.
-- **스펙에서 브리프 재료를 뽑는다**: 계획은 목표·범위를 재서술하지 않으므로, 실행자 브리프의 Goal과 Do not touch는 스펙에서 가져온다. 스펙 제목은 고정 계약이므로 제목 기준으로 잘라 낸다 — 줄 번호는 쓰지 않는다.
-  ```bash
-  awk '/^## 1\. /,/^## 2\. /' <spec> | sed '$d'   # 1 한눈에 보기 → Goal
-  awk '/^### 제외/,/^## 3\. /' <spec> | sed '$d'   # 2절 제외 → Do not touch
-  awk '/^## 6\. /,/^## 7\. /' <spec> | sed '$d'   # 6 제약과 경계 → Do not touch
-  ```
-  계획에 "목표"·"범위" 절이 남아 있는 옛 계획은 그 절을 대신 쓴다.
+- **브리프 재료는 스크립트가 뽑는다**: 계획은 목표·범위를 재서술하지 않으므로 Goal과 Do not touch는 스펙에서 온다. 추출·참조 해소·통계는 `references/assemble_brief.py`가 제목 기준으로 결정적으로 수행한다(2절 참고). 손으로 자르거나 줄 번호로 자르지 않는다. 계획에 "목표"·"범위" 절이 남아 있는 옛 계획(0.1.11 이전)은 스크립트 대신 그 절을 그대로 쓴다.
 - 실행 시작 시 `status: in_progress`로 갱신한다.
 
 ### 2. 작업 디스패치
@@ -36,15 +30,16 @@ frontmatter의 `tasks` 목록을 기준으로 실행한다.
 - 실행자의 모델은 작업의 frontmatter `tier` 필드를 현재 플랫폼의 모델로 매핑해 결정한다. 각 작업 = 실행자 1개.
   - tier는 플랫폼 중립 필드다 — Claude에서는 `standard` → sonnet, `light` → haiku로 매핑한다(다른 플랫폼에서 실행 중이면 그 플랫폼의 주력 모델/경량 모델로 매핑한다). 필드가 없으면 `standard`로 간주한다.
   - tier 지정은 플래너의 판단이므로 오케스트레이터가 임의로 바꾸지 않는다 — 단, light 작업이 재시도까지 실패했다면 재시도 시 standard로 올리는 것은 허용된다(그 사실을 보고에 포함하라).
-- 실행자에게 계획 문서 전체나 스펙 전체를 넘기지 마라. 필요한 것만 추려서 전달한다: 스펙 1절(Goal), 스펙 2절 제외와 6절(Do not touch), 해당 작업 블록 전문, 그 작업 블록이 참조하는 공통 설계 항목(Shared design). 컨텍스트가 커질수록 저비용 모델의 정확도가 떨어지고 토큰 비용이 늘어난다.
-- **참조 해소는 오케스트레이터의 일이다 — 실행자는 참조를 따라가지 않는다.** 작업 블록의 "인터페이스"·"결정 로직"·"주의사항"에 이름으로만 적힌 것(타입·함수·DTO·매직)을 계획 2절 "인터페이스"·"결정 로직 위치"·"관여하는 매직"에서 **전부** 찾아 원문 그대로 Shared design 슬롯에 넣는다. 작업 plan이면 상위 에픽 plan 2절에서 찾는다. 절차:
-  1. 작업 블록에서 백틱으로 감싼 식별자와 "참조"·"2절" 표현을 전부 뽑는다.
-  2. 각 이름을 계획 2절(및 상위 2절)에서 찾는다. 코드 블록은 그 이름이 든 블록 전체를, 결정 로직 위치·매직은 해당 줄을 가져온다.
-  3. **하나라도 못 찾으면 실행자를 띄우지 않는다.** 계획 결함이므로 사용자에게 어느 작업의 어느 이름이 2절에 없는지 보고하고, task-breakdown으로 계획을 고친 뒤 재개한다. 실행자가 모르는 이름을 받으면 추측으로 만들어 내고, 그 결과는 검증 단계에서 엉뚱한 실패로 나타난다.
-  4. 참조가 하나도 없으면 Shared design 슬롯을 지운다 — 빈 슬롯을 남기지 않는다.
-  작업 블록에 적힌 이름과 2절의 이름이 철자만 다르면(대소문자·접미사) 임의로 맞추지 말고 3과 같이 계획 결함으로 보고한다.
+- 실행자에게 계획 문서 전체나 스펙 전체를 넘기지 마라. 브리프는 **`references/assemble_brief.py`로 조립한다** — 손으로 조립하면 세션마다 형식·참조 셈법이 달라져 측정값을 비교할 수 없다. 작업마다 한 번 실행한다:
+  ```bash
+  python3 <skill>/references/assemble_brief.py --spec <spec.md> --plan <plan.md> --task T2 \
+    --model sonnet --worktree "$PWD" --branch "$(git branch --show-current)" \
+    --out docs/<티켓 키>/briefs/<plan_id>-T2-sonnet.md        # 작업 plan이면 --parent ../plan.md 추가, 재시도는 -retry1
+  ```
+  스크립트가 넣는 것: 환경 안내(워크트리·브랜치), 고정 규칙(`references/executor-brief-template.md`), Goal(스펙 1절의 첫 `###` 전까지 — 배경 소절은 실행자에게 불필요), Do not touch(스펙 2절 제외 + 6절), Shared design(아래), 작업 블록 전문, 보고 형식. 출력 파일을 실행자 프롬프트로 **그대로** 쓴다. 문장을 더하거나 빼지 않는다 — 더할 말이 있으면 계획을 고친다.
+- **참조 해소는 스크립트가 하고, 판정은 오케스트레이터가 한다.** 스크립트는 작업 블록의 백틱 이름 중 명시 참조("2절 `X` 참조")와 타입형 이름(CamelCase, `Type.member`)을 계획 2절(및 `--parent` 2절)에서 찾아, 코드 블록은 `// <경로>` 주석 단위 조각으로, 표·불렛은 해당 줄만 Shared design에 넣는다. 첫 줄 통계에 `해소 실패 N`이 찍히고 종료 코드 2면 **실행자를 띄우지 않는다** — 명시 참조한 이름이 2절에 없는 계획 결함이므로 사용자에게 어느 작업의 어느 이름인지 보고하고 task-breakdown으로 고친 뒤 재개한다. 철자만 다른 이름(대소문자·접미사)도 같은 결함이다. 실행자가 모르는 이름을 받으면 추측으로 만들어 내고, 그 결과는 검증 단계에서 엉뚱한 실패로 나타난다.
 
-**브리프 기록(측정 기간 임시)**: 실행자에게 보낸 프롬프트 전문을 `docs/<티켓 키>/briefs/<plan_id>-<T-id>-<모델>.md`로 저장한다(예: `briefs/PROFILE-7-T2-haiku.md`, 재시도는 `-retry1`을 덧붙인다). 파일 첫 줄에 한 줄 통계를 적는다 — `줄 수 · 문자 수 · 추정 토큰(문자 수/3) · Shared design 참조 수 · 변경 파일 수 · 테스트 수`. 목적은 "어떤 길이·참조 수의 브리프에서 어느 모델이 실패했는가"를 뒤에 대조하는 것이다. 이 폴더는 커밋하지 않는다(사용자가 `.gitignore`에 `docs/*/briefs/`를 넣거나 측정이 끝나면 지운다). 상한이 실측으로 정해지면 이 문단은 삭제한다.
+**브리프 파일**: `--out`으로 저장된 `docs/<티켓 키>/briefs/<plan_id>-<T-id>-<모델>.md`가 실행 기록이다. 첫 줄 통계(`<!-- brief T2 sonnet · 줄 · 자 · 추정 토큰 · Shared design 참조 N(명시 M, 해소 실패 K) · 변경 파일 · 테스트 -->`)는 사용자 보고의 브리프 행에 그대로 옮긴다. 이 폴더는 커밋하지 않는다(`.gitignore`에 `docs/*/briefs/`).
 
 **채널 언어 정책**: 오케스트레이터 ↔ 실행자 통신은 일회성이고 사람이 읽지 않으므로, 보일러플레이트(역할 규칙)와 보고 형식은 **영어 고정 계약**을 쓴다 — 토큰이 적게 들고 소형 모델의 지시 이행률이 높다. 단 두 가지는 예외다:
 
@@ -53,50 +48,9 @@ frontmatter의 `tasks` 목록을 기준으로 실행한다.
 
 보고는 자유 산문이 아니라 아래 고정 슬롯 형식만 허용한다 — 구조화는 토큰과 모호함을 동시에 줄이지만, 산문 압축(관사·접속사 생략)은 모호함을 늘리므로 금지다.
 
-실행자 프롬프트 템플릿:
+실행자 프롬프트는 `references/executor-brief-template.md`가 원본이고 스크립트가 채운다. 슬롯은 다섯이다 — `Goal`(스펙 1절), `Do not touch`(스펙 2절 제외·6절), `Shared design`(참조한 2절 항목, 없으면 슬롯 자체가 빠짐), `Your task`(작업 블록 전문), `Report format`(아래 고정 슬롯). 템플릿의 규칙에는 "계획이 지정한 테스트 지원·설정·빌드가 동작하지 않으면 우회하지 말고 되돌린 뒤 `blocked`로 보고한다"가 들어 있다 — 통과시키려고 설정을 고친 실행은 계획 결함을 숨긴다. 보고 형식:
 
 ```
-You are an executor for exactly one task from an approved work plan.
-
-Rules:
-- Do only what the task specifies. No extra improvements, no refactoring.
-- If anything is ambiguous, do not decide on your own — stop and report it.
-- Acceptance criteria are non-negotiable. "Almost done" is not done.
-  Never report partial success as success; that is the worst failure mode.
-- Implementation tasks follow TDD: write the tests specified in the task
-  first, run them and confirm they FAIL (RED), implement the minimum to
-  make them pass (GREEN), then clean up while tests stay green (REFACTOR).
-  Do not add tests beyond those specified.
-- If you find error branches or edge cases the plan does not cover, do NOT
-  add tests for them — list them under `uncovered` in your report.
-- Test names (`@DisplayName` or the test function name) state what is
-  verified: the behavior, the condition and the expected result, exactly as
-  written in the task. Never prefix them with an id or a number; the plan's
-  traceability table links criteria to tests.
-- Weakening tests (skip, disable, relaxed assertions) to make them pass is
-  failure. If you cannot make them pass, report that fact.
-- Do not add annotations, AOP, reflection, or config-driven behavior the task
-  does not name. If the task requires placing decision logic (access checks,
-  state transitions, rules) inside a repository/HTTP/reactive call chain, or
-  assigns a unit test to such logic without saying where it goes, stop and
-  report under `blocked`.
-- Deliverables (code comments, docs, any text that lands in the repo)
-  follow the repository's language conventions — for this repo, Korean.
-  English is for this communication channel only.
-
-## Goal (verbatim from the approved spec)
-<스펙 1절 "한눈에 보기" — 한국어 원문>
-
-## Do not touch (verbatim from the approved spec)
-<스펙 2절 "제외"와 6절 "제약과 경계" — 한국어 원문>
-
-## Shared design (verbatim from the approved plan)
-<작업 블록이 이름으로 참조하는 계획 2절 항목만 — 인터페이스 코드 블록, 결정 로직 위치, 관여하는 매직. 없으면 이 슬롯을 지운다>
-
-## Your task (verbatim from the approved plan)
-<해당 작업 블록 전문 — 한국어 원문 그대로: 변경 파일, 인터페이스, 결정 로직, 작성할 테스트, 완료 기준, 검증 방법, 주의사항>
-
-## Report format — mandatory, fill every field, no prose outside these slots
 files: <changed file paths, comma-separated>
 verify: <command> → PASS | FAIL — <shortest decisive output line>
 tests: <test file · test name, one per line | ->
@@ -140,7 +94,7 @@ notes: <only what the orchestrator must know to proceed | ->
 
 - 계획: <계획 문서 경로>
 - 완료한 작업: <완료 T-N 목록 / 전체 개수. 재시도나 tier 상향이 있었으면 함께 적는다>
-- 브리프: <작업별 `T-N · 모델 · 줄/추정 토큰 · 참조 N · 결과(1회차 PASS | 재시도 n회 | 승격)`. 저장 경로 `docs/<티켓 키>/briefs/`. 측정 기간 임시 항목>
+- 브리프: <작업별 한 줄 — 브리프 파일 첫 줄 통계 + `결과(1회차 PASS | 재시도 n회 | 승격 | blocked)` + `계획 이탈(없음 | 내용)`. 계획 이탈은 PASS와 별도로 적는다 — 통과했어도 계획이 지정한 것을 바꿨으면 이탈이다>
 - 바뀐 파일: <경로 목록>
 - 판정: <전체 검증 통과 여부>
 

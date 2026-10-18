@@ -38,6 +38,16 @@ claude plugin eval . --tag routing --runs 3 --ablation none --scaffold --trust-p
 
 파일 내용 채점기(`regex`에 `target: { source: file, path: … }`)는 실행 후 작업 공간의 그 파일만 본다. routes-tdd의 테스트 개수 채점기는 `ProfileServiceTest.java`만 검사하므로, 모델이 새 테스트 파일을 따로 만들면 세지 못한다.
 
+## 브리프 조립기 고정 점검
+
+plan-executor의 `references/assemble_brief.py`는 스펙·계획 템플릿의 제목(`## 1.`, `### 제외`, `## 6.`, `## 2.`, `### T<n>:`)과 2절 코드 블록의 `// <경로>` 주석 규약에 묶여 있다. 템플릿의 그 부분을 고치면 반드시 아래를 돌린다. 모델 호출이 없어 비용 0이다.
+
+```bash
+bash plugins/be-workflow/evals/assembler-check/run.sh
+```
+
+`assembler-check/{spec.md,plan.md}`는 새 형식의 최소 문서이고 `expected.txt`가 통계 첫 줄의 기대값이다. 통계가 바뀌는 것이 의도된 변경이면 `expected.txt`를 갱신한다.
+
 ## 언제 재는가
 
 측정은 바꾼 것이 채점기에 닿을 때만 한다. 한 묶음이 7~10달러이므로 매 수정마다 돌리지 않는다.
