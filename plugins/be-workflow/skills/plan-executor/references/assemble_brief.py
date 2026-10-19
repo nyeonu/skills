@@ -15,7 +15,8 @@
   찾아 넣는다. 코드 블록은 "// <경로>" 주석 단위로 쪼개 이름이 든 조각만, 표·불렛은 이름이 든 줄만.
   명시 참조("2절 `X` 참조", "`X` 참조")는 못 찾으면 해소 실패로 센다 — 오케스트레이터는 그때 실행자를 띄우지 않는다.
   명시 참조가 `Type.member` 꼴이면 그 타입의 조각 안에 멤버가 있어야 해소다(타입만 있거나, 다른 타입에 같은 이름의 멤버만 있으면 실패).
-  조각·줄은 소유 타입 이름으로만 고르고 멤버 이름만으로는 고르지 않는다. 암묵 참조는 타입 단위다.
+  조각·줄은 소유 타입 이름으로만 고르고 멤버 이름만으로는 고르지 않는다. 표·불렛 줄에서는 백틱 하나 안의 `Type.member`만
+  멤버 근거로 친다(같은 줄에 다른 타입의 멤버가 있는 것은 근거가 아니다). 암묵 참조는 타입 단위다.
   해소의 기준은 승인된 계획 2절이지 현재 코드가 아니다 — 아직 구현되지 않은 선언을 참조하는 것은 정상이다.
   그 밖의 백틱 이름은 2절에 있으면 넣고 없으면 조용히 넘긴다.
 - 첫 줄 통계는 고정 형식 한 줄이다(측정 비교용).
@@ -208,6 +209,11 @@ def line_mentions(key: str, ln: str) -> bool:
     return re.search(rf"`[^`]*\b{re.escape(key)}\b[^`]*`", ln) is not None
 
 
+def line_mentions_member(key: str, member: str, ln: str) -> bool:
+    """백틱 하나 안에 `Key.member`가 통째로 있는가 — 같은 줄에 다른 타입의 멤버가 있는 것은 근거가 아니다."""
+    return re.search(rf"`[^`]*\b{re.escape(key)}\.{re.escape(member)}\b[^`]*`", ln) is not None
+
+
 def opportunistic(n: str) -> bool:
     """명시 참조가 아닌 백틱 이름 중 2절에서 찾아볼 가치가 있는 것 — 타입(CamelCase) 또는 Type.member."""
     base = n.split("(")[0]
@@ -241,7 +247,7 @@ def shared_design(sec2_texts, names, explicit):
             for ln in lines:
                 if line_mentions(key, ln):
                     hit = True
-                    if member and line_mentions(member, ln):
+                    if member and line_mentions_member(key, member, ln):
                         member_hit = True
                     if ln not in picked_lines and not ln.startswith("|---") and "| 파일 |" not in ln and "| 결정 |" not in ln:
                         picked_lines.append(ln)

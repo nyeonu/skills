@@ -46,7 +46,7 @@ plan-executor의 `references/assemble_brief.py`는 스펙·계획 템플릿의 �
 bash plugins/be-workflow/evals/assembler-check/run.sh
 ```
 
-`assembler-check/{spec.md,plan.md}`는 새 형식의 최소 문서이고 `expected.txt`가 통계 첫 줄의 기대값이다. 통계가 바뀌는 것이 의도된 변경이면 `expected.txt`를 갱신한다. 같은 스크립트가 탈락해야 하는 입력도 돌린다 — 스펙 6절·제외 소절이 없는 변형(종료 코드 1, 빠진 절 이름 보고), 명시 참조 `Type.member`의 멤버가 그 타입 조각에 없는 변형(없는 멤버·다른 타입의 멤버·없는 타입, 종료 코드 2), 있는 멤버의 명시 참조(통과), 파일명 꼴 `Type.java` 명시 참조(통과), 암묵 `Type.member`(통과하되 다른 타입 조각 미포함).
+`assembler-check/{spec.md,plan.md}`는 새 형식의 최소 문서이고 `expected.txt`가 통계 첫 줄의 기대값이다. 통계가 바뀌는 것이 의도된 변경이면 `expected.txt`를 갱신한다. 같은 스크립트가 탈락해야 하는 입력도 돌린다 — 스펙 6절·제외 소절이 없는 변형(종료 코드 1, 빠진 절 이름 보고), 명시 참조 `Type.member`의 멤버가 그 타입 조각에 없는 변형(없는 멤버·다른 타입의 멤버·없는 타입, 종료 코드 2), 있는 멤버의 명시 참조(통과), 파일명 꼴 `Type.java` 명시 참조(통과), 2절 산문 한 줄에 타입과 다른 타입의 멤버가 같이 있는 변형(종료 코드 2)과 같은 줄에 `Type.member`가 통째로 있는 변형(통과), 암묵 `Type.member`(통과하되 다른 타입 조각 미포함).
 
 ## 알려진 검증 공백
 

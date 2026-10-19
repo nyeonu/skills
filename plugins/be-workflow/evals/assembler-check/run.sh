@@ -56,6 +56,19 @@ sed 's/2절 `BirthYearValidator` 참조/`BirthYearValidator.save`를 쓴다/' "$
 python3 -I "$SCRIPT" --spec "$HERE/spec.md" --plan "$TMP/plan-im.md" --task T1 --model haiku \
   --worktree /tmp/wt --branch chk --out "$TMP/b-im.md" > "$TMP/b-im.stats" 2>&1 || { echo "암묵 참조 Type.member가 떨어짐"; fail=1; }
 grep -q 'ProfileService.java' "$TMP/b-im.md" && { echo "암묵 참조에 다른 타입(ProfileService) 조각이 들어감"; fail=1; }
+# 2절 산문 한 줄에 타입과 다른 타입의 멤버가 같이 있어도 근거가 아니다 → 종료 코드 2. 같은 줄에 `Type.member`가 통째로 있으면 통과
+python3 - "$HERE/plan.md" "$TMP" <<'PY'
+import sys, pathlib
+s = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").replace("2절 `BirthYearValidator` 참조", "2절 `BirthYearValidator.save` 참조")
+i = s.index("\n## 3.")
+pathlib.Path(sys.argv[2] + "/plan-prose-bad.md").write_text(s[:i] + "\n- `BirthYearValidator.isValid`로 검사한 뒤 `ProfileService.save`로 저장한다.\n" + s[i:], encoding="utf-8")
+pathlib.Path(sys.argv[2] + "/plan-prose-ok.md").write_text(s[:i] + "\n- `BirthYearValidator.save`는 검증 결과를 함께 저장한다.\n" + s[i:], encoding="utf-8")
+PY
+rc=0; python3 -I "$SCRIPT" --spec "$HERE/spec.md" --plan "$TMP/plan-prose-bad.md" --task T1 --model haiku \
+  --worktree /tmp/wt --branch chk --out "$TMP/b-pb.md" > "$TMP/b-pb.stats" 2>&1 || rc=$?
+[ $rc = 2 ] || { echo "같은 줄의 다른 타입 멤버(ProfileService.save)가 BirthYearValidator.save의 근거로 잡힘 (exit $rc)"; fail=1; }
+python3 -I "$SCRIPT" --spec "$HERE/spec.md" --plan "$TMP/plan-prose-ok.md" --task T1 --model haiku \
+  --worktree /tmp/wt --branch chk --out "$TMP/b-po.md" > "$TMP/b-po.stats" 2>&1 || { echo "불렛에 통째로 적힌 Type.member 명시 참조가 떨어짐"; fail=1; }
 # 파일명 꼴의 명시 참조(`Type.java`)는 멤버가 아니라 타입 참조 — 통과
 sed 's/2절 `BirthYearValidator` 참조/2절 `BirthYearValidator.java` 참조/' "$HERE/plan.md" > "$TMP/plan-file.md"
 python3 -I "$SCRIPT" --spec "$HERE/spec.md" --plan "$TMP/plan-file.md" --task T1 --model haiku \
