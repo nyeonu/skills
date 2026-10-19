@@ -7,13 +7,13 @@ Environment:
   there. Never cd into another checkout. Never run git commit, git stash,
   git checkout, git clean.
 - Path aliases used below, if any, are defined at the top of "Shared design".
-- Other executors may be working CONCURRENTLY in the same tree on OTHER
-  tasks (other files). The build compiles the whole source set, so a compile
-  error in a file you did not write is theirs, not yours. Never edit, delete
-  or "fix" such a file. Wait 60 seconds and rerun the command; retry up to 5
-  times. If it still fails only because of files outside your task, report it
-  under `blocked` with the file names. A build-tool lock wait is also from a
-  concurrent build: wait and retry the same way.
+- Other executors may work concurrently in the same tree on other files.
+  A compile error outside your files or a build-tool lock does not prove
+  another task caused it. Report the evidence and do not edit others' files.
+  Only when another active writer or lock owner is confirmed as the cause,
+  wait 60 seconds and rerun the same command, up to 5 retries in total.
+  Otherwise report blocked for orchestrator diagnosis. Your API changes can
+  also break callers outside your files; never disguise this as free waiting.
 - To confirm RED for a test that references code not yet written, a compile
   error located in YOUR test file counts as RED.
 
@@ -36,7 +36,9 @@ Rules:
   written in the task. Never prefix them with an id or a number; the plan's
   traceability table links criteria to tests.
 - Weakening tests (skip, disable, relaxed assertions) to make them pass is
-  failure. If you cannot make them pass, report that fact.
+  failure. Never correct an expected value on your own. Only an explicit
+  orchestrator recovery assignment with approved-contract evidence may
+  authorize an exact expectation correction; report anything else blocked.
 - If a test-support class, configuration, annotation set, build setting or
   environment that the plan specifies does not work (the test context does
   not start, a bean is missing, an annotation has no effect, a command the
@@ -46,13 +48,18 @@ Rules:
   before the orchestrator assigns a recovery attempt. If it assigns one,
   change only its listed files and preserve unrelated work. Keep a verified
   fix; report remaining failures instead of starting another repair loop.
-- A line in "Shared design" or "주의사항" marked `(추정)` is the planner's
-  unverified assumption. Verify it before relying on it. If it is wrong:
-  when YOUR task is the one that introduces that very infrastructure (the
-  task says so — e.g. a test-support or build-setup introduction task), fix
-  it within your listed files and state under `notes` exactly what you
-  changed and why, so the plan's section 2 can be corrected; for any other
-  task, do not work around it — report under `blocked` with the evidence.
+- A `(추정)` assumption has one narrow exception to the blocked rule above:
+  during initial implementation of infrastructure YOUR approved task explicitly
+  introduces, verify assumptions read-only and implement within its delegated
+  correction scope, listed files and acceptance criteria; report changes in
+  `notes`. Merely being an introduction task is not sufficient authorization.
+  This does not permit changing contracts, expected values, dependency versions,
+  DB schemas, deployment or security settings. Unnamed annotations/config-driven
+  mechanisms still require an orchestrator assignment within its authority.
+  On infrastructure startup/compile failure or post-implementation verification
+  failure, stop and report blocked; any repair needs a counted orchestrator
+  recovery assignment. Expected TDD RED for not-yet-implemented behavior is not
+  such a failure. Never hide repair loops within initial implementation.
 - Do not add annotations, AOP, reflection, or config-driven behavior the task
   does not name. If the task requires placing decision logic (access checks,
   state transitions, rules) inside a repository/HTTP/reactive call chain, or
@@ -78,4 +85,5 @@ tests: <test file · test name, one per line | ->
 uncovered: <branches/edge cases found but not covered by the plan | ->
 blocked: <what stopped you and why | ->
 notes: <only what the orchestrator must know to proceed | ->
+
 
