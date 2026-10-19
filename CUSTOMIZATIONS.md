@@ -506,3 +506,17 @@ be-workflow 스킬·참고자료 합계 53,613자 → 48,866자(−4,747자). �
 **변경**: plan-template/work-plan-template의 복사할 본문에 `## 복구 기록`과 `## 환경 준비 기록` 빈 표를 추가하고 목차·체크리스트에 연결했다. 기록 제목은 recovery-policy의 문자열과 일치시키기 위해 번호 없이 유지한다. 작성 단계에서는 빈 표이고 실행 중 오케스트레이터가 채운다. plan-executor의 참조 조각 설명은 실제 지원하는 두 헤더 형식에 맞췄다. 과거 run2 보고의 T8 정정 단정을 당시 행동 서술로 바꾸고, 승인 근거·기준 실행 없이는 정당성을 소급 확정할 수 없다는 후속 해석을 같은 문서에 추가했다.
 
 **검증**: assembler-check, 수정 스킬 2종 quick_validate, 두 템플릿 제목·복구 표 열의 정책 일치, 기록을 붙여도 실행자 브리프가 동일한지 확인했다. 새 문맥 실행자 2개가 현행 브리프의 기반 도입 지시로 실제 Python 설정 파일을 작성·검증했다. 정상 서비스에서는 승인된 대안을 선택해 PASS, 서비스 불가에서는 FAIL/blocked와 수정 보존을 보고했다. 독립 재실행으로 두 결과 및 금지 파일 보존을 확인했다. Claude/Spring 실제 실행은 아니며 모델 일반화·토큰 절감은 미측정이다. 상세는 evals/history/2026-10-19-v0.1.20-introduction-check.md.
+
+## 스킬 축소 1묶음 — plan-executor·task-breakdown의 서식·정책 설명을 references로 (be-workflow 0.1.21)
+
+**계기**: be-workflow 스킬 본문 합계 90.6k자(wc -m). 매 턴 판단에 쓰이지 않는 산출물 서식과 설명이 본문에 있어 컨텍스트를 차지했다. 축소 원칙은 "매 실행마다 판단에 쓰는 것만 본문에, 그 단계에 들어갈 때 읽으면 되는 것은 references로"이고, 판단 규칙·절차·타협 금지 표는 글자를 바꾸지 않는다(타협 금지 표는 스킬마다 다른 변명을 막는 장치라 통합·축약 대상이 아니다 — 사용자 결정).
+
+**바꾼 것**:
+- plan-executor 5절 사용자 보고 서식(마크다운 블록·"한국어 산출물·결과부터"·"다음 단계 생략 금지") → `references/report-template.md`(신규). 본문에는 테스트 대조 원칙·미작성 미완료·미커버 분기 처리만 남김.
+- plan-executor 2절 채널 언어 정책 전문 → `assemble_brief.py` 머리 주석. "스크립트가 넣는 것" 나열 → docstring 포인터. 본문은 한 줄 요약.
+- task-breakdown 5단계 "구조 배치" 소불렛 4개(결정 로직 위치·암묵적 동작·도메인 경계·관례 이탈) → `references/structure-rules.md`(신규). 본문은 한 줄 요약 + 포인터.
+- 옮긴 문장은 원문과 diff 0으로 확인. plan-executor SKILL.md 23,021→19,936자, task-breakdown 16,138→14,623자.
+
+**측정**: 본문 변경이므로 해당 두 케이스 산출물 채점기만, fable 3회·sonnet 심판. routes-plan-executor 전 채점기 3/3. routes-task-breakdown은 발동·plan-template 읽기 3/3, has-traceability 2/3 — `--keep-temp` 재실행으로 확인하니 떨어진 회차의 plan.md에 추적성 표 13행이 있었고 마지막 메시지에 "추적성" 단어만 없었다. 채점기가 마지막 메시지의 단어를 보던 한계라서 `docs/PROFILE-7/plan.md`의 `## 3. 추적성` 표 존재를 보는 파일 기반 정규식으로 바꿨다(보존된 plan.md 둘 다에서 일치 확인). 결과 JSON 3개는 `evals/history/`에 보관. 첫 실행은 `--scaffold` 없이 돌려 픽스처가 실행되지 않은 무효 측정이었다(약 $2.1) — README의 명령대로 `--scaffold --trust-plugin`이 필요하다.
+
+**다음**: 2묶음(code-review-and-quality·tdd·spec-writer·spec-conformance-check), 3묶음(using-agent-skills 빠른 참조 중복).

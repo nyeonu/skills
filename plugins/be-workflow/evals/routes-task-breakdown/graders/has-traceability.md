@@ -1,5 +1,5 @@
 ---
 type: regex
-target: last_message
-pattern: '추적성'
+target: { source: file, path: docs/PROFILE-7/plan.md }
+pattern: '## 3\. 추적성[\s\S]*?\n\| [^\n]*\|[^\n]*\|[^\n]*\|\n\|---'
 ---

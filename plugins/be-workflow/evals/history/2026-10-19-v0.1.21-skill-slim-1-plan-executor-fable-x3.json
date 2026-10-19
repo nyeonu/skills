@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 1,
+  "claudeVersion": "2.1.278",
+  "startedAt": "2026-10-19T09:52:54.870Z",
+  "durationSeconds": 300,
+  "costUsd": 3.05950175,
+  "partial": false,
+  "suite": {
+    "root": "/workspace/skills/.claude/worktrees/trusting-ishizaka-fe28b6/plugins/be-workflow",
+    "ablation": "none",
+    "modelOverride": "fable",
+    "judgeModel": "sonnet",
+    "caseFilter": "routes-plan-executor",
+    "threshold": 1,
+    "concurrency": 1,
+    "plugins": [
+      {
+        "name": "be-workflow",
+        "version": "0.1.20",
+        "path": "/workspace/skills/.claude/worktrees/trusting-ishizaka-fe28b6/plugins/be-workflow"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "name": "routes-plan-executor",
+      "dir": "evals/routes-plan-executor",
+      "source": "mixed",
+      "promptMarkdown": "`docs/PROFILE-7/plan.md` 계획대로 진행해줘.",
+      "model": "sonnet",
+      "runsPerCase": 3,
+      "timeoutSeconds": 600,
+      "maxTurns": 15,
+      "graders": [
+        {
+          "name": "asks-approval",
+          "type": "regex",
+          "weight": 1,
+          "config": {
+            "target": "last_message",
+            "pattern": "승인",
+            "flags": "",
+            "match": "contains"
+          }
+        },
+        {
+          "name": "no-other-workflow-skill",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?(interview-me|spec-writer|task-breakdown|tdd|spec-conformance-check|adr-writer|using-agent-skills)\"",
+            "min": 0,
+            "max": 0,
+            "arm": "both"
+          }
+        },
+        {
+          "name": "skill-fired",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?plan-executor\""
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 13,
+            "costUsd": 1.0241280000000001,
+            "judgeCostUsd": 0,
+            "durationSeconds": 91,
+            "startedAt": "2026-10-19T09:52:54.905Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-BPQRXQ/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "asks-approval",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 승인",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 9,
+            "costUsd": 0.8043305000000001,
+            "judgeCostUsd": 0,
+            "durationSeconds": 81,
+            "startedAt": "2026-10-19T09:54:25.491Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-Gy89tz/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "asks-approval",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 승인",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 15,
+            "costUsd": 1.23104325,
+            "judgeCostUsd": 0,
+            "durationSeconds": 128,
+            "startedAt": "2026-10-19T09:55:46.453Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-khvNM1/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "asks-approval",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched 승인",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 1,
+        "passRate": 1
+      }
+    }
+  ],
+  "aggregates": {
+    "casesTotal": 1,
+    "casesPassed": 1,
+    "overallScore": 1,
+    "overallPassRate": 1
+  }
+}
