@@ -89,18 +89,3 @@ description: 작업에 맞는 진입 스킬을 고르고 모든 스킬에 공통
    고치기"는 금지다 — 승인 게이트 우회가 된다.
 5. **단일 환경 진행.** 작업 시작 시 Cowork/CLI 중 하나를 정해 끝까지 그 환경에서.
    산출물이 전부 레포 안(`docs/`)이라 다음 작업은 다른 환경에서 시작해도 된다.
-
-## 빠른 참조
-
-| 단계 | 스킬 | 한 줄 요약 |
-|------|------|-----------|
-| 정의 | interview-me | 계획·스펙·코드 전에 사용자가 진짜 원하는 것을 끌어낸다 |
-| 정의 | spec-writer | 코드 기반 스펙과 성공 기준을 문서화한다 |
-| 계획 | task-breakdown | 승인된 스펙을 실행자(저비용 모델)가 실행할 PLAN.md로 분해한다 |
-| 실행 | plan-executor | 승인된 PLAN.md를 tier 기반으로 위임·실행·검증한다 |
-| 실행 | tdd | 코드 작성 규율의 단일 원본 — 테스트 먼저(RED→GREEN→REFACTOR), 테스트 도출 5출처 |
-| 검증 | spec-conformance-check | 구현물이 스펙 성공 기준을 실제로 충족하는지 독립 검증한다 |
-| 리뷰 | code-review-and-quality | 다축 코드 리뷰(정확성·가독성·유지보수) |
-| 리뷰 | security-and-hardening | OWASP 기준 입력 검증·최소 권한·보안 강화 |
-| 리뷰 | performance-optimization | 먼저 측정하고, 중요한 병목만 최적화 |
-| 기록 | adr-writer | 되돌리기 비싼 결정을 2시점(Proposed→Accepted)으로 기록 |

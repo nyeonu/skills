@@ -48,16 +48,16 @@ plugins/
     using-agent-skills/        # 메타 라우터: 진입점 판단 + 공통 운영 규칙
     interview-me/              # [정의] 모호한 요구사항의 의도 추출
     spec-writer/               # [정의] 코드 기반 스펙 문서화
-    task-breakdown/            # [계획] 승인된 스펙 → PLAN.md 분해 (기준→테스트→작업 추적성 매핑)
+    task-breakdown/            # [계획] 승인된 스펙 → docs/<티켓 키>/plan.md 분해 (기준→테스트→작업 추적성 매핑)
     plan-executor/             # [실행] 계획 실행 오케스트레이션 (tier 기반 고/저비용 분리)
     tdd/                       # [실행] 코드 작성 규율 단일 원본 (테스트 먼저, 도출 5출처)
     spec-conformance-check/    # [검증] 구현물 ↔ 스펙 독립 검증 (fail-fast 게이트)
     adr-writer/                # [기록] ADR 2시점 기록 (Proposed → Accepted)
   be-review/
     skills/
-      code-review-and-quality/   # 다축 리뷰: 정확성·가독성·아키텍처 + 보안·성능 1차 확인
-      security-and-hardening/    # 보안 (OWASP 기준, 체크리스트 필수 로드)
-      performance-optimization/  # 성능 (백엔드 우선, 백엔드/프런트엔드 체크리스트 분리)
+      code-review-and-quality/   # [리뷰] 다축 리뷰: 정확성·가독성·아키텍처 + 보안·성능 1차 확인
+      security-and-hardening/    # [리뷰] 보안 (OWASP 기준, 체크리스트 필수 로드)
+      performance-optimization/  # [리뷰] 성능 (백엔드 우선, 백엔드/프런트엔드 체크리스트 분리)
     agents/
       code-reviewer.md           # 리뷰 페르소나 (스킬과 동일한 심각도·판정 계약)
       security-auditor.md        # 보안 감사 페르소나
@@ -123,10 +123,15 @@ flowchart TD
 - 요구사항은 명확, 스펙 없음 → 2 (spec-writer)
 - 승인된 스펙(`status: approved`) 존재 → 3 (task-breakdown). `implemented`·`superseded` 스펙은 완료된 변경의 기록이라 분해 대상이 아니다
 - 승인된 계획 존재 / 실행 중 계획 존재 → 4 (plan-executor, frontmatter `status`로 재개)
-- 버그·장애 → 디버깅 후 수정 범위가 크면 3으로 합류
-- 사소한 변경(단일 파일, 명확한 범위) → 워크플로우 생략, 직접 처리
+- 버그·장애 → tdd(재현 테스트 먼저) 후 디버깅, 수정 범위가 크면 3으로 합류
+- 구현 끝, 스펙 충족 확인 필요 → 5 (spec-conformance-check). 전체 PASS면 스펙 `status`를 `implemented`로 바꾼다
+- 코드 품질·보안·성능 검토 → 6 (be-review 3종)
+- 되돌리기 비싼 결정 기록 → adr-writer (계획 승인 직후 `Proposed`, 스펙 적합성 검증 통과 후 `Accepted`)
+- 사소한 변경(단일 파일, 명확한 범위) → 워크플로우 생략, 직접 처리 (코드 수정이면 tdd 규율 적용)
 
 진행 상태의 단일 원본은 `docs/<티켓 키>/spec.md`·`plan.md` frontmatter의 `status`다. 세션이 끊겨도 문서 상태를 읽으면 중단 지점부터 잇는다.
+
+에픽(업무 단위 티켓)이면 `docs/<에픽 키>/spec.md`와 `plan.md`(`kind: epic`, 공통 설계·추적성·분할 순서)를 두고, 승인된 뒤 작업 티켓마다 `docs/<에픽 키>/<작업 티켓 키>/plan.md`를 써서 하나씩 승인·실행한다. 실행자에게 주는 브리프는 plan-executor가 스펙 1·2·6절과 계획 2절·작업 블록에서 스크립트로 조립한다.
 
 ### 핵심 규칙
 
@@ -135,6 +140,11 @@ flowchart TD
 3. fail-fast: 앞 게이트가 실패하면 뒤 단계 비용이 발생하지 않는다.
 4. 계획 밖 병렬 실행은 읽기 전용 작업(검토)에만. 코드 수정은 반드시 계획 루프를 통한다. 승인된 계획 안에서 `depends_on` 없는 작업을 plan-executor가 병렬 실행하는 것은 계획 승인에 포함된 병렬성이다.
 5. 단일 환경 진행: 작업 시작 시 Cowork/CLI 중 하나를 정하고 끝까지 그 환경에서. 산출물이 전부 레포 안(`docs/`)이라 다음 작업은 다른 환경에서 시작해도 된다. 요구사항 소스가 외부 채널(기획서·메신저) 중심이면 Cowork, 코드 중심이면 CLI가 유리하다.
+
+
+### 제한된 자동 복구 (be-workflow 0.1.17)
+
+실행 중 실패는 오케스트레이터가 원인을 분류하고 승인된 동작·범위·제약 안에서 부분 수정으로 복구한다. 최초 실행 이후 작업당 최대 2회이며 새 근거 없는 동일 가설 반복은 중단한다. 완료 코드를 보존하고 영향받는 부분만 재검증한다. 계획의 `복구 기록`에 회차·근거·보정·검증을 남기므로 임시 브리프 파일 없이도 이력을 유지한다. 권한 경계 밖 변경이나 한도 초과는 사용자에게 보고한다. 상세 조건은 [복구 정책](plugins/be-workflow/skills/plan-executor/references/recovery-policy.md)을 따른다.
 
 ### 리뷰 스킬의 참고자료 계약
 
@@ -148,7 +158,7 @@ flowchart TD
 
 ## 평가
 
-플러그인마다 `evals/`에 `claude plugin eval` 케이스가 있다 (be-review 3개, be-workflow 8개: 스킬마다 라우팅 케이스 하나씩). 플러그인 루트에서 아래를 돌리면 플러그인 있음/없음 두 arm을 3회씩 실행해 점수 차이(Δ)를 보고한다. 케이스 목록과 각 케이스가 재는 것은 각 플러그인의 `evals/README.md`에 있다. 원시 결과(`evals/results/`)는 커밋하지 않고, 보관할 결과 JSON은 `evals/history/`에 단계별 이름으로 두고 색인에 적는다.
+플러그인마다 `evals/`에 `claude plugin eval` 케이스가 있다 (be-review 3개, be-workflow 9개: 스킬마다 라우팅 케이스 하나씩 + 설정 값 변경에 tdd가 발동하지 않는지 보는 경계 케이스. 그 밖에 be-workflow에는 API 비용 없이 도는 브리프 조립기 고정 점검 `evals/assembler-check/run.sh`가 있다). 플러그인 루트에서 아래를 돌리면 플러그인 있음/없음 두 arm을 3회씩 실행해 점수 차이(Δ)를 보고한다. 케이스 목록과 각 케이스가 재는 것은 각 플러그인의 `evals/README.md`에 있다. 원시 결과(`evals/results/`)는 커밋하지 않고, 보관할 결과 JSON은 `evals/history/`에 단계별 이름으로 두고 색인에 적는다.
 
 ```bash
 claude plugin eval . --scaffold --trust-plugin --no-publish
@@ -160,11 +170,6 @@ claude plugin eval . --scaffold --trust-plugin --no-publish
 - 기존 plan-writer/plan-executor/adr-writer: 포맷 계약과 오케스트레이션 구조
 
 원본에서 무엇을 왜 바꿨는지는 [CUSTOMIZATIONS.md](CUSTOMIZATIONS.md)에 기록되어 있다.
-
-
-### 제한된 자동 복구 (be-workflow 0.1.17)
-
-실행 중 실패는 오케스트레이터가 원인을 분류하고 승인된 동작·범위·제약 안에서 부분 수정으로 복구한다. 최초 실행 이후 작업당 최대 2회이며 새 근거 없는 동일 가설 반복은 중단한다. 완료 코드를 보존하고 영향받는 부분만 재검증한다. 계획의 `복구 기록`에 회차·근거·보정·검증을 남기므로 임시 브리프 파일 없이도 이력을 유지한다. 권한 경계 밖 변경이나 한도 초과는 사용자에게 보고한다. 상세 조건은 [복구 정책](plugins/be-workflow/skills/plan-executor/references/recovery-policy.md)을 따른다.
 
 ## 공개 자료의 경계
 
