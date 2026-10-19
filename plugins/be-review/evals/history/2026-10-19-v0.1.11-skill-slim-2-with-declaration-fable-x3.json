@@ -1,0 +1,213 @@
+{
+  "schemaVersion": 1,
+  "claudeVersion": "2.1.278",
+  "startedAt": "2026-10-19T10:32:11.612Z",
+  "durationSeconds": 293,
+  "costUsd": 3.3759310000000005,
+  "partial": false,
+  "suite": {
+    "root": "/workspace/skills/.claude/worktrees/trusting-ishizaka-fe28b6/plugins/be-review",
+    "ablation": "none",
+    "modelOverride": "fable",
+    "judgeModel": "sonnet",
+    "caseFilter": "local-reasoning-with-declaration",
+    "threshold": 1,
+    "concurrency": 1,
+    "plugins": [
+      {
+        "name": "be-review",
+        "version": "0.1.10",
+        "path": "/workspace/skills/.claude/worktrees/trusting-ishizaka-fe28b6/plugins/be-review"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "name": "local-reasoning-with-declaration",
+      "dir": "evals/local-reasoning-with-declaration",
+      "source": "mixed",
+      "promptMarkdown": "머지 전 리뷰해줘. 작업 공간에 git 저장소가 있고, 변경 내용은 HEAD 커밋이자 `CHANGES.diff` 파일이야. 전체 소스는 `src/` 아래에 있어.\n\n변경 목적: 숨김 게시판의 글은 관리자만, 멤버십 전용 글은 해당 아티스트 멤버십 회원과 관리자만 조회할 수 있게 한다.\n\n`BoardRepository`·`MembershipClient`·`BoardDTO`·`AccessDeniedException`은 다른 기능에서 이미 쓰던 기존 코드라 diff에 없어.\n\n테스트는 아직 돌리지 못했어. 셸 실행 없이 코드만 보고 리뷰해줘.",
+      "model": "sonnet",
+      "runsPerCase": 3,
+      "timeoutSeconds": 600,
+      "maxTurns": 25,
+      "graders": [
+        {
+          "name": "reads-local-reasoning-checklist",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Read",
+            "input_match": "references/local-reasoning-checklist\\.md",
+            "arm": "with-only"
+          }
+        },
+        {
+          "name": "separation-finding-is-important",
+          "type": "llm",
+          "weight": 1,
+          "graderMarkdown": "리뷰 결과(마지막 메시지)를 본다. 대상 저장소 CLAUDE.md에 \"국소 추론 판정 기준 합의\" 선언이 있다. 변경은 접근 판정(숨김 게시판·멤버십 전용)을 Repository 두 개와 HTTP 클라이언트 호출이 이어지는 리액티브 체인 안에 넣었고, 그 판정에 대한 테스트가 없다.\n\nPASS 조건 (둘 다 만족):\n1. `Important` 또는 `Critical` 등급의 어떤 항목이든, 그 권장 조치 안에 **접근 판정 로직을 IO(Repository·HTTP·리액티브 체인)에서 분리하라**는 내용이 들어 있다. 분리 권고가 다른 지적(예: 외부 호출을 조건부로만 하라, 테스트를 추가하라)과 같은 항목에 묶여 있어도 된다. 항목 제목이 다른 문제여도 본문의 권장 조치에 분리가 있으면 충족이다.\n2. 그 분리 권고가 \"같은 파일 안의 static 메서드\" 또는 \"IO 없는 순수 함수\"를 언급한다. 별도 파일·sealed 타입·새 레이어만을 유일한 해법으로 요구하지 않는다.\n\nFAIL 조건 (하나라도 해당):\n- 분리 권고가 `Suggestion` 등급에만 있거나 아예 없다.\n- 분리 권고가 새 파일·새 레이어·sealed 타입·인터페이스 도입만을 요구하고, 같은 파일의 static 메서드나 순수 함수를 언급하지 않는다.\n- 프레임워크(Spring WebFlux, Reactor)를 걷어내라고 요구한다.\n\n판단할 때 Important/Critical 항목의 본문 전체를 읽고 권장 조치를 확인한다. 항목 제목만 보고 판단하지 않는다.",
+          "config": {
+            "criteria": "리뷰 결과(마지막 메시지)를 본다. 대상 저장소 CLAUDE.md에 \"국소 추론 판정 기준 합의\" 선언이 있다. 변경은 접근 판정(숨김 게시판·멤버십 전용)을 Repository 두 개와 HTTP 클라이언트 호출이 이어지는 리액티브 체인 안에 넣었고, 그 판정에 대한 테스트가 없다.\n\nPASS 조건 (둘 다 만족):\n1. `Important` 또는 `Critical` 등급의 어떤 항목이든, 그 권장 조치 안에 **접근 판정 로직을 IO(Repository·HTTP·리액티브 체인)에서 분리하라**는 내용이 들어 있다. 분리 권고가 다른 지적(예: 외부 호출을 조건부로만 하라, 테스트를 추가하라)과 같은 항목에 묶여 있어도 된다. 항목 제목이 다른 문제여도 본문의 권장 조치에 분리가 있으면 충족이다.\n2. 그 분리 권고가 \"같은 파일 안의 static 메서드\" 또는 \"IO 없는 순수 함수\"를 언급한다. 별도 파일·sealed 타입·새 레이어만을 유일한 해법으로 요구하지 않는다.\n\nFAIL 조건 (하나라도 해당):\n- 분리 권고가 `Suggestion` 등급에만 있거나 아예 없다.\n- 분리 권고가 새 파일·새 레이어·sealed 타입·인터페이스 도입만을 요구하고, 같은 파일의 static 메서드나 순수 함수를 언급하지 않는다.\n- 프레임워크(Spring WebFlux, Reactor)를 걷어내라고 요구한다.\n\n판단할 때 Important/Critical 항목의 본문 전체를 읽고 권장 조치를 확인한다. 항목 제목만 보고 판단하지 않는다.",
+            "focus": "last_message"
+          }
+        },
+        {
+          "name": "skill-fired",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?code-review-and-quality\""
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 20,
+            "costUsd": 1.11388725,
+            "judgeCostUsd": 0.019823999999999998,
+            "durationSeconds": 102,
+            "startedAt": "2026-10-19T10:32:11.636Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-lJYIoe/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "reads-local-reasoning-checklist",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "separation-finding-is-important",
+                "passed": true,
+                "weight": 1,
+                "explanation": "judge votes: PASS PASS PASS",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  true,
+                  true,
+                  true
+                ],
+                "evidence": "CLAUDE.md에 국소 추론 판정 기준 합의 선언이 있어 체크리스트 심각도를 그대로 적용합니다. 소스 10개 파일과 diff를 모두 읽었고, 아래가 리뷰 결과입니다.\n\n## 리뷰 요약\n\n**판정:** REQUEST CHANGES\n\n**개요:** 접근 판정 자체는 스펙(숨김 게시판은 관리자만, 멤버십 글은 해당 아티스트 멤버십 회원과 관리자)과 일치한다. 그러나 외부 멤버십 HTTP 호출이 모든 글 조회에 무조건 실리고, 게시판·멤버십 조회가 비어 있을 때 조용히 빈 결과로 끝나며, 새로 추가된 판정 분기 6개에 테스트가 하나도 없다.\n\n### Critical\n- 없음\n\n### Important\n- `src/main/java/com/example/post/PostService.java:26` 멤버십 외부 호출이 글이 `membersOnly`인지, 사용자가 관리자인지, 게시판이 숨김인지와 무관하게 **모든 글 조회마다** 실행된다. 영향은 두 가지다. 공개 게시판의 일반 글을 읽는 데도 외부 HTTP 왕복이 하나 추가되고, 멤버십 서비스 장애 시 멤버십과 무관한 모든 글 조회가 함께 실패한다. 숨김 게시판 거부도 멤버십 응답을 기다린 뒤에야 내려간다. 수정 방향은 숨김 판정을 먼저 하고, `post.membersOnly() && !user.hasAdminRole()`일 때만 `isMember`를 호출하는 것이다. (호출 횟수 증가는 코드 구조에서 확정되는 사실이고, 지연 수치는 측정하지 않았다.)\n- `src/main/java/com/example/post/PostService.java:25` `boardRepository.findById`가 빈 Mono를 돌려주면 안쪽 `flatMap`이 실행되지 않아 `getPost` 전체가 오류 없이 빈 Mono로 완료된다. 글이 존재하는데 게시판 행이 없는 상태는 데이터 불일치인데, 호출자는 \"글 없음\"도 \"거부\"도 아닌 빈 응답을 받는다. 같은 패턴이 `isMember`가 빈 Mono를 반환할 때도 생긴다. 게시판 누락은 `switchIfEmpty(Mono.error(...))`로 명시적 오류를 내고, 멤버십 응답은 `.defaultIfEmpty(false)`로 거부 쪽(fail-closed)에 고정하라.\n- `src/test/java/com/example/post/PostServiceTest.java` 이 변경의 핵심인 접근 판정에 대한 테스트가 없다. 기존 성공 경로 테스트에 목 스텁만 추가됐고, 새 분기(숨김 게시판 + 비관리자 거부, 숨김 게시판 + 관리자 허용, 멤버십 글 + 회원 허용, 멤버십 글 + 비회원 거부, 멤버십 글 + 비회원 관리자 허용, 게시판 누락)는 전부 미검증이다. 국소 추론 렌즈 ②로 보면 원인이 드러난다. 판정이 Repository 두 개와 HTTP 클라이언트 사이의 `Mono` 체인 안에 있어, 분기 하나를 검증하려면 목 3개를 매번 세워야 한다. 판정을 같은 파일의 `static` 메서드(1단계 분리)로 빼고 값만 넣어 검증하라. 예를 들면 `static RuntimeException boardDenial(BoardDTO, UserDTO, UUID)`와 `static boolean requiresMembership(PostDTO, UserDTO)` 두 개면 위 첫 번째 지적의 호출 순서 변경과도 자연스럽게 맞물린다. 체인 자체는 \"멤버십 글이 아니면 isMember를 호출하지 않는다\"를 `verify(membershipClient, never())`로 한 건 더 덮으면 된다.\n\n### Suggestion\n- `src/main/java/com/example/post/PostService.java:29` 숨김 게시판 글에 `AccessDeniedException`(403 계열)을 내면 비관리자에게 그 글이 존재한다는 사실이 새어 나간다. 미공개 콘텐츠가 숨김 게시판의 용도라면 비관리자에게는 `PostNotFoundException`으로 응답하는 쪽이 안전하다. 제품 정책에 따라 결정할 문제라 질문으로 남긴다.\n- `src/main/java/com/example/post/PostService.java:26` 새 코드가 `user.id()`를 역참조한다. 기존 코드는 `user`를 사용하지 않아 비로그인 요청이 `null`로 들어와도 동작했을 수 있다. 비로그인 조회가 허용되는 엔드포인트라면 NPE로 500이 난다. 컨트롤러 계층에서 `user`가 항상 비null임이 보장되는지 확인해 달라.\n- `src/main/java/com/example/post/MembershipClient.java:8` 외부 HTTP 클라이언트의 타임아웃·실패 처리는 이 diff 범위 밖이라 확인하지 못했다. 글 조회 경로에 처음 실리는 외부 호출이므로 구현체에 타임아웃이 있는지 한 번 확인할 가치가 있다.\n\n### 잘된 점\n- 멤버십 판정 기준을 글이 아닌 게시판의 `artistId`로 잡아 \"해당 아티스트 멤버십\"이라는 스펙과 정확히 맞는다.\n- 관리자 우회가 두 조건 모두에 걸려 있어 스펙의 \"관리자는 모두 조회\" 요구를 빠짐없이 만족한다.\n- 멤버십 클라이언트가 오류를 내면 그대로 전파되어 허용 쪽으로 열리지 않는다.\n\n### 검증 확인\n- 테스트 리뷰: 했음. 새 판정 분기에 대한 테스트 0건, 기존 테스트 2건은 스텁 추가 후 통과할 것으로 읽힘(실행은 안 함).\n- 빌드 확인: 안 했음(셸 실행 없이 코드만 검토).\n- 보안·성능 1차 확인: 했음. 인가 검사 누락 없음, fail-open 없음. 글 조회당 DB 1회·외부 HTTP 1회 추가 확인.\n- 읽은 참고자료: security-checklist.md, performance-checklist-backend.md, local-reasoning-checklist.md, 대상 저장소 CLAUDE.md\n- 전문 검토 연결: 불필요. 인가 로직은 이 리뷰에서 전 분기를 읽어 확인했고, 남은 위험은 위 Suggestion의 존재 노출 정책과 클라이언트 타임아웃뿐이다."
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 20,
+            "costUsd": 1.05793275,
+            "judgeCostUsd": 0.019572000000000003,
+            "durationSeconds": 76,
+            "startedAt": "2026-10-19T10:33:53.752Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-EGCapl/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "reads-local-reasoning-checklist",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "separation-finding-is-important",
+                "passed": true,
+                "weight": 1,
+                "explanation": "judge votes: PASS PASS PASS",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  true,
+                  true,
+                  true
+                ],
+                "evidence": "diff와 `src/` 전체, 체크리스트 3종, `CLAUDE.md`를 모두 읽었습니다. 리뷰 결과입니다.\n\n## 리뷰 요약\n\n**판정:** REQUEST CHANGES\n\n**개요:** 접근 판정 조건 자체는 목적과 일치하지만, 멤버십 외부 호출이 모든 글 조회에 무조건 걸리고, 게시판 누락·멤버십 응답 누락 시 조용히 빈 결과를 내며, 새 결정 로직에 대한 테스트가 하나도 없습니다.\n\n### Critical\n- `src/main/java/com/example/post/PostService.java:26` 외부 HTTP 클라이언트인 `membershipClient.isMember`를 공개 게시판의 일반 글, 관리자 요청, 숨김 게시판 거부 대상까지 모든 조회에서 호출합니다. 멤버십 서비스가 장애·지연이면 멤버십과 무관한 모든 글 조회가 함께 실패하고, 글 조회 트래픽 전체가 외부 서비스로 전달됩니다. 판정 순서를 바꿔 관리자면 즉시 허용, 숨김이면 즉시 거부, 멤버십 전용이 아니면 즉시 허용하고, 멤버십 전용 글에서만 호출하도록 바꾸세요.\n\n### Important\n- `src/main/java/com/example/post/PostService.java:25` `boardRepository.findById`가 empty를 반환하면 `flatMap`이 건너뛰어 `getPost` 전체가 오류 없이 empty로 끝납니다. 게시판이 삭제된 글은 404도 403도 아닌 빈 응답이 되고, 호출부가 empty를 어떻게 다루는지에 따라 200 빈 바디가 될 수 있습니다. `switchIfEmpty`로 명시적 오류를 내거나 정책을 정해 처리하세요.\n- `src/main/java/com/example/post/PostService.java:26` `isMember`가 empty를 반환해도 같은 이유로 체인 전체가 empty가 됩니다. 멤버십 전용이 아닌 글까지 빈 결과가 되므로, 호출을 멤버십 전용 글로 한정한 뒤에도 `defaultIfEmpty(false)`를 붙여 거부로 수렴시키세요.\n- `src/test/java/com/example/post/PostServiceTest.java` 이번 변경이 추가한 동작에 대한 테스트가 없습니다. 기존 테스트 2개를 컴파일되게 손본 것이 전부입니다. 빠진 분기는 다음과 같습니다. 숨김 게시판을 일반 유저가 조회하면 거부, 숨김 게시판을 관리자가 조회하면 허용, 멤버십 전용 글을 비회원이 조회하면 거부, 회원이 조회하면 허용, 비회원 관리자가 조회하면 허용, 게시판이 없는 글, 멤버십 응답이 empty나 error인 경우. 현재 구조에서는 각 케이스마다 목 3개를 세워야 하므로 아래 Suggestion의 분리를 함께 권합니다.\n- `src/main/java/com/example/post/PostService.java:28-33` 국소 추론 렌즈 ②에 해당합니다. 접근 판정이 Repository 호출과 HTTP 호출 사이 3단 중첩 `flatMap` 안에 있어 판정 하나를 검증하려면 무관한 목 3개가 필요하고, 그 비용 탓에 위 테스트 공백이 생겼습니다. `CLAUDE.md`에 합의 선언이 있으므로 표대로 `Important`입니다. 1단계 분리를 권합니다. 같은 파일에 `static RuntimeException accessDenial(PostDTO post, BoardDTO board, boolean member, UserDTO user)` 형태로 IO 없이 판정만 빼고, 체인은 그 결과만 소비하게 하세요. 다만 Critical에서 멤버십 호출을 조건부로 바꾸면 판정이 두 단계로 나뉘므로, \"멤버십 조회가 필요한가\"와 \"최종 허용/거부\" 두 static 메서드로 나누는 편이 자연스럽습니다.\n\n### Suggestion\n- `src/main/java/com/example/post/PostService.java:26` 이전 시그니처에서는 `user`를 사용하지 않았는데 이제 `user.id()`를 역참조합니다. 비로그인 조회가 허용되는 엔드포인트라면 `null`이 들어와 NPE가 납니다. 컨트롤러가 이 디렉터리에 없어 확인하지 못했으니 호출부에서 null 가능성을 확인해 주세요.\n- `src/main/java/com/example/post/PostService.java:29` 숨김 게시판 글에 `AccessDeniedException`을 내면 403으로 글의 존재가 드러납니다. 숨김의 의도가 \"존재 자체를 감추기\"라면 `PostNotFoundException`으로 통일하는 쪽이 맞습니다. 정책 확인 질문입니다.\n- `src/test/java/com/example/post/PostServiceTest.java:29` `any(), any()` 스텁은 \"호출되지 않아도 된다\"를 숨깁니다. Critical 수정 후에는 공개 글 테스트에서 `verifyNoInteractions(membershipClient)`로 호출이 없음을 고정하면 회귀를 잡습니다.\n\n### 잘된 점\n- 판정 조건 두 개는 목적과 정확히 일치합니다. 숨김 게시판은 관리자만, 멤버십 전용은 해당 게시판의 `artistId` 기준 회원 또는 관리자만 허용합니다.\n- 생성자 주입과 레코드 DTO 등 기존 컨벤션을 그대로 따랐습니다.\n\n### 검증 확인\n- 테스트 리뷰: 했음. 새 동작 테스트 0건, 기존 2건은 컴파일 맞춤만.\n- 빌드 확인: 안 했음. 요청대로 셸 실행 없이 코드만 봤습니다.\n- 보안·성능 1차 확인: 했음. 인가 조건은 정확하나 외부 호출 무조건 실행과 empty 전파가 가용성 문제. `MembershipClient` 구현체의 타임아웃·실패 처리는 diff 밖이라 확인 못 했습니다.\n- 읽은 참고자료: local-reasoning-checklist.md, security-checklist.md, performance-checklist-backend.md, 대상 저장소 CLAUDE.md\n- 전문 검토 연결: 불필요. 인가 로직은 이 리뷰에서 충분히 확인했고, 멤버십 클라이언트의 타임아웃·서킷브레이커 여부만 구현체 쪽에서 별도 확인하면 됩니다."
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 20,
+            "costUsd": 1.204111,
+            "judgeCostUsd": 0.027256000000000002,
+            "durationSeconds": 115,
+            "startedAt": "2026-10-19T10:35:09.700Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-3x3zqh/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "reads-local-reasoning-checklist",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "separation-finding-is-important",
+                "passed": true,
+                "weight": 1,
+                "explanation": "judge votes: PASS PASS PASS",
+                "withOnly": false,
+                "scored": true,
+                "judgeVotes": [
+                  true,
+                  true,
+                  true
+                ],
+                "evidence": "## 리뷰 요약\n\n**판정:** REQUEST CHANGES\n\n**개요:** 접근 판정 조건 자체는 스펙(숨김 게시판은 관리자만, 멤버십 글은 해당 아티스트 회원과 관리자)과 일치하지만, 멤버십 외부 호출이 모든 글 조회에 무조건 붙어 공개 글 조회가 외부 서비스 장애에 묶이고, 빈 응답 경로가 조용히 삼켜지며, 거부·허용 분기에 대한 테스트가 하나도 없다. 인가 기능인데 판정 코드를 통째로 지워도 현재 테스트가 그대로 통과한다.\n\n### Critical\n- 없음\n\n### Important\n- `src/main/java/com/example/post/PostService.java:26` **멤버십 외부 호출이 무조건 실행된다.** `membershipClient.isMember`가 글의 `membersOnly` 여부, 게시판 `hidden` 여부, 관리자 여부와 무관하게 모든 조회에서 호출된다. `MembershipClient`는 주석대로 외부 HTTP 클라이언트다. 영향 ①: 공개 게시판의 공개 글 조회에도 외부 HTTP 왕복 1회가 추가된다(추정, 측정 없음). 영향 ②: 멤버십 서비스가 에러를 돌려주면 그 에러가 체인을 타고 올라와 **공개 글 조회까지 전부 실패**한다. 이전 코드엔 없던 가용성 의존이다. 수정: 숨김 판정을 먼저 하고, `post.membersOnly() && !user.hasAdminRole()`일 때만 멤버십을 조회하도록 분기를 호출 앞으로 옮긴다. `MembershipClient` 구현체의 타임아웃·실패 처리는 src에 없어 확인하지 못했다.\n- `src/main/java/com/example/post/PostService.java:25-27` **빈 응답이 조용히 삼켜진다.** `boardRepository.findById`가 `Mono.empty()`를 돌려주면(게시판 삭제, 참조 불일치) 안쪽 `flatMap`이 실행되지 않아 `getPost` 전체가 에러 없이 빈 Mono로 완료된다. `isMember`가 empty를 돌려줘도 같다. 영향: 글은 존재하는데 호출자는 \"없음\"도 \"거부\"도 아닌 빈 결과를 받고, 컨트롤러가 이를 어떻게 바꾸는지에 따라 200 빈 바디가 나갈 수 있다. 수정: 게시판 조회에 `switchIfEmpty(Mono.error(...))`를, 멤버십 조회에 `defaultIfEmpty(false)`를 붙여 두 경로를 명시적으로 결정한다.\n- `src/test/java/com/example/post/PostServiceTest.java:21-34` **접근 판정 분기에 테스트가 없다.** 기존 테스트 하나를 `hidden=false, membersOnly=false`로 통과시키게 고쳤을 뿐이다. 5출처로 보면 ① 스펙 기준 3개(숨김→비관리자 거부, 숨김→관리자 허용, 멤버십→비회원 거부/회원 허용/관리자 허용) 모두 대응 테스트 없음, ③ 오류 분기(`AccessDeniedException` 두 곳, 게시판 없음, 멤버십 서비스 실패) 전부 없음. 렌즈 ②: 판정 하나를 검증하려면 `postRepository`·`boardRepository`·`membershipClient` 목 셋을 세워야 하고, 그 비용 때문에 테스트가 안 쓰인 전형이다. CLAUDE.md에 \"국소 추론 판정 기준 합의\" 선언이 있으므로 표대로 Important다. 수정: 같은 파일에 `static RuntimeException accessDenial(PostDTO post, BoardDTO board, boolean member, UserDTO user)`를 두고 체인에서는 그 결과만 보게 한 뒤, 목 없이 값만 넣는 테스트로 위 5개 분기를 덮는다. 체인 수준에서는 \"멤버십 글이 아니면 `isMember`를 호출하지 않는다\"(`verifyNoInteractions`)와 \"게시판 없음\" 두 개를 추가한다.\n\n### Suggestion\n- `src/main/java/com/example/post/PostService.java:29` 숨김 게시판 글을 비관리자가 조회하면 `AccessDeniedException(postId)`를 돌려주는데, 이는 해당 id의 글이 존재한다는 사실을 확인해 준다. \"숨김\"이 존재 자체를 감추는 의도라면 `PostNotFoundException`으로 통일하는 쪽이 맞을 수 있다. 스펙에서 어느 쪽인지 정해 주면 좋겠다.\n- `src/main/java/com/example/post/PostService.java:26,28` 변경 전에는 `user` 파라미터를 전혀 읽지 않았다. 컨트롤러가 익명 요청에 `null`을 넘기고 있었다면 이제 `user.id()`에서 NPE가 난다. 컨트롤러가 src에 없어 확인하지 못했으니 호출부를 한 번 봐 달라.\n- `src/test/java/com/example/post/PostServiceTest.java:29` `isMember(any(), any())` 스텁은 `board.artistId()`가 아니라 다른 id가 넘어가도 잡지 못한다. 멤버십 테스트를 추가할 때는 구체적인 `userId`·`artistId`로 스텁하는 것이 좋다.\n\n### 잘된 점\n- 거부 조건의 순서와 관리자 우회 조건이 스펙과 정확히 일치한다. 숨김 게시판 판정이 멤버십 판정보다 앞에 있어 숨김+멤버십 조합도 올바르게 거부된다.\n- `switchIfEmpty`로 없는 글을 먼저 걸러 없는 글에는 게시판·멤버십 조회가 나가지 않는다.\n- 기존 두 테스트의 이름이 대상·조건·기대 결과를 서술한다.\n\n### 검증 확인\n- 테스트 리뷰: 했음. 변경 후에도 접근 판정의 어떤 분기도 검증되지 않으며, 판정 코드를 제거해도 두 테스트가 통과한다.\n- 빌드 확인: 안 했음. 사용자 요청대로 셸 실행 없이 코드만 읽었다. 시그니처·레코드 접근자(`boardId()`, `artistId()`, `hidden()`, `membersOnly()`, `hasAdminRole()`)는 소스와 대조해 일치함을 확인했다.\n- 보안·성능 1차 확인: 했음. 인가 누락은 없고 양쪽 거부 모두 관리자 우회가 명시적이다. 성능은 조회당 DB 1회·외부 HTTP 1회 추가가 확정이며 수치는 측정하지 않았다.\n- 읽은 참고자료: `security-checklist.md`, `local-reasoning-checklist.md`, `performance-checklist-backend.md`, 저장소 `CLAUDE.md`\n- 전문 검토 연결: `performance-optimization`에 `MembershipClient` 구현체의 타임아웃·실패 처리(서킷 브레이커 등 프로젝트 표준)와 공개 글 조회 지연 측정을 넘길 필요가 있다. 이 리뷰는 호출 구조만 봤고 구현체는 src에 없어 확인하지 못했다. 보안 전문 검토는 403/404 선택이 스펙으로 정해진 뒤에 필요하면 하면 된다."
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 1,
+        "passRate": 1
+      }
+    }
+  ],
+  "aggregates": {
+    "casesTotal": 1,
+    "casesPassed": 1,
+    "overallScore": 1,
+    "overallPassRate": 1
+  }
+}

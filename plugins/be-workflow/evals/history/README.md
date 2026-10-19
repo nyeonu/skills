@@ -37,5 +37,7 @@
 | `2026-10-19-v0.1.21-skill-slim-1-plan-executor-fable-x3.json` | 스킬 축소 1묶음(보고 서식·채널 언어 정책·구조 배치 규칙을 references로) 뒤 plan-executor 산출물 회귀, fable 3회·sonnet 심판 | routes-plan-executor: 발동 3/3, asks-approval 3/3, no-other 3/3 | $3.06 |
 | `2026-10-19-v0.1.21-skill-slim-1-task-breakdown-fable-x3.json` | 같은 변경 뒤 task-breakdown 산출물 회귀 | routes-task-breakdown: 발동 3/3, reads-plan-template 3/3, has-traceability 2/3 — 떨어진 회차의 plan.md에는 추적성 표 13행이 있었고 마지막 메시지에 "추적성" 단어가 없었음(채점기 한계) | $5.56 |
 | `2026-10-19-v0.1.21-skill-slim-1-task-breakdown-fable-x3-rerun.json` | 원인 확인용 재실행(`--keep-temp`). 같은 양상 2/3, 보존 디렉터리에서 plan.md 3절 표 확인 → has-traceability 채점기를 plan.md 파일 기반으로 교체 | routes-task-breakdown: 발동 3/3, has-traceability 2/3(교체 전 채점기) | $5.30 |
+| `2026-10-19-v0.1.22-skill-slim-2-spec-conformance-check-fable-x3.json` | 스킬 축소 2묶음(보고 서식을 references로) 뒤 spec-conformance-check 산출물 회귀, fable 3회·sonnet 심판 | routes-spec-conformance-check: 발동 3/3, conformance-verdict 2/3 | $4.12 |
+| `2026-10-19-v0.1.21-baseline-spec-conformance-check-fable-x3.json` | 위 2/3의 원인 분리용 — 수정 전 main(0.1.21)으로 같은 케이스. 같은 2/3이고 떨어진 보고서도 같은 양상(복구 정책 인용·테스트 보강 위임 제안이 LLM 채점기 조건 4에 걸림) → 2묶음 변경과 무관, 0.1.17 복구 연결 이후의 양상 | routes-spec-conformance-check: 발동 3/3, conformance-verdict 2/3 | $3.50 |
 - `2026-10-08-v0.1.8-description-rewrite-comparison.md`: description 재작성 두 안(A·B)과 절충안의 비교, tdd 누적 표, 채택안 전문, CUSTOMIZATIONS 절 초안.
 - `2026-10-08-v0.1.8-description-rewrite-result-A.md`: A안의 길이 표, 본문으로 옮긴 문장, 측정 표, 새 description 전문.

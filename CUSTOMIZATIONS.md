@@ -520,3 +520,16 @@ be-workflow 스킬·참고자료 합계 53,613자 → 48,866자(−4,747자). �
 **측정**: 본문 변경이므로 해당 두 케이스 산출물 채점기만, fable 3회·sonnet 심판. routes-plan-executor 전 채점기 3/3. routes-task-breakdown은 발동·plan-template 읽기 3/3, has-traceability 2/3 — `--keep-temp` 재실행으로 확인하니 떨어진 회차의 plan.md에 추적성 표 13행이 있었고 마지막 메시지에 "추적성" 단어만 없었다. 채점기가 마지막 메시지의 단어를 보던 한계라서 `docs/PROFILE-7/plan.md`의 `## 3. 추적성` 표 존재를 보는 파일 기반 정규식으로 바꿨다(보존된 plan.md 둘 다에서 일치 확인). 결과 JSON 3개는 `evals/history/`에 보관. 첫 실행은 `--scaffold` 없이 돌려 픽스처가 실행되지 않은 무효 측정이었다(약 $2.1) — README의 명령대로 `--scaffold --trust-plugin`이 필요하다.
 
 **다음**: 2묶음(code-review-and-quality·tdd·spec-writer·spec-conformance-check), 3묶음(using-agent-skills 빠른 참조 중복).
+
+## 스킬 축소 2묶음 — 리뷰 소불렛 중복 제거, 스펙 수정 등급·검증 보고 서식을 references로 (be-workflow 0.1.22 / be-review 0.1.11)
+
+**바꾼 것**:
+- code-review-and-quality 3단계: 가독성·아키텍처 축 아래 국소 추론 소불렛 8개가 `local-reasoning-checklist.md`의 렌즈 ①~⑤ 표(판정·심각도·선언 조건)와 같은 내용이라 렌즈 번호를 가리키는 2줄로 바꿨다. 1단계 로드 조건에 "관례 기준선 밖 형식 파일 추가"를 더해 렌즈 ③(부가 코드)도 체크리스트가 로드되게 했다. 13,109→11,931자.
+- spec-writer "승인된 스펙의 수정"(L0·L1·L2 표, 커밋·알림·상대 확인 규칙) → `references/change-levels.md`. 본문엔 등급 셋 요약과 "기준 문장을 고치면 추적성 표도" 규칙. 10,062→8,623자.
+- spec-conformance-check "보고 포맷" → `references/report-template.md`. 본문엔 한국어·PASS마다 실행 증거·남은 불확실성 규칙. 9,333→8,286자.
+- tdd는 손대지 않았다. 테스트 층 판정·좋은 테스트 원칙은 테스트를 도출할 때마다 쓰는 판단 규칙이라 "그 단계에서만 읽는 것"이 아니다 — 1묶음 설계 때의 어림(→7.6k)은 틀렸다.
+- 옮긴 두 절은 원문과 diff 0. 1묶음에서 바꾼 `has-traceability` 채점기의 패턴에 `|---`가 들어 있어 케이스 로더가 "1 case file(s) failed to load"를 냈다 — 표 머리글 `| 스펙 기준 |`을 찾는 패턴으로 바꾸고 YAML·정규식·로드를 확인했다.
+
+**측정**(fable 3회·sonnet 심판, 채점기가 옮긴 부분을 보는 케이스만): be-review local-reasoning-with/without-declaration 각 3/3 전 채점기 통과. routes-spec-conformance-check는 conformance-verdict 2/3이었고, 수정 전 main(0.1.21)으로 같은 케이스를 돌려도 2/3에 같은 양상이었다 — 떨어진 보고서는 복구 정책을 인용하며 테스트 보강 위임을 제안해 LLM 채점기의 "계획·수정 제안으로 중심 이동 금지" 조건에 걸렸다. 2묶음 변경과 무관하고 0.1.17의 "독립 스펙 검증 실패를 복구 정책에 연결" 이후의 양상이다. 후속 후보: 채점기 조건 4를 "복구 정책에 따른 위임 제안은 중심 이동이 아니다"로 조정하거나, 스킬이 보고서 안에서 제안을 "다음 조치" 절로 분리하도록. spec-writer 케이스는 채점기가 수정 등급을 보지 않아 생략. 결과 JSON 4개는 각 플러그인 `evals/history/`에 보관.
+
+**다음**: 3묶음(using-agent-skills 빠른 참조 1.1k가 라우팅 표와 중복).
