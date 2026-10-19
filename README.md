@@ -99,13 +99,15 @@ flowchart TD
     tdd -.->|테스트 도출 5출처| plan
     tdd -.->|"RED→GREEN→REFACTOR<br>지시문 주입"| exec
     exec --> verify
-    verify -->|FAIL| plan
+    verify -->|FAIL| recovery["원인 진단 · 제한된 복구"]
+    recovery -->|허용 범위 · 잔여 회차| exec
+    recovery -->|승인 필요한 변경| plan
+    recovery -->|한도 초과 · 새 근거 없음| blocked["보존 후 사용자 보고"]
     verify -->|PASS| review
     verify -.->|PASS| adr2
-    review -->|수정 필요| plan
+    review -->|수정 필요| recovery
     review -->|통과| done
 
-    linkStyle 13,16 stroke:#C5221F,color:#C5221F
     style gate1 fill:#f9e2af,color:#000
     style gate2 fill:#f9e2af,color:#000
     style adr1 fill:#cba6f7,color:#000
@@ -113,7 +115,7 @@ flowchart TD
     style tdd fill:#a6e3a1,color:#000
 ```
 
-노란 마름모 2곳(스펙·계획 승인)만 사람이 개입하는 게이트이고, 나머지 전환은 에이전트 간 자동 연결이다. 보라색은 단계가 아니라 두 시점에 끼어드는 ADR 기록이고, 초록색은 계획(테스트 도출)과 실행(하위 에이전트 지시문)에 주입되는 코드 작성 규율 tdd다.
+노란 마름모 2곳은 최초 스펙·계획 승인이다. 실행 중에는 제한된 자동 복구를 적용하고, 승인 경계 밖 변경·한도 초과·새 근거 없는 반복만 사람에게 올린다. 보라색은 단계가 아니라 두 시점에 끼어드는 ADR 기록이고, 초록색은 계획(테스트 도출)과 실행(하위 에이전트 지시문)에 주입되는 코드 작성 규율 tdd다.
 
 ### 진입점 — 모든 작업이 1번부터 시작하지 않는다
 
@@ -158,3 +160,8 @@ claude plugin eval . --scaffold --trust-plugin --no-publish
 - 기존 plan-writer/plan-executor/adr-writer: 포맷 계약과 오케스트레이션 구조
 
 원본에서 무엇을 왜 바꿨는지는 [CUSTOMIZATIONS.md](CUSTOMIZATIONS.md)에 기록되어 있다.
+
+
+### 제한된 자동 복구 (be-workflow 0.1.17)
+
+실행 중 실패는 오케스트레이터가 원인을 분류하고 승인된 동작·범위·제약 안에서 부분 수정으로 복구한다. 최초 실행 이후 작업당 최대 2회이며 새 근거 없는 동일 가설 반복은 중단한다. 완료 코드를 보존하고 영향받는 부분만 재검증한다. 계획의 `복구 기록`에 회차·근거·보정·검증을 남기므로 임시 브리프 파일 없이도 이력을 유지한다. 권한 경계 밖 변경이나 한도 초과는 사용자에게 보고한다. 상세 조건은 [복구 정책](plugins/be-workflow/skills/plan-executor/references/recovery-policy.md)을 따른다.

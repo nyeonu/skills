@@ -54,7 +54,7 @@ description: 승인된 스펙을 실행 가능한 PLAN.md로 분해하는 스킬
 8. **PLAN.md 작성**: `references/plan-template.md`를 읽고 그 템플릿을 그대로 따라 작성한다. 단일 티켓이면 `kind: single`로 작업 블록(`references/work-plan-template.md`의 "작업 블록")을 4절에 직접 둔다. 에픽이면 `kind: epic`으로 4절에 작업 plan 목록·순서만 두고, 승인된 뒤 작업 plan마다 `references/work-plan-template.md`로 하위 문서를 쓴다. 목표·범위·성공 기준은 스펙 소유이므로 계획에 옮겨 적지 않는다 — 실행자 브리프는 plan-executor가 스펙 1·2·6절에서 가져온다.
 9. **자체 검토**: 실행자 입장에서 다시 읽어라. "이 문서만 보고 코드베이스를 처음 보는 실행자가 작업을 끝낼 수 있는가?"에 아니오가 나오는 부분을 보강한다. 파일 경로 실재 여부, 검증 명령 실행 가능 여부를 확인한다.
    - 서로 `depends_on`이 없는 작업들끼리 "대상 파일"이 겹치는지도 확인한다 — 겹치면 plan-executor가 병렬로 띄울 수 있으므로, 한쪽에 `depends_on`을 걸어 순서를 정하거나 한 작업으로 합친다. 같은 파일을 두 작업이 동시에 고치면 한쪽 변경이 다른 쪽에 의해 되돌려질 수 있다.
-10. **승인 요청**: `status: draft`로 저장하고 사용자에게 제시한다. 선택한 방식과 이유, 범위, 추적성을 중심으로 검토를 요청한다. 실행(plan-executor)은 승인 후에만 진행된다 — 계획을 작성한 세션이 곧바로 실행까지 이어가지 않는다.
+10. **승인 요청**: `status: draft`로 저장하고 사용자에게 제시한다. 선택한 방식과 이유, 범위, 추적성을 중심으로 검토를 요청한다. 실행(plan-executor)은 승인 후에만 진행된다 — 계획을 작성한 세션이 곧바로 실행까지 이어가지 않는다. 승인 후의 제한된 기술 보정은 plan-executor의 `references/recovery-policy.md`를 따른다. 최초 계획 승인이나 스펙·설계 제약 변경 승인을 대신하지 않는다.
 11. **ADR 후보 안내**: 계획에 되돌리기 비싼 결정(프레임워크·의존성, 데이터 모델·스키마, 인증 전략, API 아키텍처)이 포함되면 "선택한 방식과 이유"에 표시하고, **승인 직후 adr-writer로 ADR을 `Proposed`로 작성하도록** 사용자에게 안내한다 (2시점 ADR의 첫 시점).
 
 ## 타협 금지 (Anti-Rationalization)
@@ -84,3 +84,4 @@ description: 승인된 스펙을 실행 가능한 PLAN.md로 분해하는 스킬
 - 저장: 스펙과 같은 폴더. 단일 티켓은 `docs/<티켓 키>/plan.md`(`kind: single`). 에픽은 `docs/<에픽 키>/plan.md`(`kind: epic`)이고, 승인된 뒤 작업 plan을 `docs/<에픽 키>/<작업 티켓 키>/plan.md`에 하나씩 쓴다(`references/work-plan-template.md`). 작업 plan의 `plan_id`는 작업 티켓 키, `parent`는 `../plan.md`, `parent_rev`는 에픽 plan의 최신 커밋 해시(`git log -1 --format=%H -- ../plan.md`)다.
 - frontmatter의 `spec` 필드에 원본 스펙 문서 경로(같은 폴더면 `spec.md`, 작업 plan이면 `../spec.md`)를, `spec_rev`에 그 파일의 최신 커밋 해시(`git log -1 --format=%H -- <스펙 경로>`)를 기록한다. plan-executor가 실행 전에 이 값으로 "계획 이후 스펙이 바뀌었는지"를 기계적으로 확인한다.
 - 사용자가 다른 경로를 지정하면 그것을 따른다.
+
