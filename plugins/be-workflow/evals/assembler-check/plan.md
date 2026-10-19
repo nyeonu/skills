@@ -40,7 +40,7 @@ public void save(Profile p);   // 이 조각은 T1 브리프에 들어가면 안
 |---|---|---|
 | 생년 상한 | `BirthYearValidator.isValid` static | `BirthYearValidatorTest` (T1) |
 
-### 관여하는 매직
+### 관련된 암묵적 동작
 
 - 없음
 

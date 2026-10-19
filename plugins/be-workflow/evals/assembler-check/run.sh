@@ -18,4 +18,6 @@ grep -q 'BirthYearValidator.java' "$OUT" || { echo "Shared design에 참조 타�
 grep -q 'ProfileService.java' "$OUT" && { echo "Shared design에 참조하지 않은 조각이 들어감"; fail=1; }
 grep -q '^### T1: 검증 상한 수정' "$OUT" || { echo "Your task에 작업 블록이 없음"; fail=1; }
 grep -q 'do NOT work' "$OUT" || { echo "템플릿 규칙(우회 금지)이 없음"; fail=1; }
+echo "$stats" | grep -q '작업 블록 [0-9]*줄 · Shared design [0-9]*줄 · Goal [0-9]*줄' || { echo "통계에 구성 요소별 줄 수가 없음"; fail=1; }
+grep -q '상한 초과' "$OUT.stats" && { echo "최소 픽스처에서 상한 초과 경고가 남"; fail=1; }
 if [ $fail = 0 ]; then echo "OK — $stats"; else exit 1; fi

@@ -42,6 +42,7 @@ PLAN_TASK_END = r"^### T\d+:|^## "
 CODE_CHUNK_SPLIT = r"^\s*//\s*<"      # 2절 코드 블록을 타입별로 나누는 "// <경로>" 주석
 FILE_ROW = r"^\s*\| `"                # 변경 파일 표 행 (통계용)
 TEST_BULLET = r'^\s*- "'              # 작성할 테스트 불렛 (통계용)
+LIMIT_TASK, LIMIT_SHARED, LIMIT_GOAL = 80, 60, 20   # 권장 상한(줄). work-plan-template 작업 블록 규칙과 같이 바꾼다
 # ------------------------------------------------------------------------------------------------
 
 
@@ -267,13 +268,26 @@ def main():
     tests = len(re.findall(TEST_BULLET, task, re.M))
     lines = brief.count("\n") + 1
     chars = len(brief)
+    task_lines = task.count("\n") + 1
+    sd_lines = sd.count("\n") + 1 if sd else 0
+    goal_lines = g.count("\n") + 1
     stats = (f"<!-- brief {a.task} {a.model} · {lines}줄 · {chars}자 · 추정 토큰 {chars // 3} · "
              f"Shared design 참조 {len(found)}(명시 {len(explicit)}, 해소 실패 {len(missing)}) · "
-             f"변경 파일 {files} · 테스트 {tests} -->")
+             f"변경 파일 {files} · 테스트 {tests} · 작업 블록 {task_lines}줄 · Shared design {sd_lines}줄 · Goal {goal_lines}줄 -->")
+    # 구성 요소별 권장 상한(work-plan-template 작업 블록 규칙). 초과는 경고만 — 계획 결함 후보로 사용자에게 보인다.
+    over = []
+    if task_lines > LIMIT_TASK:
+        over.append(f"작업 블록 {task_lines}>{LIMIT_TASK}")
+    if sd_lines > LIMIT_SHARED:
+        over.append(f"Shared design {sd_lines}>{LIMIT_SHARED}")
+    if goal_lines > LIMIT_GOAL:
+        over.append(f"Goal {goal_lines}>{LIMIT_GOAL}")
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(stats + "\n" + brief, encoding="utf-8")
     print(stats)
+    if over:
+        print("상한 초과(경고): " + ", ".join(over) + " — 작업을 나누거나 참조를 줄일 후보")
     if missing:
         print("해소 실패(명시 참조인데 2절에 없음): " + ", ".join(missing))
         return 2
