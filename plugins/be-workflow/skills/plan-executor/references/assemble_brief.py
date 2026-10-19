@@ -9,11 +9,14 @@
         --out docs/T-1/briefs/T-1-T2-sonnet.md
 
 - Goal: 스펙 "## 1." 절에서 첫 "###" 소제목 전까지(불렛만). 배경 소절은 실행자에게 주지 않는다.
-- Do not touch: 스펙 2절 "### 제외" 소절 + "## 6." 절 전문.
+- Do not touch: 스펙 2절 "### 제외" 소절 + "## 6." 절 전문. 둘 다 필수 — 하나라도 제목이 없으면 종료 코드 1.
 - Your task: 계획에서 "### <task>:" 블록 전문.
 - Shared design: 작업 블록이 백틱으로 가리키는 이름을 계획 "## 2." 절(작업 plan이면 상위 에픽 plan의 2절도)에서
   찾아 넣는다. 코드 블록은 "// <경로>" 주석 단위로 쪼개 이름이 든 조각만, 표·불렛은 이름이 든 줄만.
   명시 참조("2절 `X` 참조", "`X` 참조")는 못 찾으면 해소 실패로 센다 — 오케스트레이터는 그때 실행자를 띄우지 않는다.
+  명시 참조가 `Type.member` 꼴이면 그 타입의 조각 안에 멤버가 있어야 해소다(타입만 있거나, 다른 타입에 같은 이름의 멤버만 있으면 실패).
+  조각·줄은 소유 타입 이름으로만 고르고 멤버 이름만으로는 고르지 않는다. 암묵 참조는 타입 단위다.
+  해소의 기준은 승인된 계획 2절이지 현재 코드가 아니다 — 아직 구현되지 않은 선언을 참조하는 것은 정상이다.
   그 밖의 백틱 이름은 2절에 있으면 넣고 없으면 조용히 넘긴다.
 - 첫 줄 통계는 고정 형식 한 줄이다(측정 비교용).
 
@@ -93,11 +96,12 @@ def goal(spec_body: str) -> str:
     return "\n".join(kept).rstrip()
 
 
-def do_not_touch(spec_body: str) -> str:
+def do_not_touch(spec_body: str):
+    """(제외 소절, 6절) 각각. 둘 다 필수라 호출자가 따로 검사한다 — 합쳐서 비었는지만 보면 한쪽이 빠져도 통과한다.
+    section()은 제목 줄을 포함하므로 본문이 "없음"인 유효 절은 비어 있지 않고, 제목 자체가 없을 때만 빈 문자열이다."""
     excl = section(spec_body, SPEC_EXCLUDE_START, SPEC_EXCLUDE_END)
     six = section(spec_body, SPEC_CONSTRAINT_START, SPEC_CONSTRAINT_END)
-    parts = [p for p in (excl, six) if p]
-    return "\n\n".join(parts)
+    return excl, six
 
 
 def task_block(plan_body: str, task_id: str) -> str:
@@ -148,6 +152,18 @@ def simple_name(n: str) -> str:
     n = n.split("(")[0]
     n = n.split("<")[0]
     return n.split(".")[0] if not n.startswith("@") else n
+
+
+FILE_EXT = {"java", "kt", "kts", "ts", "js", "py", "go", "rs", "sql", "yml", "yaml", "md"}
+
+
+def member_of(n: str):
+    """`Type.member(...)` → member, 그 밖에는 None. `Type.java` 같은 파일명은 멤버가 아니라 타입 이름이다."""
+    head = n.split("(")[0]
+    if "." not in head or n.startswith("@"):
+        return None
+    m = head.split(".")[1]
+    return None if m in FILE_EXT else m
 
 
 def code_chunks(sec2: str):
@@ -210,24 +226,30 @@ def shared_design(sec2_texts, names, explicit):
         lines = prose_lines(sec2)
         for n in targets:
             key = simple_name(n)
-            member = n.split("(")[0].split(".")[1] if "." in n.split("(")[0] and not n.startswith("@") else None
+            member = member_of(n)
             if not key or len(key) < 3:
                 continue
             hit = False
+            member_hit = False
             for lang, ch in chunks:
-                if chunk_declares(key, ch) or (member and chunk_declares(member, ch)):
+                if chunk_declares(key, ch):   # 조각은 소유 타입으로만 고른다 — 멤버 이름만으로 다른 타입 조각을 끌어오지 않는다
                     hit = True
+                    if member and chunk_declares(member, ch):
+                        member_hit = True
                     if (lang, ch) not in picked_code:
                         picked_code.append((lang, ch))
             for ln in lines:
-                if line_mentions(key, ln) or (member and line_mentions(member, ln)):
+                if line_mentions(key, ln):
                     hit = True
+                    if member and line_mentions(member, ln):
+                        member_hit = True
                     if ln not in picked_lines and not ln.startswith("|---") and "| 파일 |" not in ln and "| 결정 |" not in ln:
                         picked_lines.append(ln)
-            if hit:
-                found.add(n)
+            if hit and not (n in explicit and member and not member_hit):
+                found.add(n)   # 명시 참조가 Type.member 꼴이면 멤버까지 2절에 있어야 해소다 — 타입만 있으면 실행자가 멤버를 추측한다
     found_keys = {simple_name(f) for f in found}
-    missing = sorted(e for e in explicit if e not in found and simple_name(e) not in found_keys)
+    missing = sorted(e for e in explicit if e not in found
+                     and (member_of(e) or simple_name(e) not in found_keys))
     out = []
     out.extend(dict.fromkeys(aliases))
     for lang, ch in picked_code:
@@ -256,10 +278,12 @@ def main():
         print(f"작업 블록을 찾지 못함: {a.task}", file=sys.stderr)
         return 1
     g = goal(spec_body)
-    dnt = do_not_touch(spec_body)
-    if not g or not dnt:
-        print("스펙 1절 또는 2절 제외/6절을 찾지 못함 — 스펙 제목이 템플릿과 같은지 확인", file=sys.stderr)
+    excl, six = do_not_touch(spec_body)
+    absent = [name for name, part in (("1절(## 1.)", g), ("2절 제외(### 제외)", excl), ("6절(## 6.)", six)) if not part]
+    if absent:
+        print("스펙에서 찾지 못한 절: " + ", ".join(absent) + " — 스펙 제목이 템플릿과 같은지 확인. 내용이 없으면 절은 두고 `없음`이라고 적는다", file=sys.stderr)
         return 1
+    dnt = excl + "\n\n" + six
 
     sec2s = [section2(plan_body)]
     if a.parent:

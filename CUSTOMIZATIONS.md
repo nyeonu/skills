@@ -588,3 +588,18 @@ be-workflow 스킬·참고자료 합계 53,613자 → 48,866자(−4,747자). �
 
 **측정**: 생략. 표 삭제는 본문 변경이지만 routes-using-agent-skills 채점기 3개(발동·진입 스킬 이름·오진입 금지)가 보지 않는 부분이고, 나머지는 문구 변경이다.
 
+## Codex 검토 반영 — 조립기 절별 검사·멤버 해소, 재개 규칙, sealed 조건 분리 (be-workflow 0.1.27 / be-review 0.1.13)
+
+**계기**: Codex가 작성한 전달 문서(2026-10-20, 저장소 밖)의 10항목을 검토했다. 재현 가능한 2건은 재현됐고, 정책 제안 중 2건은 실제 문서 충돌이었다. 회신 전문은 저장소 밖(`~/Documents/Codex/…/claude-plugin-review-response.md`)에 두었다. 반박한 항목(interview-me 되묻기, 부모 직접 수정 단축 흐름, 스펙 승인 시 push)은 의도된 설계라 바꾸지 않았고, 스펙 변경 감지(미커밋 변경 미감지)는 사용자 보류다.
+
+**바꾼 것**:
+- `assemble_brief.py` `do_not_touch()`가 제외 소절과 6절을 각각 돌려주고, `main()`이 1절·제외·6절을 따로 검사해 빠진 절 이름을 보고하며 종료 코드 1. 전에는 합친 결과가 비었는지만 봐서 한쪽이 빠져도 종료 코드 0이었다(재현: 6절 제거 → exit 0, 브리프에 6절 없음). `section()`이 제목 줄을 포함하므로 본문이 `없음`인 유효 절과 제목이 없는 문서가 구분된다.
+- 명시 참조가 `Type.member` 꼴이면 2절 조각 안에 그 멤버가 있어야 해소로 친다. 전에는 `simple_name()`이 멤버를 떼어 타입만 찾아 `BirthYearValidator.missingMethod`도 해소 실패 0이었다. 암묵 참조(작업 블록의 그 밖의 백틱 이름)는 타입 단위 그대로. 기준은 계획 2절이지 현재 코드가 아니라는 점을 docstring과 plan-executor 2절에 적었다.
+- plan-executor 1절에 **재개** 규칙 추가: `status: in_progress`는 미승인이 아니라 중단된 실행이므로 승인을 다시 묻지 않고 frontmatter `tasks`의 `status`로 중단 지점을 잇는다. 자동 탐색 대상에 `in_progress` 포함. 전에는 using-agent-skills가 "진행 중 계획 → plan-executor, 중단 지점부터"를 약속하는데 plan-executor는 `approved`가 아니면 승인을 다시 묻고 탐색도 `approved`만 찾아 충돌했다.
+- `structure-rules.md` 6행: 별도 파일 분리 조건(저장소에 같은 꼴 관례가 있을 때)과 sealed 결과 타입 조건(결과 셋 이상·Java 21·소비처 한 곳)을 분리. 전 문장은 둘을 한 조건으로 묶어, 실측 산출물이 기존 검증기 관례를 따라 만든 새 파일까지 금지하는 꼴이었다.
+- Codex 재검토(같은 날)가 첫 수정본의 구멍 둘을 잡았다. (1) 멤버 검사가 소유 타입과 묶이지 않아 `BirthYearValidator.save`·`UnknownValidator.save`가 `ProfileService.save`로 해소되고 그 조각이 브리프에 들어갔다(재현: 둘 다 exit 0, ProfileService 조각 포함) → 조각·줄을 소유 타입으로만 고르고 그 안에서 멤버를 확인하도록 고침. 암묵 참조도 멤버 이름만으로 다른 타입 조각을 끌어오지 않는다. (2) tdd 77행이 옛 문장("별도 파일과 sealed 결과 타입은 결과가 셋 이상일 때만")을 그대로 갖고 있어 계획 규칙과 충돌 → structure-rules를 원본으로 가리키며 같은 뜻으로 맞추고, be-review 국소 추론 체크리스트에 "관례에 따른 별도 파일은 2단계가 아니라 1단계"를 한 문단 추가. 15행 승인 확인 조건에도 `in_progress` 제외를 명시.
+- 보존된 실제 산출물 셋(plan.md 6작업)에 수정 전·후 스크립트를 돌려 대조하니 해소 수가 네 작업에서 하나씩 줄었다. 줄어든 이름은 전부 `BirthYearValidator.java`·`.validate` 같은 2절에 없는 기존 클래스의 암묵 참조였고, 전 버전은 파일명 `X.java`의 "java"를 멤버로 보고 모든 `.java` 행을 Shared design에 끌어오고 있었다(그래서 브리프가 더 길었음). 같은 이유로 명시 참조 "2절 `X.java` 참조"가 멤버 "java"를 찾다 실패하지 않도록 파일 확장자는 멤버로 보지 않게 했다.
+- `assembler-check/run.sh`에 탈락 입력 다섯(6절 누락·제외 누락·없는 멤버 명시 참조·다른 타입의 멤버 명시 참조·없는 타입의 멤버 명시 참조)과 통과 입력 셋(있는 멤버 명시 참조, 파일명 꼴 `Type.java` 명시 참조, 암묵 `Type.member`는 다른 타입 조각 없이 통과)을 추가. 처음 추가본은 `set -e` 때문에 종료 코드 2인 실행에서 스크립트가 멈춰 `|| rc=$?`로 고쳤다.
+
+**측정**: assembler-check 통과(양성 1 + 탈락 5 + 통과 3). 보존 산출물 6작업 전·후 대조는 위. plan-executor 1절 재개 규칙은 routes-plan-executor 케이스(draft 계획, 승인 질문에서 종료)가 볼 수 없어 측정 생략 — README "알려진 검증 공백"의 범위다. 문구 변경(structure-rules)은 생략.
+
