@@ -1,0 +1,307 @@
+{
+  "schemaVersion": 1,
+  "claudeVersion": "2.1.278",
+  "startedAt": "2026-10-19T11:32:38.725Z",
+  "durationSeconds": 576,
+  "costUsd": 5.5141445,
+  "partial": false,
+  "suite": {
+    "root": "/workspace/skills/.claude/worktrees/trusting-ishizaka-fe28b6/plugins/be-workflow",
+    "ablation": "none",
+    "modelOverride": "fable",
+    "judgeModel": "sonnet",
+    "caseFilter": "routes-task-breakdown",
+    "threshold": 1,
+    "concurrency": 1,
+    "plugins": [
+      {
+        "name": "be-workflow",
+        "version": "0.1.22",
+        "path": "/workspace/skills/.claude/worktrees/trusting-ishizaka-fe28b6/plugins/be-workflow"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "name": "routes-task-breakdown",
+      "dir": "evals/routes-task-breakdown",
+      "source": "mixed",
+      "promptMarkdown": "`docs/PROFILE-7/spec.md` 스펙 승인됐어. 이걸 어떻게 나눠서 작업할지 정리해줘.",
+      "model": "sonnet",
+      "runsPerCase": 3,
+      "timeoutSeconds": 600,
+      "maxTurns": 25,
+      "graders": [
+        {
+          "name": "has-traceability",
+          "type": "regex",
+          "weight": 1,
+          "config": {
+            "target": {
+              "source": "file",
+              "path": "docs/PROFILE-7/plan.md"
+            },
+            "pattern": "## 3\\. 추적성[\\s\\S]*?\\| 스펙 기준 \\|[^\\n]*\\n\\|[-| :]+\\n\\| *[^\\s|][^\\n]*\\|",
+            "flags": "",
+            "match": "contains"
+          }
+        },
+        {
+          "name": "no-other-workflow-skill",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?(interview-me|spec-writer|plan-executor|tdd|spec-conformance-check|adr-writer|using-agent-skills)\"",
+            "min": 0,
+            "max": 0,
+            "arm": "both"
+          }
+        },
+        {
+          "name": "plan-has-decision-logic-placement",
+          "type": "regex",
+          "weight": 1,
+          "config": {
+            "target": {
+              "source": "file",
+              "path": "docs/PROFILE-7/plan.md"
+            },
+            "pattern": "## 2\\. 공통 설계[\\s\\S]*?### 결정 로직 위치[\\s\\S]*?\\n\\| *[^\\s|][^\\n]*\\|",
+            "flags": "",
+            "match": "contains"
+          }
+        },
+        {
+          "name": "reads-plan-template",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Read",
+            "input_match": "references/plan-template\\.md",
+            "arm": "with-only"
+          }
+        },
+        {
+          "name": "reads-structure-rules",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Read",
+            "input_match": "structure-rules\\.md",
+            "arm": "with-only"
+          }
+        },
+        {
+          "name": "skill-fired",
+          "type": "tool_used",
+          "weight": 1,
+          "config": {
+            "tool": "Skill",
+            "input_match": "\"skill\"\\s*:\\s*\"(?:[\\w-]+:)?task-breakdown\""
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 19,
+            "costUsd": 1.7073789999999998,
+            "judgeCostUsd": 0,
+            "durationSeconds": 180,
+            "startedAt": "2026-10-19T11:32:38.797Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-zvakIS/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "has-traceability",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched ## 3\\. 추적성[\\s\\S]*?\\| 스펙 기준 \\|[^\\n]*\\n\\|[-| :]+\\n\\| *[^\\s|][^\\n]*\\|",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "plan-has-decision-logic-placement",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched ## 2\\. 공통 설계[\\s\\S]*?### 결정 로직 위치[\\s\\S]*?\\n\\| *[^\\s|][^\\n]*\\|",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "reads-plan-template",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "reads-structure-rules",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 18,
+            "costUsd": 1.601273,
+            "judgeCostUsd": 0,
+            "durationSeconds": 165,
+            "startedAt": "2026-10-19T11:35:39.082Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-c9O5CL/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "has-traceability",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched ## 3\\. 추적성[\\s\\S]*?\\| 스펙 기준 \\|[^\\n]*\\n\\|[-| :]+\\n\\| *[^\\s|][^\\n]*\\|",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "plan-has-decision-logic-placement",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched ## 2\\. 공통 설계[\\s\\S]*?### 결정 로직 위치[\\s\\S]*?\\n\\| *[^\\s|][^\\n]*\\|",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "reads-plan-template",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "reads-structure-rules",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          },
+          {
+            "score": 1,
+            "passed": true,
+            "turns": 18,
+            "costUsd": 2.2054925,
+            "judgeCostUsd": 0,
+            "durationSeconds": 231,
+            "startedAt": "2026-10-19T11:38:24.405Z",
+            "error": null,
+            "tracePath": "/private/tmp/e-fZKdoY/out/trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "has-traceability",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched ## 3\\. 추적성[\\s\\S]*?\\| 스펙 기준 \\|[^\\n]*\\n\\|[-| :]+\\n\\| *[^\\s|][^\\n]*\\|",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "no-other-workflow-skill",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 0x (expected 0..0)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "plan-has-decision-logic-placement",
+                "passed": true,
+                "weight": 1,
+                "explanation": "matched ## 2\\. 공통 설계[\\s\\S]*?### 결정 로직 위치[\\s\\S]*?\\n\\| *[^\\s|][^\\n]*\\|",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "reads-plan-template",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "reads-structure-rules",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Read called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              },
+              {
+                "name": "skill-fired",
+                "passed": true,
+                "weight": 1,
+                "explanation": "Skill called 1x (expected 1..∞)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 1,
+        "passRate": 1
+      }
+    }
+  ],
+  "aggregates": {
+    "casesTotal": 1,
+    "casesPassed": 1,
+    "overallScore": 1,
+    "overallPassRate": 1
+  }
+}

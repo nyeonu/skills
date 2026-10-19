@@ -48,6 +48,11 @@ bash plugins/be-workflow/evals/assembler-check/run.sh
 
 `assembler-check/{spec.md,plan.md}`는 새 형식의 최소 문서이고 `expected.txt`가 통계 첫 줄의 기대값이다. 통계가 바뀌는 것이 의도된 변경이면 `expected.txt`를 갱신한다.
 
+## 알려진 검증 공백
+
+- routes-plan-executor는 계획이 `draft`라 승인 질문에서 끝난다. 그래서 디스패치 이후(브리프 조립, 실행자 보고 검증, `references/report-template.md` 서식의 사용자 보고)는 이 묶음이 검증하지 못한다. 승인된 계획으로 실행자(Agent 도구)까지 띄우는 케이스는 비용·시간이 커 만들지 않았고, 실제 티켓 실행 기록(`history/`의 CASE-001 2차)이 대신한다.
+- 산출물 채점기는 마지막 메시지나 파일의 정규식·LLM 판정이라 "참고 파일을 읽었는가"(`tool_used: Read`)와 "산출물에 그 규칙의 흔적이 있는가"(파일 정규식)까지만 본다. 규칙을 제대로 적용했는지는 LLM 채점기 없이는 판정하지 않는다.
+
 ## 언제 재는가
 
 측정은 바꾼 것이 채점기에 닿을 때만 한다. 한 묶음이 7~10달러이므로 매 수정마다 돌리지 않는다.
