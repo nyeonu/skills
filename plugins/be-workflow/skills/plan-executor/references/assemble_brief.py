@@ -39,10 +39,10 @@ PLAN_DESIGN_START = r"^## 2\. "        # 계획 2절 공통 설계 → Shared de
 PLAN_DESIGN_END = r"^## 3\. "
 PLAN_TASK_HEADING = "### {task}:"       # 작업 블록 제목. 다음 "### T<n>:" 또는 "## "까지
 PLAN_TASK_END = r"^### T\d+:|^## "
-CODE_CHUNK_SPLIT = r"^\s*//\s*<"      # 2절 코드 블록을 타입별로 나누는 "// <경로>" 주석
+CODE_CHUNK_SPLIT = r"^\s*//\s*(<|[A-Z][A-Za-z0-9]*(\.java|\.kt)?\s*($|—|-|:))"   # 2절 코드 블록을 타입별로 나누는 헤더 주석: "// <경로>/이름.java" 또는 "// 이름 — 설명"
 FILE_ROW = r"^\s*\| `"                # 변경 파일 표 행 (통계용)
 TEST_BULLET = r'^\s*- "'              # 작성할 테스트 불렛 (통계용)
-LIMIT_TASK, LIMIT_SHARED, LIMIT_GOAL = 80, 60, 20   # 권장 상한(줄). work-plan-template 작업 블록 규칙과 같이 바꾼다
+LIMIT_TASK, LIMIT_SHARED, LIMIT_GOAL = 80, 80, 20   # 권장 상한(줄). work-plan-template 작업 블록 규칙과 같이 바꾼다. Shared design은 2차 측정(T4 74·T7 81)으로 60→80
 # ------------------------------------------------------------------------------------------------
 
 
@@ -168,6 +168,8 @@ def chunk_declares(key: str, chunk: str) -> bool:
     """조각이 key를 선언하는가 — 헤더 주석 경로의 파일명, 또는 class/record/interface/enum 선언, 또는 메서드 선언."""
     if re.search(rf"//\s*<[^>]*>[^\n]*/{re.escape(key)}\.(java|kt|ts|py)\b", chunk):
         return True
+    if re.search(rf"^\s*//\s*{re.escape(key)}(\.java|\.kt)?\s*($|—|-|:)", chunk, re.M):
+        return True  # "// 이름 — 설명" 형태의 조각 헤더
     if re.search(rf"\b(class|record|interface|enum)\s+{re.escape(key)}\b", chunk):
         return True
     for ln in chunk.split("\n"):

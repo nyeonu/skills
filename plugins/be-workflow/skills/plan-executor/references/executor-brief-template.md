@@ -47,8 +47,12 @@ Rules:
   change only its listed files and preserve unrelated work. Keep a verified
   fix; report remaining failures instead of starting another repair loop.
 - A line in "Shared design" or "주의사항" marked `(추정)` is the planner's
-  unverified assumption. Verify it before relying on it. If it is wrong, do
-  not work around it — report under `blocked` with the evidence.
+  unverified assumption. Verify it before relying on it. If it is wrong:
+  when YOUR task is the one that introduces that very infrastructure (the
+  task says so — e.g. a test-support or build-setup introduction task), fix
+  it within your listed files and state under `notes` exactly what you
+  changed and why, so the plan's section 2 can be corrected; for any other
+  task, do not work around it — report under `blocked` with the evidence.
 - Do not add annotations, AOP, reflection, or config-driven behavior the task
   does not name. If the task requires placing decision logic (access checks,
   state transitions, rules) inside a repository/HTTP/reactive call chain, or
