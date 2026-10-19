@@ -50,7 +50,7 @@ bash plugins/be-workflow/evals/assembler-check/run.sh
 
 ## 알려진 검증 공백
 
-- routes-plan-executor는 계획이 `draft`라 승인 질문에서 끝난다. 그래서 디스패치 이후(브리프 조립, 실행자 보고 검증, `references/report-template.md` 서식의 사용자 보고)는 이 묶음이 검증하지 못한다. 승인된 계획으로 실행자(Agent 도구)까지 띄우는 케이스는 비용·시간이 커 만들지 않았고, 실제 티켓 실행 기록(`history/`의 CASE-001 2차)이 대신한다.
+- routes-plan-executor는 계획이 `draft`라 승인 질문에서 끝난다. 그래서 디스패치 이후(브리프 조립, 실행자 보고 검증, `references/report-template.md` 서식의 사용자 보고)는 이 묶음이 검증하지 못한다. 승인된 계획으로 실행자(Agent 도구)까지 띄우는 케이스는 비용·시간이 커 만들지 않았고, 이전 버전의 비식별화 실행 기록은 참고 자료이며, 보고 서식 분리 이후의 동작 검증을 대신하지 않는다.
 - 산출물 채점기는 마지막 메시지나 파일의 정규식·LLM 판정이라 "참고 파일을 읽었는가"(`tool_used: Read`)와 "산출물에 그 규칙의 흔적이 있는가"(파일 정규식)까지만 본다. 규칙을 제대로 적용했는지는 LLM 채점기 없이는 판정하지 않는다.
 
 ## 언제 재는가
@@ -67,3 +67,9 @@ bash plugins/be-workflow/evals/assembler-check/run.sh
 ## 결과 기록
 
 `results/`는 원시 실행 디렉터리(HTML 보고서 포함)라 커밋하지 않는다. 보관할 결과는 `--json`으로 쓴 JSON을 `history/<측정일>-v<버전>-<무엇>.json`으로 복사하고 `history/README.md` 색인에 한 줄 추가한다. 비교 표(케이스별 `skill-fired` 통과 수와 산출물 채점기 통과 수)는 `CUSTOMIZATIONS.md`의 해당 절에 옮겨 적는다.
+
+## 공개용 기록
+
+픽스처의 `com.example` 소스와 생성되는 프로젝트 지침은 평가용 합성 자료다. 실제 애플리케이션 코드·서비스명·업무 티켓·조직 전용 설정을 가져오지 않는다.
+
+보관된 평가 JSON의 개인 경로는 `/workspace/…`로 비식별화했다. 이 경로는 탐색 가능한 원본 파일 주소가 아니다. 측정 수치·판정은 유지하며, 합성 픽스처와 비식별화한 실제 실행 기록을 구분한다.

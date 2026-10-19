@@ -15,3 +15,9 @@ claude plugin eval . --scaffold --trust-plugin --no-publish --judge-model sonnet
 ```
 
 국소 추론 두 케이스의 루브릭은 "권장 조치가 무엇인가"를 읽어야 해서 기본 심판(haiku)이 오독한다 — `--judge-model sonnet`을 붙인다. 채점기 점검용 단일 실행: `--case <이름> --runs 1 --ablation none`. 모델은 각 `prompt.md`가 sonnet으로 고정하고 있고 `--model`로 덮어쓴다. `results/`는 원시 실행 디렉터리라 커밋하지 않는다. 보관할 결과는 `--json`으로 쓴 JSON을 `history/<측정일>-v<버전>-<무엇>.json`으로 복사하고 `history/README.md` 색인에 한 줄 추가한다.
+
+## 공개용 기록
+
+픽스처의 `com.example` 소스와 생성되는 프로젝트 지침은 평가용 합성 자료다. 실제 애플리케이션 코드·서비스명·업무 티켓·조직 전용 설정을 가져오지 않는다.
+
+보관된 평가 JSON의 개인 경로는 `/workspace/…`로 비식별화했다. 이 경로는 탐색 가능한 원본 파일 주소가 아니다. 측정 수치·판정은 유지하며, 합성 픽스처와 비식별화한 실제 실행 기록을 구분한다.

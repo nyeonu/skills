@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 평가용 픽스처. 빈 작업 공간에 git 저장소를 만들고, 기준 커밋 위에 리뷰 대상 변경을 올린다.
+# 가상의 게시판을 사용하는 평가용 합성 픽스처. 빈 작업 공간에 git 저장소를 만들고, 기준 커밋 위에 리뷰 대상 변경을 올린다.
 # 리뷰 세션에는 Bash가 없으므로 변경 내용을 CHANGES.diff 파일로도 남긴다.
 set -euo pipefail
 export GIT_AUTHOR_NAME=eval GIT_AUTHOR_EMAIL=eval@example.com GIT_COMMITTER_NAME=eval GIT_COMMITTER_EMAIL=eval@example.com
@@ -29,7 +29,7 @@ package com.example.post;
 
 import java.util.UUID;
 
-public record BoardDTO(UUID id, UUID artistId, boolean hidden) {}
+public record BoardDTO(UUID id, UUID groupId, boolean hidden) {}
 EOF
 cat > src/main/java/com/example/post/UserDTO.java <<'EOF'
 package com.example.post;
@@ -71,7 +71,7 @@ import reactor.core.publisher.Mono;
 
 /** 외부 멤버십 서비스 HTTP 클라이언트 */
 public interface MembershipClient {
-    Mono<Boolean> isMember(UUID userId, UUID artistId);
+    Mono<Boolean> isMember(UUID userId, UUID groupId);
 }
 EOF
 cat > src/main/java/com/example/post/PostNotFoundException.java <<'EOF'
@@ -196,7 +196,7 @@ public class PostService {
         return postRepository.findById(postId)
             .switchIfEmpty(Mono.error(new PostNotFoundException(postId)))
             .flatMap(post -> boardRepository.findById(post.boardId())
-                .flatMap(board -> membershipClient.isMember(user.id(), board.artistId())
+                .flatMap(board -> membershipClient.isMember(user.id(), board.groupId())
                     .flatMap(member -> {
                         if (board.hidden() && !user.hasAdminRole()) {
                             return Mono.error(new AccessDeniedException(postId));
