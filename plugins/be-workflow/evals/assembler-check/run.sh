@@ -69,6 +69,25 @@ rc=0; python3 -I "$SCRIPT" --spec "$HERE/spec.md" --plan "$TMP/plan-prose-bad.md
 [ $rc = 2 ] || { echo "같은 줄의 다른 타입 멤버(ProfileService.save)가 BirthYearValidator.save의 근거로 잡힘 (exit $rc)"; fail=1; }
 python3 -I "$SCRIPT" --spec "$HERE/spec.md" --plan "$TMP/plan-prose-ok.md" --task T1 --model haiku \
   --worktree /tmp/wt --branch chk --out "$TMP/b-po.md" > "$TMP/b-po.stats" 2>&1 || { echo "불렛에 통째로 적힌 Type.member 명시 참조가 떨어짐"; fail=1; }
+# 산문 계약: (4a) 코드 블록 없이 "결정 로직 위치" 표 행에 백틱 이름만 → 종료 0 + "코드 조각 미수집(경고)";
+#            (4b) 백틱도 없음 → 종료 2, 실패 안내는 "표기에서 찾지 못함"(계약 부재 판정이 아님)
+python3 - "$HERE/plan.md" "$TMP" <<'PY'
+import re, sys, pathlib
+s = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"); o = sys.argv[2]
+v = re.sub(r"```java\n// <main>/profile/BirthYearValidator\.java\n[\s\S]*?```\n", "", s)
+i = v.index("\n## 3.")
+v = v[:i] + "\n- BirthYearValidator는 연도와 올해를 받아 boolean을 돌려주는 static isValid를 둔다. IO 없음.\n" + v[i:]
+v = v.replace("2절 `BirthYearValidator` 참조", "2절 `BirthYearValidator.isValid` 참조")
+pathlib.Path(o + "/plan-prose-a.md").write_text(v, encoding="utf-8")
+pathlib.Path(o + "/plan-prose-b.md").write_text(v.replace("| `BirthYearValidator.isValid` static |", "| BirthYearValidator.isValid static |"), encoding="utf-8")
+PY
+python3 -I "$SCRIPT" --spec "$HERE/spec.md" --plan "$TMP/plan-prose-a.md" --task T1 --model haiku \
+  --worktree /tmp/wt --branch chk --out "$TMP/b-pa.md" > "$TMP/b-pa.stats" 2>&1 || { echo "산문+표 행(4a)이 떨어짐 — 종료 0이어야 함"; fail=1; }
+grep -q '코드 조각 미수집(경고): BirthYearValidator.isValid' "$TMP/b-pa.stats" || { echo "산문+표 행(4a)에 코드 조각 미수집 경고가 없음"; fail=1; }
+rc=0; python3 -I "$SCRIPT" --spec "$HERE/spec.md" --plan "$TMP/plan-prose-b.md" --task T1 --model haiku \
+  --worktree /tmp/wt --branch chk --out "$TMP/b-pbb.md" > "$TMP/b-pbb.stats" 2>&1 || rc=$?
+[ $rc = 2 ] && grep -q '표기에서 명시 참조를 찾지 못함' "$TMP/b-pbb.stats" || { echo "산문만(4b)이 종료 2와 표기 안내를 내지 않음 (exit $rc)"; fail=1; }
+grep -q '코드 조각 미수집' "$OUT.stats" && { echo "기본 픽스처에서 코드 조각 미수집 경고가 남"; fail=1; }
 # 파일명 꼴의 명시 참조(`Type.java`)는 멤버가 아니라 타입 참조 — 통과
 sed 's/2절 `BirthYearValidator` 참조/2절 `BirthYearValidator.java` 참조/' "$HERE/plan.md" > "$TMP/plan-file.md"
 python3 -I "$SCRIPT" --spec "$HERE/spec.md" --plan "$TMP/plan-file.md" --task T1 --model haiku \

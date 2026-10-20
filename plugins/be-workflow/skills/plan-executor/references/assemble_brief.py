@@ -14,6 +14,9 @@
 - Shared design: 작업 블록이 백틱으로 가리키는 이름을 계획 "## 2." 절(작업 plan이면 상위 에픽 plan의 2절도)에서
   찾아 넣는다. 코드 블록은 "// <경로>" 주석 단위로 쪼개 이름이 든 조각만, 표·불렛은 이름이 든 줄만.
   명시 참조("2절 `X` 참조", "`X` 참조")는 못 찾으면 해소 실패로 센다 — 오케스트레이터는 그때 실행자를 띄우지 않는다.
+  해소 실패는 "조립기가 지원하는 표기에서 못 찾음"이지 계약 부재의 판정이 아니다. 산문에 적힌 계약은 오케스트레이터가
+  원문에서 확인하고, 조립기가 읽는 표기로 옮긴 뒤 재조립한다(plan-executor 2절·복구 정책).
+  명시 참조가 코드 조각 없이 표·불렛 줄로만 해소되면 "코드 조각 미수집" 경고를 찍는다(종료 코드 불변).
   명시 참조가 `Type.member` 꼴이면 그 타입의 조각 안에 멤버가 있어야 해소다(타입만 있거나, 다른 타입에 같은 이름의 멤버만 있으면 실패).
   조각·줄은 소유 타입 이름으로만 고르고 멤버 이름만으로는 고르지 않는다. 표·불렛 줄에서는 백틱 하나 안의 `Type.member`만
   멤버 근거로 친다(같은 줄에 다른 타입의 멤버가 있는 것은 근거가 아니다). 암묵 참조는 타입 단위다.
@@ -222,6 +225,7 @@ def opportunistic(n: str) -> bool:
 
 def shared_design(sec2_texts, names, explicit):
     picked_code, picked_lines, found = [], [], set()
+    code_hit_names = set()   # 코드 조각을 하나라도 수집한 이름 — 명시 참조가 표·불렛으로만 해소되면 "코드 조각 미수집" 경고
     aliases = []
     targets = [n for n in names if n in explicit or opportunistic(n)]
     for sec2 in sec2_texts:
@@ -240,6 +244,7 @@ def shared_design(sec2_texts, names, explicit):
             for lang, ch in chunks:
                 if chunk_declares(key, ch):   # 조각은 소유 타입으로만 고른다 — 멤버 이름만으로 다른 타입 조각을 끌어오지 않는다
                     hit = True
+                    code_hit_names.add(n)
                     if member and chunk_declares(member, ch):
                         member_hit = True
                     if (lang, ch) not in picked_code:
@@ -256,13 +261,16 @@ def shared_design(sec2_texts, names, explicit):
     found_keys = {simple_name(f) for f in found}
     missing = sorted(e for e in explicit if e not in found
                      and (member_of(e) or simple_name(e) not in found_keys))
+    # 해소는 됐지만 코드 조각 없이 표·불렛 줄로만 수집된 명시 참조. 산문에 완전한 계약이 있을 수 있으므로
+    # 누락으로 단정하지 않고 경고만 한다 — 오케스트레이터가 2절 원문과 브리프를 대조한다.
+    no_code = sorted(e for e in explicit if e in found and e not in code_hit_names)
     out = []
     out.extend(dict.fromkeys(aliases))
     for lang, ch in picked_code:
         out.append(f"```{lang}\n{ch}\n```")
     if picked_lines:
         out.append("\n".join(picked_lines))
-    return "\n\n".join(out).strip(), found, missing
+    return "\n\n".join(out).strip(), found, missing, no_code
 
 
 def main():
@@ -296,7 +304,7 @@ def main():
         _, pb = split_frontmatter(read(a.parent))
         sec2s.append(section2(pb))
     names, explicit = identifiers(task)
-    sd, found, missing = shared_design(sec2s, names, explicit)
+    sd, found, missing, no_code = shared_design(sec2s, names, explicit)
 
     tpl = TEMPLATE.read_text(encoding="utf-8")
     sd_section = f"## Shared design (verbatim from the approved plan)\n{sd}\n\n" if sd else ""
@@ -328,8 +336,10 @@ def main():
     print(stats)
     if over:
         print("상한 초과(경고): " + ", ".join(over) + " — 작업을 나누거나 참조를 줄일 후보")
+    if no_code:
+        print("코드 조각 미수집(경고): " + ", ".join(no_code) + " — 표·불렛 줄로만 해소됨. 계획 2절 원문에 계약이 있는지, 브리프 Shared design에 충분히 들어갔는지 확인")
     if missing:
-        print("해소 실패(명시 참조인데 2절에 없음): " + ", ".join(missing))
+        print("해소 실패: " + ", ".join(missing) + " — 조립기가 지원하는 표기에서 명시 참조를 찾지 못함. 계획 원문에서 계약 유무를 확인")
         return 2
     return 0
 

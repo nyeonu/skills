@@ -46,11 +46,26 @@ plan-executor의 `references/assemble_brief.py`는 스펙·계획 템플릿의 �
 bash plugins/be-workflow/evals/assembler-check/run.sh
 ```
 
-`assembler-check/{spec.md,plan.md}`는 새 형식의 최소 문서이고 `expected.txt`가 통계 첫 줄의 기대값이다. 통계가 바뀌는 것이 의도된 변경이면 `expected.txt`를 갱신한다. 같은 스크립트가 탈락해야 하는 입력도 돌린다 — 스펙 6절·제외 소절이 없는 변형(종료 코드 1, 빠진 절 이름 보고), 명시 참조 `Type.member`의 멤버가 그 타입 조각에 없는 변형(없는 멤버·다른 타입의 멤버·없는 타입, 종료 코드 2), 있는 멤버의 명시 참조(통과), 파일명 꼴 `Type.java` 명시 참조(통과), 2절 산문 한 줄에 타입과 다른 타입의 멤버가 같이 있는 변형(종료 코드 2)과 같은 줄에 `Type.member`가 통째로 있는 변형(통과), 암묵 `Type.member`(통과하되 다른 타입 조각 미포함).
+`assembler-check/{spec.md,plan.md}`는 새 형식의 최소 문서이고 `expected.txt`가 통계 첫 줄의 기대값이다. 통계가 바뀌는 것이 의도된 변경이면 `expected.txt`를 갱신한다. 같은 스크립트가 탈락해야 하는 입력도 돌린다 — 스펙 6절·제외 소절이 없는 변형(종료 코드 1, 빠진 절 이름 보고), 명시 참조 `Type.member`의 멤버가 그 타입 조각에 없는 변형(없는 멤버·다른 타입의 멤버·없는 타입, 종료 코드 2), 있는 멤버의 명시 참조(통과), 파일명 꼴 `Type.java` 명시 참조(통과), 2절 산문 한 줄에 타입과 다른 타입의 멤버가 같이 있는 변형(종료 코드 2)과 같은 줄에 `Type.member`가 통째로 있는 변형(통과), 산문 계약 변형 둘(표 행에 백틱 이름만 → 종료 0 + "코드 조각 미수집(경고)", 백틱 없음 → 종료 2 + "표기에서 찾지 못함" 안내), 암묵 `Type.member`(통과하되 다른 타입 조각 미포함).
+
+## 참조 처리 케이스 (`reference-handling-*`, boundary 태그)
+
+승인된 새 형식 계획(assembler-check 픽스처 + 프로필 저장소)으로 plan-executor의 디스패치 전 참조 처리를 본다. 평가 샌드박스에는 Gradle이 없어 오케스트레이터가 "실행 전 환경 점검"에서 멈추므로 실행자 배정까지는 가지 않는다 — 그래서 판단은 **최종 plan.md에 남은 것**(보정한 선언·복구 기록·참조 문장)과 조립기 재실행 여부로 채점한다. 하네스의 서브에이전트 도구 이름은 `Task`다. `Edit`·`Write`의 `input_match`는 입력 JSON 전체(바꾼 내용 포함)에 걸리므로 경로 검사는 `"file_path"` 키에 고정한다. 1회 실행 기준 케이스당 1.7~2.3달러.
+
+| 케이스 | 변형 | 기대 | 채점기 |
+|---|---|---|---|
+| `reference-handling-ok` | 정상 참조 | 참조 보정 없이 조립 | 조립기 실행, 복구 회차 사용 행(`\| T1 \| 1/2 \|` 등) 없음, src 직접 수정 없음 |
+| `reference-handling-prose-warn` | 산문 계약 + 표 행 백틱 이름(조립기 종료 0 + 경고) | 원문 확인 → 산문 그대로 선언으로 옮김 → 재조립 | 2절에 `// <main>/profile/BirthYearValidator.java` + `boolean isValid(int year, int thisYear)`, 복구 기록 T1 1/2, 조립기 2회 이상, src 직접 수정 없음 |
+| `reference-handling-prose-fail` | 산문 계약만(조립기 종료 2) | 계약 부재로 단정하지 않고 같은 보정 → 재조립 | 같음 |
+| `reference-handling-missing` | 작업이 2절에도 산문에도 없는 새 타입 `AgeNormalizer.normalize`를 명시 참조, 변경 파일 표에 신규 | 시그니처를 추측하거나 다른 타입으로 대체하지 않고 멈춰 묻기 | 참조 문장 유지, plan.md에 `normalize(…);` 선언 없음, 실행자(`Task`) 미배정, 마지막 메시지에 AgeNormalizer, src 직접 수정 없음 |
+
+```bash
+claude plugin eval . --tag reference-handling --runs 1 --ablation none --scaffold --trust-plugin --no-publish --allow-tools Write Edit Bash Agent --model fable --keep-temp -j 2 --json evals/results/<이름>.json
+```
 
 ## 알려진 검증 공백
 
-- routes-plan-executor는 계획이 `draft`라 승인 질문에서 끝난다. 그래서 디스패치 이후(브리프 조립, 실행자 보고 검증, `references/report-template.md` 서식의 사용자 보고)는 이 묶음이 검증하지 못한다. 승인된 계획으로 실행자(Agent 도구)까지 띄우는 케이스는 비용·시간이 커 만들지 않았고, 이전 버전의 비식별화 실행 기록은 참고 자료이며, 보고 서식 분리 이후의 동작 검증을 대신하지 않는다.
+- routes-plan-executor는 계획이 `draft`라 승인 질문에서 끝난다. 디스패치 전(브리프 조립·참조 처리)은 `reference-handling-*` 4케이스가 1회씩 보지만, 샌드박스에 Gradle이 없어 실행자 배정 자체와 디스패치 이후(실행자 보고 검증, `references/report-template.md` 서식의 사용자 보고, 재개 규칙)는 여전히 검증하지 못한다. 실행 완료까지 보는 케이스는 비용·시간이 커 만들지 않았고, 이전 버전의 비식별화 실행 기록은 참고 자료이며, 보고 서식 분리 이후의 동작 검증을 대신하지 않는다.
 - 산출물 채점기는 마지막 메시지나 파일의 정규식·LLM 판정이라 "참고 파일을 읽었는가"(`tool_used: Read`)와 "산출물에 그 규칙의 흔적이 있는가"(파일 정규식)까지만 본다. 규칙을 제대로 적용했는지는 LLM 채점기 없이는 판정하지 않는다.
 
 ## 언제 재는가
