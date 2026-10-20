@@ -63,6 +63,10 @@ bash plugins/be-workflow/evals/assembler-check/run.sh
 claude plugin eval . --tag reference-handling --runs 1 --ablation none --scaffold --trust-plugin --no-publish --allow-tools Write Edit Bash Agent --model fable --keep-temp -j 2 --json evals/results/<이름>.json
 ```
 
+## LLM 채점기를 고칠 때
+
+LLM 채점기(`type: llm`)의 판정은 같은 텍스트·같은 기준·같은 이름의 심판 모델이라도 호출 경로에 따라 달라질 수 있다 — `claude -p`로 부른 심판이 PASS로 본 보고서를 하네스 심판은 FAIL로 본 사례가 있다(CUSTOMIZATIONS 0.1.30 절). 그래서 채점 기준을 고칠 때는 하네스 경로로 확인한다. 고정 텍스트를 픽스처가 `report.md`로 쓰고 채점기를 `focus: { source: file, path: report.md }`로 둔 임시 케이스를 저장소 밖에 만들고, 평가 대상은 아무 작업도 하지 않게 한다. 통과해야 할 보고서와 명백히 떨어져야 할 보고서(조건 하나씩만 어긴 것)를 함께 넣는다. 하네스 심판은 시스템 프롬프트 "You are a strict, terse evaluation judge for coding-agent traces."와 "Respond with exactly one word: PASS or FAIL."로 3회 묻고 과반으로 정한다(CLI 2.1.278 기준).
+
 ## 알려진 검증 공백
 
 - routes-plan-executor는 계획이 `draft`라 승인 질문에서 끝난다. 디스패치 전(브리프 조립·참조 처리)은 `reference-handling-*` 4케이스가 1회씩 보지만, 샌드박스에 Gradle이 없어 실행자 배정 자체와 디스패치 이후(실행자 보고 검증, `references/report-template.md` 서식의 사용자 보고, 재개 규칙)는 여전히 검증하지 못한다. 실행 완료까지 보는 케이스는 비용·시간이 커 만들지 않았고, 이전 버전의 비식별화 실행 기록은 참고 자료이며, 보고 서식 분리 이후의 동작 검증을 대신하지 않는다.
