@@ -1,5 +1,5 @@
 ---
-description: 구현 완료 후 "스펙대로 됐는지 확인해줘" 요청이 spec-conformance-check로 가고, 계획·구현·TDD 스킬로 새지 않는지.
+description: 구현 완료 후 "스펙대로 됐는지 확인해줘" 요청이 spec-conformance-check로 가고, 계획·구현·testing-policy 스킬로 새지 않는지.
 tags: [routing]
 model: sonnet
 max_turns: 25

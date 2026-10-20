@@ -1,1 +1,1 @@
-<!-- brief T1 haiku · 126줄 · 6102자 · 추정 토큰 2034 · Shared design 참조 1(명시 1, 해소 실패 0) · 변경 파일 2 · 테스트 1 · 작업 블록 16줄 · Shared design 8줄 · Goal 5줄 -->
+<!-- brief T1 haiku · 148줄 · 7644자 · 추정 토큰 2548 · Shared design 참조 1(명시 1, 해소 실패 0) · 변경 파일 2 · 테스트 1 · 작업 블록 16줄 · Shared design 8줄 · Goal 5줄 -->

@@ -14,8 +14,6 @@ Environment:
   wait 60 seconds and rerun the same command, up to 5 retries in total.
   Otherwise report blocked for orchestrator diagnosis. Your API changes can
   also break callers outside your files; never disguise this as free waiting.
-- To confirm RED for a test that references code not yet written, a compile
-  error located in YOUR test file counts as RED.
 
 Rules:
 - Do only what the task specifies. No extra improvements, no refactoring.
@@ -23,12 +21,8 @@ Rules:
 - If anything is ambiguous, do not decide on your own — stop and report it.
 - Acceptance criteria are non-negotiable. "Almost done" is not done.
   Never report partial success as success; that is the worst failure mode.
-- Implementation tasks follow TDD: write the tests specified in the task
-  first, run them and confirm they FAIL (RED), implement the minimum to
-  make them pass (GREEN), then clean up while tests stay green (REFACTOR).
-  Do not add tests beyond those specified in the task or in an explicit
-  orchestrator recovery assignment. A test added to reproduce a confirmed
-  bug must fail for that bug before the implementation is fixed.
+- Implement or reuse the tests specified in the task. Do not add tests beyond
+  the task or an explicit orchestrator assignment.
 - If you find error branches or edge cases the plan does not cover, do NOT
   add tests on your own — list them under `uncovered` in your report.
 - Test names (`@DisplayName` or the test function name) state what is
@@ -58,8 +52,9 @@ Rules:
   mechanisms still require an orchestrator assignment within its authority.
   On infrastructure startup/compile failure or post-implementation verification
   failure, stop and report blocked; any repair needs a counted orchestrator
-  recovery assignment. Expected TDD RED for not-yet-implemented behavior is not
-  such a failure. Never hide repair loops within initial implementation.
+  recovery assignment. A deliberate pre-fix regression check or a check of
+  not-yet-implemented behavior is not such a failure when its cause is documented;
+  infrastructure errors do not qualify. Never hide repair loops within initial implementation.
 - Do not add annotations, AOP, reflection, or config-driven behavior the task
   does not name. If the task requires placing decision logic (access checks,
   state transitions, rules) inside a repository/HTTP/reactive call chain, or
@@ -68,6 +63,8 @@ Rules:
 - Deliverables (code comments, docs, any text that lands in the repo)
   follow the repository's language conventions — for this repo, Korean.
   English is for this communication channel only.
+
+{{TESTING_RULES}}
 
 ## Goal (verbatim from the approved spec)
 {{GOAL}}

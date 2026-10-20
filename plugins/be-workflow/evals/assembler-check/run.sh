@@ -18,10 +18,40 @@ grep -q 'BirthYearValidator.java' "$OUT" || { echo "Shared design에 참조 타�
 grep -q 'ProfileService.java' "$OUT" && { echo "Shared design에 참조하지 않은 조각이 들어감"; fail=1; }
 grep -q '^### T1: 검증 상한 수정' "$OUT" || { echo "Your task에 작업 블록이 없음"; fail=1; }
 grep -q 'do NOT work' "$OUT" || { echo "템플릿 규칙(우회 금지)이 없음"; fail=1; }
+# 공유 지침이 실제 브리프에 도달해야 한다. 파일을 링크만 하는 것은 전달이 아니다.
+python3 - "$OUT" "$HERE/../../skills/testing-policy/references/testing-rules.md" <<'PY'
+from pathlib import Path
+import sys
+brief, rules = (Path(p).read_text(encoding="utf-8") for p in sys.argv[1:])
+assert brief.count(rules.strip()) == 1, "공통 테스트 지침 원문이 정확히 한 번 포함돼야 함"
+assert "{{TESTING_RULES}}" not in brief, "미치환 지침 슬롯"
+assert "Implementation tasks follow TDD" not in brief, "기존 TDD 강제가 남음"
+assert "counts as RED" not in brief, "컴파일 오류를 RED로 인정하는 옛 규칙이 남음"
+PY
 echo "$stats" | grep -q '작업 블록 [0-9]*줄 · Shared design [0-9]*줄 · Goal [0-9]*줄' || { echo "통계에 구성 요소별 줄 수가 없음"; fail=1; }
 grep -q '상한 초과' "$OUT.stats" && { echo "최소 픽스처에서 상한 초과 경고가 남"; fail=1; }
 # ---- 탈락해야 하는 입력(Codex 검토 2026-10-20에서 재현한 구멍) ----
 TMP=$(dirname "$OUT")
+# 실행자 템플릿에서 전달 슬롯이 빠지거나 지침이 비면 조립에 실패해야 한다.
+mkdir -p "$TMP/skills/plan-executor/references" "$TMP/skills/testing-policy/references"
+cp "$SCRIPT" "$TMP/skills/plan-executor/references/"
+cp "$HERE/../../skills/plan-executor/references/executor-brief-template.md" "$TMP/skills/plan-executor/references/"
+cp "$HERE/../../skills/testing-policy/references/testing-rules.md" "$TMP/skills/testing-policy/references/"
+for mode in missing-slot empty-rules; do
+  cp "$HERE/../../skills/plan-executor/references/executor-brief-template.md" "$TMP/skills/plan-executor/references/executor-brief-template.md"
+  if [ "$mode" = missing-slot ]; then
+    sed '/{{TESTING_RULES}}/d' "$HERE/../../skills/plan-executor/references/executor-brief-template.md" > "$TMP/skills/plan-executor/references/executor-brief-template.md"
+  else
+    : > "$TMP/skills/testing-policy/references/testing-rules.md"
+  fi
+  if python3 -I "$TMP/skills/plan-executor/references/assemble_brief.py" --spec "$HERE/spec.md" \
+      --plan "$HERE/plan.md" --task T1 --model haiku --worktree /tmp/wt --branch chk \
+      --out "$TMP/b-$mode.md" > "$TMP/b-$mode.stats" 2>&1; then
+    echo "공통 테스트 지침 전달 실패($mode)를 조립기가 통과시킴"; fail=1
+  elif ! grep -Eq 'TESTING_RULES|공통 테스트 지침' "$TMP/b-$mode.stats"; then
+    echo "공통 지침 전달 실패($mode)의 원인이 보고되지 않음"; fail=1
+  fi
+done
 # 스펙 6절 제거 / 제외 소절 제거 → 종료 코드 1, 빠진 절 이름을 보고
 python3 - "$HERE/spec.md" "$TMP" <<'PY'
 import re, sys, pathlib

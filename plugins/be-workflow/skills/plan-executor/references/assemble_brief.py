@@ -41,6 +41,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 TEMPLATE = HERE / "executor-brief-template.md"
+TESTING_RULES = HERE.parents[1] / "testing-policy" / "references" / "testing-rules.md"
 
 # ---- 템플릿 계약 (spec-template.md · plan-template.md · work-plan-template.md와 함께 바뀐다) ----
 # 제목이 바뀌면 여기만 고친다. 템플릿 쪽 해당 제목에는 "assemble_brief.py가 이 제목으로 자른다" 주석이 있다.
@@ -307,9 +308,17 @@ def main():
     sd, found, missing, no_code = shared_design(sec2s, names, explicit)
 
     tpl = TEMPLATE.read_text(encoding="utf-8")
+    if tpl.count("{{TESTING_RULES}}") != 1:
+        print("템플릿에 {{TESTING_RULES}} 슬롯이 정확히 하나 있어야 함", file=sys.stderr)
+        return 1
+    testing_rules = read(TESTING_RULES).strip()
+    if not testing_rules:
+        print("공통 테스트 지침이 비어 있음", file=sys.stderr)
+        return 1
     sd_section = f"## Shared design (verbatim from the approved plan)\n{sd}\n\n" if sd else ""
     brief = (tpl.replace("{{WORKTREE}}", a.worktree).replace("{{BRANCH}}", a.branch)
              .replace("{{GOAL}}", g).replace("{{DO_NOT_TOUCH}}", dnt)
+             .replace("{{TESTING_RULES}}", testing_rules)
              .replace("{{SHARED_DESIGN_SECTION}}", sd_section).replace("{{TASK}}", task))
 
     files = len(re.findall(FILE_ROW, task, re.M))

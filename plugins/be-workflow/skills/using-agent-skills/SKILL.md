@@ -21,13 +21,13 @@ description: 작업에 맞는 진입 스킬을 고르고 모든 스킬에 공통
 ```
 작업 도착
     │
-    ├── 사소한 변경(단일 파일·명확한 범위)? ──→ 워크플로우 생략, 직접 처리 (코드 수정이면 tdd 규율 적용)
+    ├── 사소한 변경(단일 파일·명확한 범위)? ──→ 워크플로우 생략, 직접 처리 (동작 변경이면 testing-policy 적용)
     ├── 요구사항이 모호? ───────────────────→ interview-me
     ├── 요구사항 명확, 스펙 없음? ───────────→ spec-writer          [사람 승인 게이트]
     ├── 승인된 스펙(status: approved) 있음? ─→ task-breakdown       [사람 승인 게이트]
     │   (implemented·superseded 스펙은 기록이다. 새 변경은 spec-writer로 새 스펙을 쓴다)
     ├── 승인된/진행 중 계획 있음? ───────────→ plan-executor
-    ├── 버그·장애? ────────────────────────→ tdd(재현 테스트 먼저) 후 디버깅, 수정 범위 크면 task-breakdown으로 합류
+    ├── 버그·장애? ────────────────────────→ testing-policy로 회귀 검증과 수정, 범위가 크면 task-breakdown으로 합류
     ├── 구현 끝, 스펙 충족 확인 필요? ────────→ spec-conformance-check
     ├── 코드 품질 리뷰? ────────────────────→ code-review-and-quality
     │   ├── 보안 관심사? ──────────────────→ security-and-hardening

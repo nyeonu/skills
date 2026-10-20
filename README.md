@@ -30,7 +30,7 @@ claude plugin install be-workflow@be-agentic-workflow --scope user
 
 | 플러그인 | 내용 | 비고 |
 |---|---|---|
-| `be-workflow` | 워크플로우 코어 스킬 8종 (아래 도식의 파이프라인 전체 + 코드 작성 규율 tdd) | 상호 의존이라 묶음 설치 |
+| `be-workflow` | 워크플로우 코어 스킬 8종 (아래 도식의 파이프라인 전체 + 테스트 지침 testing-policy) | 상호 의존이라 묶음 설치 |
 | `be-review` | 리뷰 스킬 3종 + 페르소나 에이전트 2종 | 단독 사용 가능 |
 | `mcp-context7` | 라이브러리 최신 문서 조회 MCP | 선택. API 키 불필요 |
 | `mcp-atlassian` | Jira·Confluence 원격 MCP | 선택. 첫 사용 시 `/mcp`에서 OAuth 로그인 |
@@ -50,7 +50,7 @@ plugins/
     spec-writer/               # [정의] 코드 기반 스펙 문서화
     task-breakdown/            # [계획] 승인된 스펙 → docs/<티켓 키>/plan.md 분해 (기준→테스트→작업 추적성 매핑)
     plan-executor/             # [실행] 계획 실행 오케스트레이션 (tier 기반 고/저비용 분리)
-    tdd/                       # [실행] 코드 작성 규율 단일 원본 (테스트 먼저, 도출 5출처)
+    testing-policy/            # [공통] 테스트 설계·작성·실행 지침 (작성 순서 자유, 도출 5출처)
     spec-conformance-check/    # [검증] 구현물 ↔ 스펙 독립 검증 (fail-fast 게이트)
     adr-writer/                # [기록] ADR 2시점 기록 (Proposed → Accepted)
   be-review/
@@ -84,7 +84,7 @@ flowchart TD
     done([완료])
     adr1["adr-writer<br>ADR Proposed 작성"]
     adr2["adr-writer<br>ADR Accepted 확정"]
-    tdd["tdd<br>코드 작성 규율"]
+    testing_policy["testing-policy<br>테스트 지침"]
 
     start -->|모호함| interview
     start -->|명확함| spec
@@ -96,8 +96,8 @@ flowchart TD
     gate2 -->|반려| plan
     gate2 -->|승인| exec
     gate2 -.->|되돌리기 비싼<br>결정 포함 시| adr1
-    tdd -.->|테스트 도출 5출처| plan
-    tdd -.->|"RED→GREEN→REFACTOR<br>지시문 주입"| exec
+    testing_policy -.->|테스트 도출 5출처| plan
+    testing_policy -.->|"공통 테스트 지침<br>원문 자동 삽입"| exec
     exec --> verify
     verify -->|FAIL| recovery["원인 진단 · 제한된 복구"]
     recovery -->|허용 범위 · 잔여 회차| exec
@@ -112,10 +112,10 @@ flowchart TD
     style gate2 fill:#f9e2af,color:#000
     style adr1 fill:#cba6f7,color:#000
     style adr2 fill:#cba6f7,color:#000
-    style tdd fill:#a6e3a1,color:#000
+    style testing_policy fill:#a6e3a1,color:#000
 ```
 
-노란 마름모 2곳은 최초 스펙·계획 승인이다. 실행 중에는 제한된 자동 복구를 적용하고, 승인 경계 밖 변경·한도 초과·새 근거 없는 반복만 사람에게 올린다. 보라색은 단계가 아니라 두 시점에 끼어드는 ADR 기록이고, 초록색은 계획(테스트 도출)과 실행(하위 에이전트 지시문)에 주입되는 코드 작성 규율 tdd다.
+노란 마름모 2곳은 최초 스펙·계획 승인이다. 실행 중에는 제한된 자동 복구를 적용하고, 승인 경계 밖 변경·한도 초과·새 근거 없는 반복만 사람에게 올린다. 보라색은 단계가 아니라 두 시점에 끼어드는 ADR 기록이고, 초록색은 계획(테스트 도출)과 실행(하위 에이전트 지시문)에 주입되는 테스트 지침 testing-policy다.
 
 ### 진입점 — 모든 작업이 1번부터 시작하지 않는다
 
@@ -123,11 +123,11 @@ flowchart TD
 - 요구사항은 명확, 스펙 없음 → 2 (spec-writer)
 - 승인된 스펙(`status: approved`) 존재 → 3 (task-breakdown). `implemented`·`superseded` 스펙은 완료된 변경의 기록이라 분해 대상이 아니다
 - 승인된 계획 존재 / 실행 중 계획 존재 → 4 (plan-executor, frontmatter `status`로 재개)
-- 버그·장애 → tdd(재현 테스트 먼저) 후 디버깅, 수정 범위가 크면 3으로 합류
+- 버그·장애 → testing-policy(결함을 검출하는 회귀 테스트)와 디버깅, 수정 범위가 크면 3으로 합류
 - 구현 끝, 스펙 충족 확인 필요 → 5 (spec-conformance-check). 전체 PASS면 스펙 `status`를 `implemented`로 바꾼다
 - 코드 품질·보안·성능 검토 → 6 (be-review 3종)
 - 되돌리기 비싼 결정 기록 → adr-writer (계획 승인 직후 `Proposed`, 스펙 적합성 검증 통과 후 `Accepted`)
-- 사소한 변경(단일 파일, 명확한 범위) → 워크플로우 생략, 직접 처리 (코드 수정이면 tdd 규율 적용)
+- 사소한 변경(단일 파일, 명확한 범위) → 워크플로우 생략, 직접 처리 (동작 변경이면 testing-policy 적용)
 
 진행 상태의 단일 원본은 `docs/<티켓 키>/spec.md`·`plan.md` frontmatter의 `status`다. 세션이 끊겨도 문서 상태를 읽으면 중단 지점부터 잇는다.
 
@@ -141,6 +141,12 @@ flowchart TD
 4. 계획 밖 병렬 실행은 읽기 전용 작업(검토)에만. 코드 수정은 반드시 계획 루프를 통한다. 승인된 계획 안에서 `depends_on` 없는 작업을 plan-executor가 병렬 실행하는 것은 계획 승인에 포함된 병렬성이다.
 5. 단일 환경 진행: 작업 시작 시 Cowork/CLI 중 하나를 정하고 끝까지 그 환경에서. 산출물이 전부 레포 안(`docs/`)이라 다음 작업은 다른 환경에서 시작해도 된다. 요구사항 소스가 외부 채널(기획서·메신저) 중심이면 Cowork, 코드 중심이면 CLI가 유리하다.
 
+
+### 테스트 지침 (be-workflow 0.1.31)
+
+`testing-policy`가 테스트 설계·작성·실행 기준을 제공한다. 계획 단계에서 변경 기능·주요 로직·관련 조건의 검증 기준을 정하고, 실행자 브리프에는 공통 지침 원문을 자동 삽입한다. 완료 시 실제 테스트·실행 결과를 대조한다. 테스트와 구현의 작성 순서나 작성자 분리는 강제하지 않는다. 기존 테스트 재사용을 허용하며, 버그는 결함을 구별하는 회귀 테스트와 가능한 경우 수정 전후 확인으로 검증한다. 구현 중 발견한 누락은 보고하고 승인 범위 안에서 보완한다.
+
+기존 `tdd` 스킬은 `testing-policy`로 교체했다. 직접 호출이나 개인 지침에서 `tdd`를 참조했다면 새 이름으로 바꾼다. 과거 TDD 평가 결과는 새 지침의 결함·시간·비용 효과를 입증하지 않는다.
 
 ### 제한된 자동 복구 (be-workflow 0.1.17)
 
@@ -158,7 +164,7 @@ flowchart TD
 
 ## 평가
 
-플러그인마다 `evals/`에 `claude plugin eval` 케이스가 있다 (be-review 3개, be-workflow 9개: 스킬마다 라우팅 케이스 하나씩 + 설정 값 변경에 tdd가 발동하지 않는지 보는 경계 케이스. 그 밖에 be-workflow에는 API 비용 없이 도는 브리프 조립기 고정 점검 `evals/assembler-check/run.sh`가 있다). 플러그인 루트에서 아래를 돌리면 플러그인 있음/없음 두 arm을 3회씩 실행해 점수 차이(Δ)를 보고한다. 케이스 목록과 각 케이스가 재는 것은 각 플러그인의 `evals/README.md`에 있다. 원시 결과(`evals/results/`)는 커밋하지 않고, 보관할 결과 JSON은 `evals/history/`에 단계별 이름으로 두고 색인에 적는다.
+플러그인마다 `evals/`에 `claude plugin eval` 케이스가 있다 (be-review 3개, be-workflow 9개: 스킬마다 라우팅 케이스 하나씩 + 설정 값 변경에 testing-policy가 발동하지 않는지 보는 경계 케이스. 그 밖에 be-workflow에는 API 비용 없이 도는 브리프 조립기 고정 점검 `evals/assembler-check/run.sh`가 있다). 플러그인 루트에서 아래를 돌리면 플러그인 있음/없음 두 arm을 3회씩 실행해 점수 차이(Δ)를 보고한다. 케이스 목록과 각 케이스가 재는 것은 각 플러그인의 `evals/README.md`에 있다. 원시 결과(`evals/results/`)는 커밋하지 않고, 보관할 결과 JSON은 `evals/history/`에 단계별 이름으로 두고 색인에 적는다.
 
 ```bash
 claude plugin eval . --scaffold --trust-plugin --no-publish
@@ -166,7 +172,7 @@ claude plugin eval . --scaffold --trust-plugin --no-publish
 
 ## 출처
 
-- addyosmani/agent-skills (MIT): interview-me 원본, spec-writer·task-breakdown·tdd의 방법론, review 3종·페르소나 번역 원문
+- addyosmani/agent-skills (MIT): interview-me 원본, spec-writer·task-breakdown·testing-policy의 초기 방법론, review 3종·페르소나 번역 원문
 - 기존 plan-writer/plan-executor/adr-writer: 포맷 계약과 오케스트레이션 구조
 
 원본에서 무엇을 왜 바꿨는지는 [CUSTOMIZATIONS.md](CUSTOMIZATIONS.md)에 기록되어 있다.

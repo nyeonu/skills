@@ -175,7 +175,7 @@ spec: spec.md
 spec_rev: ${SPEC_REV}
 tasks:
   - id: T1
-    title: ProfileRequest에 bio 필드와 BioValidator 추가 (테스트 먼저)
+    title: ProfileRequest에 bio 필드와 BioValidator 추가 (동작 검증 포함)
     depends_on: []
     status: pending
     tier: standard
@@ -225,7 +225,7 @@ bio 길이 검증은 BirthYearValidator와 같은 모양의 \`BioValidator.valid
 
 ## 6. 작업
 
-### T1. ProfileRequest에 bio 필드와 BioValidator 추가 (테스트 먼저)
+### T1. ProfileRequest에 bio 필드와 BioValidator 추가 (동작 검증 포함)
 
 - 대상 파일: ProfileRequest.java, BioValidator.java(신규), BioValidatorTest.java(신규)
 - 작업 내용: record에 \`String bio\` 추가, 기존 2인자 생성자 유지. BioValidator.validate는 null 허용, 201자 이상이면 InvalidRequestException(-3).
